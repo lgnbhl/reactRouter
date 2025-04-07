@@ -54,7 +54,7 @@ when users clicks on a new page.
 
 ``` r
 # in the server
-# reload session when user clicks on new paeg
+# reload session when user clicks on new page
 observeEvent(c(input$page_1, input$page_2), {
   session$reload()
 })
@@ -259,8 +259,8 @@ shinyApp(ui, server)
 ### Usage with Quarto
 
 Thanks to the client side routing provided by React Router, you can also
-create multiple pages in your Quarto / Rmarkdown documents (as no server
-is required).
+create multiple pages in your Quarto and Rmarkdown documents (as no
+server is required).
 
 TODO: create Quarto example.
 
