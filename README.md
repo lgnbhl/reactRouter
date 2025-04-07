@@ -7,6 +7,10 @@
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/shinyReactRouter)](https://CRAN.R-project.org/package=shinyReactRouter)
+[![R-CMD-check](https://github.com/lgnbhl/shinyReactRouter/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/lgnbhl/shinyReactRouter/actions/workflows/R-CMD-check.yaml)
+
 <!-- badges: end -->
 
 The goal of **shinyReactRouter** is to provide a wrapper around [React
