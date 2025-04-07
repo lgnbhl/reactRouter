@@ -1,0 +1,7 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^js$
+^README\.Rmd$
+^LICENSE\.md$
+_\.new\.png$
+^\.github$
