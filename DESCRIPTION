@@ -1,13 +1,13 @@
 Package: shinyReactRouter
 Type: Package
-Title: 'React Router' for 'shiny' Apps and 'quarto'
+Title: 'React Router' for 'shiny' Apps and 'Quarto'
 Version: 0.1.0
 Authors@R: c(
     person(given = "Felix", family = "Luginbuhl", role = c("aut", "cre"), email = "felix.luginbuhl@protonmail.ch"),
     person(family = "Shopify Inc.", role = c("ctb", "cph"), comment = "Shopify Inc. template <https://reactrouter.com/>")
     )
 Maintainer: Felix Luginbuhl <felix.luginbuhl@protonmail.ch>
-Description: Using a router in 'shiny' and 'quarto' with the 'react-router-dom' 
+Description: Using a router in 'shiny' and 'Quarto' with the 'react-router-dom' 
     'React Router' library.
 License: MIT + file LICENSE
 Encoding: UTF-8
