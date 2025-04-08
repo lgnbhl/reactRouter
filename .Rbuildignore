@@ -5,3 +5,5 @@
 ^LICENSE\.md$
 _\.new\.png$
 ^\.github$
+^_pkgdown.yml
+^pkgdown
