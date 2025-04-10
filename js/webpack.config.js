@@ -5,7 +5,7 @@ const config = {
   entry: './src/index.js',
   mode: 'production',
   output: {
-    path: path.join(__dirname, '..', 'inst', 'shinyReactRouter-6.30.0'),
+    path: path.join(__dirname, '..', 'inst', 'reactRouter-6.30.0'),
     filename: 'react-router-dom.js',
   },
   resolve: { extensions: ['.js', '.jsx', '.ts', '.tsx'] },

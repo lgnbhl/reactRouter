@@ -2,7 +2,7 @@ input <- function(name) {
   function(inputId, ...) {
     checkmate::assert_string(inputId)
     shiny.react::reactElement(
-      module = "@/shinyReactRouter",
+      module = "@/reactRouter",
       name = name,
       props = shiny.react::asProps(inputId = inputId, ...),
       deps = reactRouterDependency()

@@ -1,27 +1,27 @@
 library(shiny)
 
 ui <- fluidPage(
-  shinyReactRouter::HashRouter(
-    shinyReactRouter::NavLink.shinyInput(
+  reactRouter::HashRouter(
+    reactRouter::NavLink.shinyInput(
       inputId = "NavLinkHome",
       to = "/",
       "Home"
     ),
     div(),
-    shinyReactRouter::NavLink.shinyInput(
+    reactRouter::NavLink.shinyInput(
       inputId = "NavLinkPage",
       to = "page",
       "Page"
     ),
     hr(),
-    shinyReactRouter::Routes(
-      shinyReactRouter::Route(
+    reactRouter::Routes(
+      reactRouter::Route(
         path = "/",
         element = div(
           uiOutput(outputId = "outputHome")
         )
       ),
-      shinyReactRouter::Route(
+      reactRouter::Route(
         path = "page",
         element = div(
           uiOutput(outputId = "outputPage")

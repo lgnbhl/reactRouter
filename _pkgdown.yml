@@ -1,4 +1,4 @@
-url: https://felixluginbuhl.com/shinyReactRouter
+url: https://felixluginbuhl.com/reactRouter
 template:
   bootstrap: 5
   bootswatch: litera
@@ -25,6 +25,6 @@ navbar:
    - icon: fa-twitter
      href: https://twitter.com/FelixLuginbuhl
    - icon: fa-github
-     href: https://github.com/lgnbhl/shinyReactRouter
+     href: https://github.com/lgnbhl/reactRouter
    - icon: fa-home
      href: http://felixluginbuhl.com

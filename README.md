@@ -1,19 +1,19 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# shinyReactRouter
+# reactRouter
 
 <!-- badges: start -->
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN
-status](https://www.r-pkg.org/badges/version/shinyReactRouter)](https://CRAN.R-project.org/package=shinyReactRouter)
-[![R-CMD-check](https://github.com/lgnbhl/shinyReactRouter/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/lgnbhl/shinyReactRouter/actions/workflows/R-CMD-check.yaml)
+status](https://www.r-pkg.org/badges/version/reactRouter)](https://CRAN.R-project.org/package=reactRouter)
+[![R-CMD-check](https://github.com/lgnbhl/reactRouter/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/lgnbhl/reactRouter/actions/workflows/R-CMD-check.yaml)
 
 <!-- badges: end -->
 
-The goal of **shinyReactRouter** is to provide a wrapper around [React
+The goal of **reactRouter** is to provide a wrapper around [React
 Router (v6)](https://reactrouter.com/6.30.0).
 
 ### Usage
@@ -21,7 +21,7 @@ Router (v6)](https://reactrouter.com/6.30.0).
 You can now add URL pages like so:
 
 ``` r
-library(shinyReactRouter)
+library(reactRouter)
 
 HashRouter(
   NavLink(to = "/", "Main"),
@@ -35,10 +35,10 @@ HashRouter(
 
 ### Install
 
-Install **shinyReactRouter** like so:
+Install **reactRouter** like so:
 
 ``` r
-remotes::install_github("lgnbhl/shinyReactRouter")
+remotes::install_github("lgnbhl/reactRouter")
 ```
 
 ### Usage with R Shiny
@@ -66,29 +66,29 @@ But for more advanced apps it is recommended to reload the session.
 Below a simple example using R Shiny:
 
 ``` r
-library(shinyReactRouter)
+library(reactRouter)
 library(shiny)
 library(DT)
 
 ui <- fluidPage(
-  shinyReactRouter::HashRouter(
-    titlePanel("shinyReactRouter"),
+  reactRouter::HashRouter(
+    titlePanel("reactRouter"),
     sidebarLayout(
       sidebarPanel(
-        shinyReactRouter::NavLink.shinyInput(
+        reactRouter::NavLink.shinyInput(
           inputId = "page_home",
           to = "/",
           style = JS('({isActive}) => { return isActive ? {color: "red", textDecoration:"none"} : {}; }'),
           "Home"),
         br(),
-        shinyReactRouter::NavLink.shinyInput(
+        reactRouter::NavLink.shinyInput(
           inputId = "page_analysis",
           to = "/analysis",
           style = JS('({isActive}) => { return isActive ? {color: "red", textDecoration: "none"} : {}; }'),
           "Analysis"
         ),
         br(),
-        shinyReactRouter::NavLink.shinyInput(
+        reactRouter::NavLink.shinyInput(
           inputId = "page_about",
           to = "/about",
           style = JS('({ isActive }) => { return isActive ? { color: "red", textDecoration: "none" } : {}; }'),
@@ -96,29 +96,29 @@ ui <- fluidPage(
         )
       ),
       mainPanel(
-        shinyReactRouter::Routes(
-          shinyReactRouter::Route(
+        reactRouter::Routes(
+          reactRouter::Route(
             path = "/",
             element = div(
               tags$h1("Home page"),
-              tags$h4("A basic example of shinyReactRouter."),
+              tags$h4("A basic example of reactRouter."),
               uiOutput(outputId = "contentHome")
             )
           ),
-          shinyReactRouter::Route(
+          reactRouter::Route(
             path = "/analysis",
             element = div(
               tags$h1("Analysis"),
               DT::DTOutput("table")
               )
           ),
-          shinyReactRouter::Route(
+          reactRouter::Route(
             path = "/about",
             element = div(
               uiOutput(outputId = "contentAbout")
             )
           ),
-          shinyReactRouter::Route(path = "*", element = div(tags$p("Error 404")))
+          reactRouter::Route(path = "*", element = div(tags$p("Error 404")))
         )
       )
     )
@@ -161,18 +161,18 @@ Below an example using MUI Material UI components from the
 # remotes::install_github("lgnbhl/shinyMaterialUI")
 library(shiny)
 library(shinyMaterialUI)
-library(shinyReactRouter)
+library(reactRouter)
 
 
 ui <- shinyMaterialUIPage(
-  shinyReactRouter::HashRouter(
+  reactRouter::HashRouter(
     CssBaseline(
-    Typography("shinyReactRouter with shinyMaterialUI", variant = "h5", m = 2),
+    Typography("reactRouter with shinyMaterialUI", variant = "h5", m = 2),
     Stack(
       direction = "row", spacing = 2, p = 2,
       Paper(
         MenuList(
-          shinyReactRouter::NavLink.shinyInput(
+          reactRouter::NavLink.shinyInput(
             inputId = "page_home",
             to = "/",
             style = JS('({isActive}) => { return isActive ? {color: "red", textDecoration:"none"} : { textDecoration: "none" }; }'),
@@ -181,7 +181,7 @@ ui <- shinyMaterialUIPage(
             )
           ),
           br(),
-          shinyReactRouter::NavLink.shinyInput(
+          reactRouter::NavLink.shinyInput(
             inputId = "page_analysis",
             to = "/analysis",
             style = JS('({isActive}) => { return isActive ? {color: "red", textDecoration: "none"} : { textDecoration: "none" }; }'),
@@ -190,7 +190,7 @@ ui <- shinyMaterialUIPage(
             )
           ),
           br(),
-          shinyReactRouter::NavLink.shinyInput(
+          reactRouter::NavLink.shinyInput(
             inputId = "page_about",
             to = "/about",
             style = JS('({ isActive }) => { return isActive ? { color: "red", textDecoration: "none" } : { textDecoration: "none" }; }'),
@@ -201,27 +201,27 @@ ui <- shinyMaterialUIPage(
         )
       ),
       Box(
-        shinyReactRouter::Routes(
-          shinyReactRouter::Route(
+        reactRouter::Routes(
+          reactRouter::Route(
             path = "/",
             element = div(
               tags$h1("Home page"),
-              tags$h4("A basic example of shinyReactRouter with shinyMaterialUI."),
+              tags$h4("A basic example of reactRouter with shinyMaterialUI."),
               uiOutput(outputId = "contentHome")
             )
           ),
-          shinyReactRouter::Route(
+          reactRouter::Route(
             path = "/analysis",
             element = div(
               tags$h1("Analysis"),
               uiOutput(outputId = "contentAnalysis")
               )
           ),
-          shinyReactRouter::Route(
+          reactRouter::Route(
             path = "/about",
             element = uiOutput(outputId = "contentAbout")
           ),
-          shinyReactRouter::Route(path = "*", element = div(tags$p("Error 404")))
+          reactRouter::Route(path = "*", element = div(tags$p("Error 404")))
         )
       )
     )
@@ -265,7 +265,7 @@ server is required).
 TODO: create Quarto example.
 
 ``` r
-library(shinyReactRouter)
+library(reactRouter)
 
 HashRouter(
   NavLink(to = "/", "Main"),
@@ -279,7 +279,7 @@ HashRouter(
 
 ### Usage with Shiny modules
 
-shinyReactRouter usage with shiny modules is not tested yet.
+reactRouter usage with shiny modules is not tested yet.
 
 ### Alternatives
 
@@ -291,7 +291,7 @@ shinyReactRouter usage with shiny modules is not tested yet.
 
 ### More information
 
-shinyReactRouter implements React Router
+reactRouter implements React Router
 [v.6.30.0](https://reactrouter.com/6.30.0).
 
 More info about how to use React Router can be found in the [official

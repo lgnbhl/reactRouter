@@ -2,6 +2,6 @@ import * as Inputs from './inputs';
 
 window.jsmodule = {
   ...window.jsmodule,
-  '@/shinyReactRouter': { ...Inputs },
+  '@/reactRouter': { ...Inputs },
   'react-router-dom': require('react-router-dom'),
 };

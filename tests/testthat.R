@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(shinyReactRouter)
+library(reactRouter)
 
-test_check("shinyReactRouter")
+test_check("reactRouter")

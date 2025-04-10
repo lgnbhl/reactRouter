@@ -1,4 +1,4 @@
-Package: shinyReactRouter
+Package: reactRouter
 Type: Package
 Title: 'React Router' for 'shiny' Apps and 'Quarto'
 Version: 0.1.0
@@ -22,6 +22,6 @@ Suggests:
     chromote (>= 0.1.1.9001),
     shinytest2
 RoxygenNote: 7.3.2
-URL: https://felixluginbuhl.com/shinyReactRouter
-BugReports: https://github.com/lgnbhl/shinyReactRouter/issues
+URL: https://felixluginbuhl.com/reactRouter
+BugReports: https://github.com/lgnbhl/reactRouter/issues
 Config/testthat/edition: 3
