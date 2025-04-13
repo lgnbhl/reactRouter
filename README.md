@@ -10,11 +10,10 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 [![CRAN
 status](https://www.r-pkg.org/badges/version/reactRouter)](https://CRAN.R-project.org/package=reactRouter)
 [![R-CMD-check](https://github.com/lgnbhl/reactRouter/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/lgnbhl/reactRouter/actions/workflows/R-CMD-check.yaml)
-
 <!-- badges: end -->
 
-The goal of **reactRouter** is to provide a wrapper around [React
-Router (v6)](https://reactrouter.com/6.30.0).
+The goal of **reactRouter** is to provide a wrapper around [React Router
+(v6)](https://reactrouter.com/6.30.0).
 
 ### Usage
 
@@ -43,26 +42,6 @@ remotes::install_github("lgnbhl/reactRouter")
 
 ### Usage with R Shiny
 
-In order to render objects from the server, you should observe user
-clicks on each page produced by `NavLink.shinyInput()` (learn more about
-**shiny.react** `*.shinyInput` wrappers
-[here](https://appsilon.github.io/shiny.react/articles/shiny-react.html#creating-input-wrappers)).
-
-It is **strongly** recommended to reload the session using the
-`observeEvent({})` function to ensure server objects renders properly
-when users clicks on a new page.
-
-``` r
-# in the server
-# reload session when user clicks on new page
-observeEvent(c(input$page_1, input$page_2), {
-  session$reload()
-})
-```
-
-For simple apps, wrapping the server R code in `observe({})` also works.
-But for more advanced apps it is recommended to reload the session.
-
 Below a simple example using R Shiny:
 
 ``` r
@@ -75,21 +54,18 @@ ui <- fluidPage(
     titlePanel("reactRouter"),
     sidebarLayout(
       sidebarPanel(
-        reactRouter::NavLink.shinyInput(
-          inputId = "page_home",
+        reactRouter::NavLink(
           to = "/",
           style = JS('({isActive}) => { return isActive ? {color: "red", textDecoration:"none"} : {}; }'),
           "Home"),
         br(),
-        reactRouter::NavLink.shinyInput(
-          inputId = "page_analysis",
+        reactRouter::NavLink(
           to = "/analysis",
           style = JS('({isActive}) => { return isActive ? {color: "red", textDecoration: "none"} : {}; }'),
           "Analysis"
         ),
         br(),
-        reactRouter::NavLink.shinyInput(
-          inputId = "page_about",
+        reactRouter::NavLink(
           to = "/about",
           style = JS('({ isActive }) => { return isActive ? { color: "red", textDecoration: "none" } : {}; }'),
           "About"
@@ -126,26 +102,17 @@ ui <- fluidPage(
 )
 
 server <- function(input, output, session) {
-  
-  # reload session when user clicks on new page
-  # observeEvent(c(input$page_home, input$page_analysis, input$page_about), {
-  #   session$reload()
-  # })
-  
-  # all R code in an observer
-  observe({
-    output$contentHome <- renderUI({
-      p("Content home")
-    })
-    output$table <- renderDT({
-      data.frame(x = c(1, 2), y = c(3, 4))
-    })
-    output$contentAbout <- renderUI({
-      div(
-        tags$h1("About"),
-        p("Content about")
-      )
-    })
+  output$contentHome <- renderUI({
+    p("Content home")
+  })
+  output$table <- renderDT({
+    data.frame(x = c(1, 2), y = c(3, 4))
+  })
+  output$contentAbout <- renderUI({
+    div(
+      tags$h1("About"),
+      p("Content about")
+    )
   })
 }
 
@@ -164,16 +131,14 @@ library(shinyMaterialUI)
 library(reactRouter)
 
 
-ui <- shinyMaterialUIPage(
-  reactRouter::HashRouter(
+ui <- reactRouter::HashRouter(
     CssBaseline(
     Typography("reactRouter with shinyMaterialUI", variant = "h5", m = 2),
     Stack(
       direction = "row", spacing = 2, p = 2,
       Paper(
         MenuList(
-          reactRouter::NavLink.shinyInput(
-            inputId = "page_home",
+          reactRouter::NavLink(
             to = "/",
             style = JS('({isActive}) => { return isActive ? {color: "red", textDecoration:"none"} : { textDecoration: "none" }; }'),
             MenuItem(
@@ -181,8 +146,7 @@ ui <- shinyMaterialUIPage(
             )
           ),
           br(),
-          reactRouter::NavLink.shinyInput(
-            inputId = "page_analysis",
+          reactRouter::NavLink(
             to = "/analysis",
             style = JS('({isActive}) => { return isActive ? {color: "red", textDecoration: "none"} : { textDecoration: "none" }; }'),
             MenuItem(
@@ -190,8 +154,7 @@ ui <- shinyMaterialUIPage(
             )
           ),
           br(),
-          reactRouter::NavLink.shinyInput(
-            inputId = "page_about",
+          reactRouter::NavLink(
             to = "/about",
             style = JS('({ isActive }) => { return isActive ? { color: "red", textDecoration: "none" } : { textDecoration: "none" }; }'),
             MenuItem(
@@ -225,35 +188,71 @@ ui <- shinyMaterialUIPage(
         )
       )
     )
+  )
+)
+
+server <- function(input, output, session) {
+  output$contentHome <- renderUI({
+    p("Content home")
+  })
+  output$contentAnalysis <- renderUI({
+    p("Content analysis")
+  })
+  output$contentAbout <- renderUI({
+    div(
+      tags$h1("About"),
+      p("Content about")
+    )
+  })
+}
+
+shinyApp(ui, server)
+```
+
+### Propagation issue
+
+It seems that {shiny} doesn’t show the content of a different route if
+the structure of the `element` argument is identical in both routes. In
+case the `element` structure is similar, you can refresh the session
+each time the user click on a router link by observing the
+`NavLink.shinyInput()` input in the session.
+
+``` r
+library(shiny)
+library(reactRouter)
+
+ui <- HashRouter(
+  NavLink.shinyInput(inputId = "linkMain", to = "/", "Main"), br(),
+  NavLink.shinyInput(inputId = "linkOther", to = "/other", "Other"),
+  Routes(
+    Route(
+      path = "/", 
+      element = div(uiOutput(outputId = "contentMain"))
+    ),
+    Route(
+      path = "/other", 
+      element = div(
+        # A different HTML structure will make this route visible on user click
+        #h1("Other"), # only a different structure makes Shiny execute / render this route
+        uiOutput(outputId = "contentOther")
+      )
     )
   )
 )
 
 server <- function(input, output, session) {
-  
-  # reload session when user clicks on new page
-  # observeEvent(c(input$page_home, input$page_analysis, input$page_about), {
-  #   session$reload()
-  # })
-  
-  # all R code in an observer
-  observe({ 
-    output$contentHome <- renderUI({
-      p("Content home")
-    })
-    output$contentAnalysis <- renderUI({
-      p("Content analysis")
-    })
-    output$contentAbout <- renderUI({
-      div(
-        tags$h1("About"),
-        p("Content about")
-      )
-    })
+  # NOTE: please contact me if you know a way to refresh output content without reloading the session :)
+  # reload session when user clicks on new page to refresh output content
+  observeEvent(c(input$linkMain, input$linkOther), {
+    session$reload()
   })
+  output$contentMain <- renderUI( { p("Content home") } )
+  output$contentOther <- renderUI( { p("New content") })
 }
 
-shinyApp(ui, server)
+if (interactive()) {
+  shinyApp(ui = ui, server = server)
+}
 ```
 
 ### Usage with Quarto
