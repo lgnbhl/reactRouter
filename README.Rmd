@@ -302,10 +302,10 @@ shinyApp(ui, server)
 
 ### Propagation issue
 
-It seems that {shiny} doesn't update the content of a different route if the structure
-of the `element` argument is identical in both routes. In case the `element` structure is similar,
-you can refresh the session each time the user click on a router link by observing
-the `NavLink.shinyInput()` input in the session.
+It seems that {shiny} doesn’t show the content of a different route if the structure of the `element` argument is identical in both routes. This is an issue if multiple pages share the same HTML structure. More examples of this issue are given [here](https://github.com/lgnbhl/reactRouter/issues/1).
+
+A possible workaround, in case the element argument structure is similar, is to refresh the session each time the user click on a router link by observing the `NavLink.shinyInput()` input in the session.
+
 
 ```r
 library(shiny)
@@ -330,8 +330,8 @@ ui <- HashRouter(
   )
 )
 
+# NOTE: please contact me if you know a way to refresh output content without reloading the session.
 server <- function(input, output, session) {
-  # NOTE: please contact me if you know a way to refresh output content without reloading the session :)
   # reload session when user clicks on new page to refresh output content
   # observeEvent(c(input$linkMain, input$linkOther), {
   #   session$reload()
@@ -344,6 +344,44 @@ if (interactive()) {
   shinyApp(ui = ui, server = server)
 }
 ```
+
+Another solution is to render all the UI from the server.
+
+```r
+library(shiny)
+library(reactRouter)
+
+ui <- uiOutput(outputId = "main")
+
+# NOTE: please contact me if you know a way to refresh output content without reloading the session.
+server <- function(input, output, session) {
+  output$main <- renderUI({
+    HashRouter(
+      NavLink.shinyInput(inputId = "linkMain", to = "/", "Main"), br(),
+      NavLink.shinyInput(inputId = "linkOther", to = "/other", "Other"),
+      Routes(
+        Route(
+          path = "/", 
+          element = p("Content home")
+        ),
+        Route(
+          path = "/other", 
+          element = div(
+            # A different HTML structure will make this route visible on user click
+            #h1("Other"), # only a different structure makes Shiny execute / render this route
+            p("New content")
+          )
+        )
+      )
+    )
+  })
+}
+
+if (interactive()) {
+  shinyApp(ui = ui, server = server)
+}
+```
+
 
 ### Usage with Shiny modules
 
