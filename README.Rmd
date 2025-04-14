@@ -353,7 +353,6 @@ library(reactRouter)
 
 ui <- uiOutput(outputId = "main")
 
-# NOTE: please contact me if you know a way to refresh output content without reloading the session.
 server <- function(input, output, session) {
   output$main <- renderUI({
     HashRouter(
@@ -367,8 +366,6 @@ server <- function(input, output, session) {
         Route(
           path = "/other", 
           element = div(
-            # A different HTML structure will make this route visible on user click
-            #h1("Other"), # only a different structure makes Shiny execute / render this route
             p("New content")
           )
         )
