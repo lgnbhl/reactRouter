@@ -26,6 +26,13 @@ component <- function(name, module = 'react-router-dom') {
 #' @export
 HashRouter <- component('HashRouter')
 
+#' MemoryRouter
+#' @rdname MemoryRouter
+#' @description \url{https://reactrouter.com/6.30.0/router-components/memory-router}
+#' @param ... Props to pass to element.
+#' @export
+MemoryRouter <- component('MemoryRouter')
+
 #' Route
 #' @rdname Route
 #' @description \url{https://reactrouter.com/6.30.0/components/route}
@@ -39,6 +46,13 @@ Route <- component('Route')
 #' @param ... Props to pass to element.
 #' @export
 Link <- component('Link')
+
+#' Navigate
+#' @rdname Navigate
+#' @description \url{https://reactrouter.com/6.30.0/components/navigate}
+#' @param ... Props to pass to element.
+#' @export
+Navigate <- component('Navigate')
 
 #' NavLink
 #' @rdname NavLink
