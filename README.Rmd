@@ -300,15 +300,77 @@ shinyApp(ui, server)
 
 ### Propagation issue
 
-It seems that {shiny} doesn’t show the content of a different route if the structure of the `element` argument is identical in both routes. This is an issue if multiple pages share the same HTML structure. More examples of this issue are given [here](https://github.com/lgnbhl/reactRouter/issues/1).
-
-A possible workaround, in case the element argument structure is similar, is to refresh the session each time the user click on a router link by observing the `NavLink.shinyInput()` input in the session.
-
+If pages have the same HTML structure, Shiny will not update the content of the page rendered in the server when clicking on the page link.
 
 ```{r}
-# https://github.com/rstudio/shiny/issues/3877#issuecomment-1688864991
-# https://unleash-shiny.rinterface.com/shiny-input-system#input-binding
+library(shiny)
+library(reactRouter)
 
+ui <- HashRouter(
+  NavLink.shinyInput(inputId = "linkMain", to = "/", "Main"), br(),
+  NavLink.shinyInput(inputId = "linkOther", to = "/other", "Other"),
+  Routes(
+    Route(
+      path = "/", 
+      element = div(uiOutput(outputId = "contentMain"))
+    ),
+    Route(
+      path = "/other", 
+      element = div(uiOutput(outputId = "contentOther"))
+    )
+  )
+)
+
+server <- function(input, output, session) {
+  output$contentMain <- renderUI( { p("Content home") } )
+  output$contentOther <- renderUI( { p("New content") })
+}
+
+if (interactive()) {
+  shinyApp(ui = ui, server = server)
+}
+```
+
+A simple workaround it to be sure each of your Shiny pages have a different HTML structure.
+
+```{r}
+library(shiny)
+library(reactRouter)
+
+ui <- HashRouter(
+  NavLink.shinyInput(inputId = "linkMain", to = "/", "Main"), br(),
+  NavLink.shinyInput(inputId = "linkOther", to = "/other", "Other"),
+  Routes(
+    Route(
+      path = "/", 
+      element = div(uiOutput(outputId = "contentMain"))
+    ),
+    Route(
+      path = "/other", 
+      element = div(
+        # add title to have a different HTML structure
+        h1("NOW VISIBLE"),
+        uiOutput(outputId = "contentOther")
+      )
+    )
+  )
+)
+
+server <- function(input, output, session) {
+  output$contentMain <- renderUI( { p("Content home") } )
+  output$contentOther <- renderUI( { p("New content") })
+}
+
+if (interactive()) {
+  shinyApp(ui = ui, server = server)
+}
+```
+
+Another workaround is to reload the session when clicking on a page link using `NavLink.shinyInput()` instead of `NavLink()`. This is equivalent to clicking on the refresh button of your browser.
+
+This solution has multiple downsides, in particular loose all current session objects when reloading the session.
+
+```r
 library(shiny)
 library(reactRouter)
 
@@ -331,9 +393,9 @@ ui <- HashRouter(
   )
 )
 
-# NOTE: please contact me if you know a way to refresh output content without reloading the session.
 server <- function(input, output, session) {
-  # reload session when user clicks on new page to refresh output content
+  # Reload session when user clicks on new page to refresh output content.
+  # It is equivalent to click on the refresh button in the browser.
   # observeEvent(c(input$linkMain, input$linkOther), {
   #   session$reload()
   # })
@@ -346,7 +408,7 @@ if (interactive()) {
 }
 ```
 
-Another solution is to render all the UI from the server.
+A third workaround is to render all the UI from the server.
 
 ```r
 library(shiny)
@@ -380,6 +442,7 @@ if (interactive()) {
 }
 ```
 
+More examples of this issue are given [here](https://github.com/lgnbhl/reactRouter/issues/1). Please contact me if you have a solution to this issue.
 
 ### Usage with Shiny modules
 
