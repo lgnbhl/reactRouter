@@ -302,7 +302,7 @@ shinyApp(ui, server)
 
 If pages have the same HTML structure, Shiny will not update the content of the page rendered in the server when clicking on the page link.
 
-```{r}
+```r
 library(shiny)
 library(reactRouter)
 
@@ -333,7 +333,7 @@ if (interactive()) {
 
 A simple workaround it to be sure each of your Shiny pages have a different HTML structure.
 
-```{r}
+```r
 library(shiny)
 library(reactRouter)
 
