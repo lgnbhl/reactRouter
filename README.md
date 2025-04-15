@@ -48,8 +48,8 @@ As React Router provides client routing, you can easily create multiple
 routes in a Quarto and R markdown documents:
 
 ``` r
-# to run an a Quarto document
-# example from: https://github.com/remix-run/react-router/tree/dev/examples/basic
+# code to run in a Quarto document
+# example adapted from: https://github.com/remix-run/react-router/tree/dev/examples/basic
 library(htmltools)
 library(reactRouter)
 
@@ -308,6 +308,9 @@ similar, is to refresh the session each time the user click on a router
 link by observing the `NavLink.shinyInput()` input in the session.
 
 ``` r
+# https://github.com/rstudio/shiny/issues/3877#issuecomment-1688864991
+# https://unleash-shiny.rinterface.com/shiny-input-system#input-binding
+
 library(shiny)
 library(reactRouter)
 
