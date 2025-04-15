@@ -333,7 +333,7 @@ if (interactive()) {
 }
 ```
 
-A simple workaround is have a different HTML structure for each page.
+A simple workaround is to have a different HTML structure for each page.
 
 ```r
 library(shiny)
