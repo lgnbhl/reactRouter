@@ -295,10 +295,12 @@ server <- function(input, output, session) {
 shinyApp(ui, server)
 ```
 
-### Propagation issue
+### Server side rendering issue
 
-If pages have the same HTML structure, Shiny will not update the content
-of the page rendered in the server when clicking on the page link.
+If some pages have the same HTML structure, shiny will not update the
+content rendered in the server when clicking on a new page.
+
+Here an minimal example of the issue:
 
 ``` r
 library(shiny)
@@ -329,8 +331,7 @@ if (interactive()) {
 }
 ```
 
-A simple workaround it to be sure each of your Shiny pages have a
-different HTML structure.
+A simple workaround is have a different HTML structure for each page.
 
 ``` r
 library(shiny)
@@ -369,7 +370,7 @@ Another workaround is to reload the session when clicking on a page link
 using `NavLink.shinyInput()` instead of `NavLink()`. This is equivalent
 to clicking on the refresh button of your browser.
 
-This solution has multiple downsides, in particular loose all current
+This workaround has multiple downsides, in particular loose all current
 session objects when reloading the session.
 
 ``` r
