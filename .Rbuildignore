@@ -7,3 +7,4 @@ _\.new\.png$
 ^\.github$
 ^_pkgdown.yml
 ^pkgdown
+^docs
