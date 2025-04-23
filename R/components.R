@@ -23,6 +23,7 @@ component <- function(name, module = 'react-router-dom') {
 #' @rdname HashRouter
 #' @description \url{https://reactrouter.com/6.30.0/router-components/hash-router}
 #' @param ... Props to pass to element.
+#' @return A HashRouter component.
 #' @export
 HashRouter <- component('HashRouter')
 
@@ -30,6 +31,7 @@ HashRouter <- component('HashRouter')
 #' @rdname MemoryRouter
 #' @description \url{https://reactrouter.com/6.30.0/router-components/memory-router}
 #' @param ... Props to pass to element.
+#' @return A MemoryRouter component.
 #' @export
 MemoryRouter <- component('MemoryRouter')
 
@@ -37,6 +39,7 @@ MemoryRouter <- component('MemoryRouter')
 #' @rdname Route
 #' @description \url{https://reactrouter.com/6.30.0/components/route}
 #' @param ... Props to pass to element.
+#' @return A Route component.
 #' @export
 Route <- component('Route')
 
@@ -44,6 +47,7 @@ Route <- component('Route')
 #' @rdname Link
 #' @description \url{https://reactrouter.com/6.30.0/components/link}
 #' @param ... Props to pass to element.
+#' @return A Link component.
 #' @export
 Link <- component('Link')
 
@@ -51,6 +55,7 @@ Link <- component('Link')
 #' @rdname Navigate
 #' @description \url{https://reactrouter.com/6.30.0/components/navigate}
 #' @param ... Props to pass to element.
+#' @return A Navigate component.
 #' @export
 Navigate <- component('Navigate')
 
@@ -58,6 +63,7 @@ Navigate <- component('Navigate')
 #' @rdname NavLink
 #' @description \url{https://reactrouter.com/6.30.0/components/nav-link}
 #' @param ... Props to pass to element.
+#' @return A NavLink component.
 #' @export
 NavLink <- component('NavLink')
 
@@ -65,6 +71,7 @@ NavLink <- component('NavLink')
 #' @rdname Outlet
 #' @description \url{https://reactrouter.com/6.30.0/components/outlet}
 #' @param ... Props to pass to element.
+#' @return A Outlet component.
 #' @export
 Outlet <- component('Outlet')
 
@@ -72,5 +79,6 @@ Outlet <- component('Outlet')
 #' @rdname Routes
 #' @description \url{https://reactrouter.com/6.30.0/components/routes}
 #' @param ... Props to pass to element.
+#' @return A Routes component.
 #' @export
 Routes <- component('Routes')

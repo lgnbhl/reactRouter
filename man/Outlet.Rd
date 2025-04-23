@@ -9,6 +9,9 @@ Outlet(...)
 \arguments{
 \item{...}{Props to pass to element.}
 }
+\value{
+A Outlet component.
+}
 \description{
 \url{https://reactrouter.com/6.30.0/components/outlet}
 }

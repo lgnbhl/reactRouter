@@ -23,6 +23,9 @@ updateLink.shinyInput(
 
 \item{session}{Object passed as the `session` argument to Shiny server.}
 }
+\value{
+A Link component.
+}
 \description{
 \url{https://reactrouter.com/6.30.0/components/link}
 

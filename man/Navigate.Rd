@@ -9,6 +9,9 @@ Navigate(...)
 \arguments{
 \item{...}{Props to pass to element.}
 }
+\value{
+A Navigate component.
+}
 \description{
 \url{https://reactrouter.com/6.30.0/components/navigate}
 }

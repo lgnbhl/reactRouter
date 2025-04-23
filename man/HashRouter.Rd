@@ -9,6 +9,9 @@ HashRouter(...)
 \arguments{
 \item{...}{Props to pass to element.}
 }
+\value{
+A HashRouter component.
+}
 \description{
 \url{https://reactrouter.com/6.30.0/router-components/hash-router}
 }

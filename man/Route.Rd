@@ -9,6 +9,9 @@ Route(...)
 \arguments{
 \item{...}{Props to pass to element.}
 }
+\value{
+A Route component.
+}
 \description{
 \url{https://reactrouter.com/6.30.0/components/route}
 }
