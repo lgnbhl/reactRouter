@@ -45,6 +45,6 @@ remotes::install_github("lgnbhl/reactRouter")
 ### More tutorials
 
 Read the vignette
-[here](https://lgnbhl.github.io/reactRouter/articles/introduction.html)
+[here](https://felixluginbuhl.com/reactRouter/articles/introduction.html)
 for detailed tutorials of **reactRouter** use cases with Quarto and R
 Shiny.

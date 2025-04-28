@@ -9,7 +9,7 @@ Authors@R: c(
 Maintainer: Felix Luginbuhl <felix.luginbuhl@protonmail.ch>
 Description: You can easily share url pages using 'React Router' in 'shiny' applications
   and 'Quarto' documents. The package wraps the 'react-router-dom' 'React' library and
-  provides access to hash routing to navigate on multiple urls.
+  provides access to hash routing to navigate on multiple url pages.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
