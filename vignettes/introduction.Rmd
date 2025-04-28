@@ -214,7 +214,7 @@ library(reactRouter)
 
 
 ui <- reactRouter::HashRouter(
-    CssBaseline(
+  CssBaseline(
     Typography("reactRouter with shinyMaterialUI", variant = "h5", m = 2),
     Stack(
       direction = "row", spacing = 2, p = 2,
