@@ -13,6 +13,7 @@ Description: You can easily share url pages using 'React Router' in 'shiny' appl
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Depends: R (>= 3.4)
 Imports:
     htmltools,
     shiny,

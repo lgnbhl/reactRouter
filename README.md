@@ -36,15 +36,14 @@ HashRouter(
 
 ### Install
 
-Install **reactRouter** with:
-
 ``` r
-remotes::install_github("lgnbhl/reactRouter")
+#remotes::install_github("lgnbhl/reactRouter") # development version
+
+install.packages("reactRouter")
 ```
 
 ### More tutorials
 
 Read the vignette
 [here](https://felixluginbuhl.com/reactRouter/articles/introduction.html)
-for detailed tutorials of **reactRouter** use cases with Quarto and R
-Shiny.
+for detailed use cases with Quarto and R Shiny.
