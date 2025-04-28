@@ -17,8 +17,12 @@ knitr::opts_chunk$set(
 ### Install
 
 ``` r
-remotes::install_github("lgnbhl/reactRouter")
+#remotes::install_github("lgnbhl/reactRouter") # development version
+
+install.packages("reactRouter")
 ```
+
+## Minimal example
 
 ```{r setup}
 library(reactRouter)
