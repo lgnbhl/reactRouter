@@ -288,6 +288,8 @@ server <- function(input, output, session) {
 shinyApp(ui, server)
 ```
 
+More examples are given [here](https://felixluginbuhl.com/shinyMaterialUI/).
+
 ### Server side rendering issue
 
 If some pages have the same HTML structure, shiny will not update the content rendered in the server when clicking on a new page.
