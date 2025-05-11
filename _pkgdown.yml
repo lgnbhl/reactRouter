@@ -4,7 +4,7 @@ template:
   bootswatch: litera
   ganalytics: UA-158089797-1
   bslib:
-    primary: "#f44250"
+    primary: "#11cdef"
 
 authors:
   Felix Luginbuhl:

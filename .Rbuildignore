@@ -8,3 +8,4 @@ _\.new\.png$
 ^_pkgdown.yml
 ^pkgdown
 ^docs
+^data-raw
