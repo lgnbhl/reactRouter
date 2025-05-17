@@ -46,7 +46,7 @@ HashRouter(
 ### Usage with Quarto
 
 As React Router provides client routing, you can easily create multiple routes in a 
-Quarto and R markdown documents:
+Quarto or R markdown documents:
 
 ``` {r}
 # code to run in a Quarto document
@@ -122,6 +122,40 @@ reactRouter::HashRouter(
   )
 )
 ```
+
+### Usage with bslib
+
+Below an example using the [bslib](https://rstudio.github.io/bslib/) R package.
+
+```r
+library(reactRouter)
+library(bslib)
+library(htmltools)
+
+reactRouter::HashRouter(
+  bslib::page_navbar(
+    title = "reactRouter with bslib",
+    nav_item(tags$a("Home", href = "#/")),
+    nav_item(tags$a("Analysis", href = "#/analysis")),
+    reactRouter::Routes(
+      reactRouter::Route(
+        path = "/",
+        element = div(
+          tags$h3("Home page"),
+          p("A basic example of reactRouter with bslib.")
+        )
+      ),
+      reactRouter::Route(
+        path = "/analysis",
+        element = "Content analysis"
+      ),
+      reactRouter::Route(path = "*", element = "Custom error 404")
+    )
+  )
+)
+```
+
+<img src="man/figures/reactRouter-with-bslib.png" alt="reactRouter with bslib"/>
 
 ### Usage with R Shiny
 
