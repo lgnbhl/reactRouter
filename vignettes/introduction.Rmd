@@ -167,7 +167,7 @@ reactRouter::HashRouter(
 )
 ```
 
-<img src="man/figures/reactRouter-with-bslib.png" alt="reactRouter with bslib"/>
+<img style="border:1px solid black;" src="https://raw.githubusercontent.com/lgnbhl/reactRouter/master/man/figures/reactRouter-with-bslib.png" align="center" />
 
 ### Usage with R Shiny
 
