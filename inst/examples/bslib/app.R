@@ -6,8 +6,20 @@ library(shiny)
 ui <- reactRouter::HashRouter(
   bslib::page_navbar(
     title = "reactRouter with bslib",
-    nav_item(tags$a("Home", href = "#/")),
-    nav_item(tags$a("Analysis", href = "#/analysis")),
+    nav_item(
+      reactRouter::NavLink(
+        "Home", 
+        to = "/", 
+        style = JS('({isActive}) => { return isActive ? {color: "red", textDecoration: "none"} : {}; }')
+      )
+    ),
+    nav_item(
+      reactRouter::NavLink(
+        "Analysis", 
+        to = "/analysis",
+        style = JS('({isActive}) => { return isActive ? {color: "red", textDecoration: "none"} : {}; }')
+      )
+    ),
     reactRouter::Routes(
       reactRouter::Route(
         path = "/",
@@ -28,4 +40,3 @@ ui <- reactRouter::HashRouter(
 server <- function(input, output, session) {}
 
 shinyApp(ui, server)
-
