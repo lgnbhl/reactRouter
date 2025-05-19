@@ -448,7 +448,7 @@ if (interactive()) {
 
 A third workaround is to render all the UI from the server.
 
-```r
+```{r}
 library(shiny)
 library(reactRouter)
 
@@ -467,8 +467,7 @@ server <- function(input, output, session) {
         Route(
           path = "/other", 
           element = div(
-            p("New content"),
-            p(print(JS("location.reload()")))
+            p("New content")
           )
         )
       )
