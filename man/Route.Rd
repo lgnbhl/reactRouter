@@ -4,14 +4,18 @@
 \alias{Route}
 \title{Route}
 \usage{
-Route(...)
+Route(..., element)
 }
 \arguments{
 \item{...}{Props to pass to element.}
+
+\item{element}{element with UUID key wrap in a `shiny::div()`.}
 }
 \value{
 A Route component.
 }
 \description{
-\url{https://reactrouter.com/6.30.0/components/route}
+Internally the `element` is wrapped in a `shiny::div()` 
+with a UUID key so, in case R shiny is used, shiny can differentiate 
+each element.
 }

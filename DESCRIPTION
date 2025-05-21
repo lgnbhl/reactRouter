@@ -18,7 +18,8 @@ Imports:
     htmltools,
     shiny,
     shiny.react,
-    checkmate
+    checkmate,
+    uuid
 Suggests: 
     testthat (>= 3.0.0),
     chromote (>= 0.1.1.9001),

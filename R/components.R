@@ -36,12 +36,30 @@ HashRouter <- component('HashRouter')
 MemoryRouter <- component('MemoryRouter')
 
 #' Route
+#' 
+#' Internally the `element` is wrapped in a `shiny::div()` 
+#' with a UUID key so, in case R shiny is used, shiny can differentiate 
+#' each element.
+#' 
 #' @rdname Route
-#' @description \url{https://reactrouter.com/6.30.0/components/route}
 #' @param ... Props to pass to element.
+#' @param element element with UUID key wrap in a `shiny::div()`.
 #' @return A Route component.
 #' @export
-Route <- component('Route')
+Route <- function(..., element) {
+  shiny.react::reactElement(
+    module = "react-router-dom",
+    name = "Route",
+    props = shiny.react::asProps(
+      ..., 
+      element = shiny::div(
+        key = uuid::UUIDgenerate(), 
+        element
+      )
+    ),
+    deps = reactRouterDependency()
+  )
+}
 
 #' Link
 #' @rdname Link
