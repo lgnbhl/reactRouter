@@ -169,83 +169,36 @@ reactRouter::HashRouter(
 
 <img style="border:1px solid black;" src="https://raw.githubusercontent.com/lgnbhl/reactRouter/master/man/figures/reactRouter-with-bslib.png" align="center" />
 
-### Usage with R Shiny
+### Usage with Shiny
 
-Below a simple example using R Shiny:
+A minimal example with R Shiny:
 
 ```r
-library(reactRouter)
 library(shiny)
-library(DT)
+library(reactRouter)
 
-ui <- fluidPage(
-  reactRouter::HashRouter(
-    titlePanel("reactRouter"),
-    sidebarLayout(
-      sidebarPanel(
-        reactRouter::NavLink(
-          to = "/",
-          style = JS('({isActive}) => { return isActive ? {color: "red", textDecoration:"none"} : {}; }'),
-          "Home"),
-        br(),
-        reactRouter::NavLink(
-          to = "/analysis",
-          style = JS('({isActive}) => { return isActive ? {color: "red", textDecoration: "none"} : {}; }'),
-          "Analysis"
-        ),
-        br(),
-        reactRouter::NavLink(
-          to = "/about",
-          style = JS('({ isActive }) => { return isActive ? { color: "red", textDecoration: "none" } : {}; }'),
-          "About"
-        )
-      ),
-      mainPanel(
-        reactRouter::Routes(
-          reactRouter::Route(
-            path = "/",
-            element = div(
-              tags$h1("Home page"),
-              tags$h4("A basic example of reactRouter."),
-              uiOutput(outputId = "contentHome")
-            )
-          ),
-          reactRouter::Route(
-            path = "/analysis",
-            element = div(
-              tags$h1("Analysis"),
-              DT::DTOutput("table")
-              )
-          ),
-          reactRouter::Route(
-            path = "/about",
-            element = div(
-              uiOutput(outputId = "contentAbout")
-            )
-          ),
-          reactRouter::Route(path = "*", element = div(tags$p("Error 404")))
-        )
-      )
+ui <- HashRouter(
+  NavLink(to = "/", "Main"), 
+  br(),
+  NavLink(to = "/other", "Other"),
+  Routes(
+    Route(
+      path = "/", 
+      element = uiOutput(outputId = "uiMain")
+    ),
+    Route(
+      path = "/other", 
+      element = uiOutput(outputId = "uiOther")
     )
   )
 )
 
 server <- function(input, output, session) {
-  output$contentHome <- renderUI({
-    p("Content home")
-  })
-  output$table <- renderDT({
-    data.frame(x = c(1, 2), y = c(3, 4))
-  })
-  output$contentAbout <- renderUI({
-    div(
-      tags$h1("About"),
-      p("Content about")
-    )
-  })
+  output$uiMain <- renderUI( { p("Content home") } )
+  output$uiOther <- renderUI( { p("Other content") })
 }
 
-shinyApp(ui, server)
+shinyApp(ui = ui, server = server)
 ```
 
 ### Usage with MUI Material UI
@@ -336,152 +289,6 @@ shinyApp(ui, server)
 
 More examples are given [here](https://felixluginbuhl.com/shinyMaterialUI/).
 
-### Server side rendering issue
-
-If some pages have the same HTML structure, shiny will not update the content rendered in the server when clicking on a new page.
-
-Here an minimal example of the issue:
-
-```r
-library(shiny)
-library(reactRouter)
-
-ui <- HashRouter(
-  NavLink.shinyInput(inputId = "linkMain", to = "/", "Main"), br(),
-  NavLink.shinyInput(inputId = "linkOther", to = "/other", "Other"),
-  Routes(
-    Route(
-      path = "/", 
-      element = div(uiOutput(outputId = "contentMain"))
-    ),
-    Route(
-      path = "/other", 
-      element = div(uiOutput(outputId = "contentOther"))
-    )
-  )
-)
-
-server <- function(input, output, session) {
-  output$contentMain <- renderUI( { p("Content home") } )
-  output$contentOther <- renderUI( { p("New content") })
-}
-
-if (interactive()) {
-  shinyApp(ui = ui, server = server)
-}
-```
-
-A simple workaround is to have a different HTML structure for each page.
-
-```r
-library(shiny)
-library(reactRouter)
-
-ui <- HashRouter(
-  NavLink.shinyInput(inputId = "linkMain", to = "/", "Main"), br(),
-  NavLink.shinyInput(inputId = "linkOther", to = "/other", "Other"),
-  Routes(
-    Route(
-      path = "/", 
-      element = div(uiOutput(outputId = "contentMain"))
-    ),
-    Route(
-      path = "/other", 
-      element = div(
-        # add title to have a different HTML structure
-        h1("NOW VISIBLE"),
-        uiOutput(outputId = "contentOther")
-      )
-    )
-  )
-)
-
-server <- function(input, output, session) {
-  output$contentMain <- renderUI( { p("Content home") } )
-  output$contentOther <- renderUI( { p("New content") })
-}
-
-if (interactive()) {
-  shinyApp(ui = ui, server = server)
-}
-```
-
-Another workaround is to reload the session when clicking on a page link using `NavLink.shinyInput()` instead of `NavLink()`. This is equivalent to clicking on the refresh button of your browser.
-
-This workaround has multiple downsides, in particular loose all current session objects when reloading the session.
-
-```r
-library(shiny)
-library(reactRouter)
-
-ui <- HashRouter(
-  NavLink.shinyInput(inputId = "linkMain", to = "/", "Main"), br(),
-  NavLink.shinyInput(inputId = "linkOther", to = "/other", "Other"),
-  Routes(
-    Route(
-      path = "/", 
-      element = div(uiOutput(outputId = "contentMain"))
-    ),
-    Route(
-      path = "/other", 
-      element = div(
-        uiOutput(outputId = "contentOther")
-      )
-    )
-  )
-)
-
-server <- function(input, output, session) {
-  # Reload session when user clicks on new page to refresh output content.
-  # It is equivalent to click on the refresh button in the browser.
-  observeEvent(c(input$linkMain, input$linkOther), {
-    session$reload()
-  })
-  output$contentMain <- renderUI( { p("Content home") } )
-  output$contentOther <- renderUI( { p("New content") })
-}
-
-if (interactive()) {
-  shinyApp(ui = ui, server = server)
-}
-```
-
-A third workaround is to render all the UI from the server.
-
-```{r}
-library(shiny)
-library(reactRouter)
-
-ui <- uiOutput(outputId = "main")
-
-server <- function(input, output, session) {
-  output$main <- renderUI({
-    HashRouter(
-      NavLink.shinyInput(inputId = "linkMain", to = "/", "Main"), br(),
-      NavLink.shinyInput(inputId = "linkOther", to = "/other", "Other"),
-      Routes(
-        Route(
-          path = "/", 
-          element = p("Content home")
-        ),
-        Route(
-          path = "/other", 
-          element = div(
-            p("New content")
-          )
-        )
-      )
-    )
-  })
-}
-
-if (interactive()) {
-  shinyApp(ui = ui, server = server)
-}
-```
-
-More examples of this issue are given [here](https://github.com/lgnbhl/reactRouter/issues/1). Please contact me if you have a solution to this issue.
-
 ### Usage with Shiny modules
 
 ```r
@@ -502,7 +309,7 @@ page <- function(title, content, id) {
 
 # Both sample pages.
 root_page <- page("Home page", "Home page clicks", "root")
-second_page <- page("Second page", "2nd page clicks", "second")
+second_page <- page("Other page", "Other page clicks", "second")
 
 server_module <- function(id, clicks, power = 1) {
   moduleServer(id, function(input, output, session) {
@@ -514,8 +321,8 @@ server_module <- function(id, clicks, power = 1) {
 
 # Create output for our router in main UI of Shiny app.
 ui <- reactRouter::HashRouter(
-  NavLink.shinyInput(inputId = "linkMain", to = "/", "Main"), br(),
-  NavLink.shinyInput(inputId = "linkOther", to = "/other", "Other"),
+  NavLink(to = "/", "Main"), br(),
+  NavLink(to = "/other", "Other"),
   actionButton("clicks", "Click me!"),
   Routes(
     Route(
@@ -535,15 +342,9 @@ ui <- reactRouter::HashRouter(
 
 # Plug router into Shiny server.
 server <- function(input, output, session) {
-  # reload the session to make the modules work
-  # Not desired behavior as clicks object lost
-  observeEvent(c(input$linkMain, input$linkOther), {
-    session$reload()
-  })
   clicks <- reactive({
     input$clicks
   })
-
   server_module("root", clicks = clicks, power = 1)
   server_module("second", clicks = clicks, power = 2)
 }
@@ -559,7 +360,6 @@ shinyApp(ui, server)
 
 ### More information
 
-reactRouter implements React Router [v.6.30.0](https://reactrouter.com/6.30.0).
+**reactRouter** implements React Router [v.6.30.0](https://reactrouter.com/6.30.0).
 
 More info about how to use React Router can be found in the [official website](https://reactrouter.com/6.30.0).
-
