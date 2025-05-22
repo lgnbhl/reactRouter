@@ -27,6 +27,14 @@ component <- function(name, module = 'react-router-dom') {
 #' @export
 HashRouter <- component('HashRouter')
 
+#' BrowserRouter
+#' @rdname BrowserRouter
+#' @description \url{https://reactrouter.com/6.30.0/router-components/browser-router}
+#' @param ... Props to pass to element.
+#' @return A BrowserRouter component.
+#' @export
+BrowserRouter <- component('BrowserRouter')
+
 #' MemoryRouter
 #' @rdname MemoryRouter
 #' @description \url{https://reactrouter.com/6.30.0/router-components/memory-router}
