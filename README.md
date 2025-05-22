@@ -42,7 +42,14 @@ HashRouter(
 install.packages("reactRouter")
 ```
 
-### More tutorials
+### Example
+
+Get started with a showcase example:
+
+``` r
+# print all examples available: reactRouterExample()
+reactRouterExample("basic")
+```
 
 Read the vignette
 [here](https://felixluginbuhl.com/reactRouter/articles/introduction.html)

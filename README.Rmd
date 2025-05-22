@@ -50,7 +50,7 @@ install.packages("reactRouter")
 
 Get started with a showcase example:
 
-```{r}
+```r
 # print all examples available: reactRouterExample()
 reactRouterExample("basic")
 ```
