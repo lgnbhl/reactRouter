@@ -40,13 +40,20 @@ HashRouter(
 
 ### Install
 
-``` r
+```r
 #remotes::install_github("lgnbhl/reactRouter") # development version
 
 install.packages("reactRouter")
 ```
 
-### More tutorials
+### Example
+
+Get started with a showcase example:
+
+```{r}
+# print all examples available: reactRouterExample()
+reactRouterExample("basic")
+```
 
 Read the vignette [here](https://felixluginbuhl.com/reactRouter/articles/introduction.html) for detailed use cases with Quarto and R Shiny.
 
