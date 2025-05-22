@@ -32,14 +32,6 @@ ui <- fluidPage(
 )
 
 server <- function(input, output, session) {
-  # update session when clicking on specific navLink
-  # session$reload() is the equivalent of hitting the browser's Reload button.
-  observeEvent(input$NavLinkHome, {
-    session$reload()
-  })
-  observeEvent(input$NavLinkPage, {
-    session$reload()
-  })
   output$outputHome <- renderUI({
     p("home content")
   })
