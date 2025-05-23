@@ -43,89 +43,41 @@ HashRouter(
 )
 ```
 
-### Usage with Quarto
+### Usage with shiny
 
-As React Router provides client routing, you can easily create multiple routes in a 
-Quarto or R markdown documents:
+A minimal example using [shiny](https://shiny.posit.co/).
 
-``` {r}
-# code to run in a Quarto document
-# example adapted from: https://github.com/remix-run/react-router/tree/dev/examples/basic
+```r
+library(shiny)
 library(reactRouter)
-library(htmltools)
 
-Layout <- div(
-  # A "layout route" is a good place to put markup you want to
-  # share across all the pages on your site, like navigation.
-  tags$nav(
-    tags$ul(
-      tags$li(
-        reactRouter::Link(to = "/", "Home")
-      ),
-      tags$li(
-        reactRouter::Link(to = "/dashboard", "Dashboard")
-      ),
-      tags$li(
-        reactRouter::Link(to = "/nothing-here", "Nothing Here")
-      )
-    )
-  ),
-  tags$hr(),
-  # An <Outlet> renders whatever child route is currently active,
-  # so you can think about this <Outlet> as a placeholder for
-  # the child routes we defined above.
-  reactRouter::Outlet()
-)
-
-reactRouter::HashRouter(
-  div(
-    h1("Basic Example"),
-    tags$p(
-      paste0('This example demonstrates some of the core features of React Router
-          including nested reactRouter::Route(), reactRouter::Outlet(), 
-          reactRouter::Link(), and using a "*" route (aka "splat route") 
-          to render a "not found" page when someone visits an unrecognized URL.'
-      )
+ui <- HashRouter(
+  NavLink(to = "/", "Main"), 
+  shiny::br(),
+  NavLink(to = "/other", "Other"),
+  Routes(
+    Route(
+      path = "/", 
+      element = uiOutput(outputId = "uiMain")
     ),
-    reactRouter::Routes(
-      Route(
-        path = "/",
-        element = Layout,
-        Route(
-          index = TRUE,
-          element = div(
-            tags$h2("Home"),
-            tags$p("Home content")
-          )
-        ),
-        Route(
-          path = "dashboard",
-          element = div(
-            tags$h2("Dashboard"),
-            tags$p("Dashboard here")
-          )
-        ),
-        # Using path="*"" means "match anything", so this route
-        # acts like a catch-all for URLs that we don't have explicit
-        # routes for.
-        Route(
-          path = "*",
-          element = div(
-            tags$h2("Nothing to see here!"),
-            tags$p(
-              Link(to = "/", "Go to the home page")
-            )
-          )
-        )
-      )
+    Route(
+      path = "/other", 
+      element = uiOutput(outputId = "uiOther")
     )
   )
 )
+
+server <- function(input, output, session) {
+  output$uiMain <- renderUI( { p("Content home") } )
+  output$uiOther <- renderUI( { p("Other content") })
+}
+
+shinyApp(ui = ui, server = server)
 ```
 
 ### Usage with bslib
 
-Below an example using the [bslib](https://rstudio.github.io/bslib/) R package.
+A minimal example using [bslib](https://rstudio.github.io/bslib/).
 
 ```r
 library(reactRouter)
@@ -169,125 +121,62 @@ reactRouter::HashRouter(
 
 <img style="border:1px solid black;" src="https://raw.githubusercontent.com/lgnbhl/reactRouter/master/man/figures/reactRouter-with-bslib.png" align="center" />
 
-### Usage with Shiny
+### Usage with shinyMaterialUI
 
-A minimal example with R Shiny:
-
-```r
-library(shiny)
-library(reactRouter)
-
-ui <- HashRouter(
-  NavLink(to = "/", "Main"), 
-  br(),
-  NavLink(to = "/other", "Other"),
-  Routes(
-    Route(
-      path = "/", 
-      element = uiOutput(outputId = "uiMain")
-    ),
-    Route(
-      path = "/other", 
-      element = uiOutput(outputId = "uiOther")
-    )
-  )
-)
-
-server <- function(input, output, session) {
-  output$uiMain <- renderUI( { p("Content home") } )
-  output$uiOther <- renderUI( { p("Other content") })
-}
-
-shinyApp(ui = ui, server = server)
-```
-
-### Usage with MUI Material UI
-
-Below an example using MUI Material UI components from the **shinyMaterialUI** R package:
+A minimal example using [shinyMaterialUI](https://felixluginbuhl.com/shinyMaterialUI/).
 
 ```r
 # remotes::install_github("lgnbhl/shinyMaterialUI")
-library(shiny)
 library(shinyMaterialUI)
-library(reactRouter)
 
-
-ui <- reactRouter::HashRouter(
-  CssBaseline(
-    Typography("reactRouter with shinyMaterialUI", variant = "h5", m = 2),
-    Stack(
-      direction = "row", spacing = 2, p = 2,
-      Paper(
-        MenuList(
-          reactRouter::NavLink(
-            to = "/",
-            style = JS('({isActive}) => { return isActive ? {color: "red", textDecoration:"none"} : { textDecoration: "none" }; }'),
-            MenuItem(
-              "home"
-            )
-          ),
-          br(),
-          reactRouter::NavLink(
-            to = "/analysis",
-            style = JS('({isActive}) => { return isActive ? {color: "red", textDecoration: "none"} : { textDecoration: "none" }; }'),
-            MenuItem(
-              "Analysis"
-            )
-          ),
-          br(),
-          reactRouter::NavLink(
-            to = "/about",
-            style = JS('({ isActive }) => { return isActive ? { color: "red", textDecoration: "none" } : { textDecoration: "none" }; }'),
-            MenuItem(
-              "About"
-            )
+HashRouter(
+  Box(
+    sx = list(flexGrow = 1),
+    AppBar(
+      position = "static",
+      Toolbar(
+        Typography(
+          variant = "h6",
+          component = "div",
+          sx = list(mr = 1),
+          "shinyMaterialUI"
+        ),
+        NavLink(
+          to = "/",
+          Button(
+            color = "inherit",
+            "Home"
+          )
+        ),
+        NavLink(
+          to = "analysis",
+          Button(
+            color = "inherit",
+            "Analysis"
           )
         )
-      ),
+      )
+    ),
       Box(
         reactRouter::Routes(
           reactRouter::Route(
             path = "/",
-            element = div(
-              tags$h1("Home page"),
-              tags$h4("A basic example of reactRouter with shinyMaterialUI."),
-              uiOutput(outputId = "contentHome")
-            )
+            element = Box("Home page", sx = list(p = 1))
           ),
           reactRouter::Route(
             path = "/analysis",
-            element = div(
-              tags$h1("Analysis"),
-              uiOutput(outputId = "contentAnalysis")
-              )
+            element = Box("Content analysis", sx = list(p = 1))
           ),
-          reactRouter::Route(
-            path = "/about",
-            element = uiOutput(outputId = "contentAbout")
-          ),
-          reactRouter::Route(path = "*", element = div(tags$p("Error 404")))
+          reactRouter::Route(path = "*", element = "Error 404")
         )
       )
-    )
   )
 )
-
-server <- function(input, output, session) {
-  output$contentHome <- renderUI({
-    p("Content home")
-  })
-  output$contentAnalysis <- renderUI({
-    p("Content analysis")
-  })
-  output$contentAbout <- renderUI({
-    p("Content about")
-  })
-}
-
-shinyApp(ui, server)
 ```
 
-More examples are given [here](https://felixluginbuhl.com/shinyMaterialUI/).
+<img style="border:1px solid black;" src="https://raw.githubusercontent.com/lgnbhl/reactRouter/master/man/figures/reactRouter-with-shinyMaterialUI.png" align="center" />
+
+Find more examples with **shinyMaterialUI** [here](https://felixluginbuhl.com/shinyMaterialUI/).
 
 ### Usage with Shiny modules
 
@@ -351,6 +240,185 @@ server <- function(input, output, session) {
 
 # Run server in a standard way.
 shinyApp(ui, server)
+```
+
+### Example with Quarto
+
+As React Router provides client routing, you can easily create multiple routes in a Quarto or R markdown documents:
+
+``` {r}
+# code to run in a Quarto document
+# example adapted from: https://github.com/remix-run/react-router/tree/dev/examples/basic
+library(reactRouter)
+library(htmltools)
+
+Layout <- div(
+  # A "layout route" is a good place to put markup you want to
+  # share across all the pages on your site, like navigation.
+  tags$nav(
+    tags$ul(
+      tags$li(
+        reactRouter::Link(to = "/", "Home")
+      ),
+      tags$li(
+        reactRouter::Link(to = "/dashboard", "Dashboard")
+      ),
+      tags$li(
+        reactRouter::Link(to = "/nothing-here", "Nothing Here")
+      )
+    )
+  ),
+  tags$hr(),
+  # An <Outlet> renders whatever child route is currently active,
+  # so you can think about this <Outlet> as a placeholder for
+  # the child routes we defined above.
+  reactRouter::Outlet()
+)
+
+reactRouter::HashRouter(
+  div(
+    style = "border:1px solid black;", # add border just for the example
+    h1("Basic Example"),
+    tags$p(
+      paste0('This example demonstrates some of the core features of React Router
+          including nested reactRouter::Route(), reactRouter::Outlet(), 
+          reactRouter::Link(), and using a "*" route (aka "splat route") 
+          to render a "not found" page when someone visits an unrecognized URL.'
+      )
+    ),
+    reactRouter::Routes(
+      Route(
+        path = "/",
+        element = Layout,
+        Route(
+          index = TRUE,
+          element = div(
+            tags$h2("Home"),
+            tags$p("Home content")
+          )
+        ),
+        Route(
+          path = "dashboard",
+          element = div(
+            tags$h2("Dashboard"),
+            tags$p("Dashboard here")
+          )
+        ),
+        # Using path="*"" means "match anything", so this route
+        # acts like a catch-all for URLs that we don't have explicit
+        # routes for.
+        Route(
+          path = "*",
+          element = div(
+            tags$h2("Nothing to see here!"),
+            tags$p(
+              Link(to = "/", "Go to the home page")
+            )
+          )
+        )
+      )
+    )
+  )
+)
+```
+
+### Dynamic segments
+
+A minimal example using dynamic segments, i.e. using `Route(to = ":id/*")`.
+
+If you want to observe the `url_hash` of the shiny session, you need to use a workaround ([issue #4](https://github.com/lgnbhl/reactRouter/issues/4)) to get the correct `url_hash` path by reloading the session when the user click on a link, as showed below:
+
+```r
+library(shiny)
+library(reactRouter)
+library(bslib)
+
+ui <- HashRouter(
+  bslib::page(
+    reactRouter::Link.shinyInput(
+      inputId = "home",
+      to = "/", 
+      h3("reactRouter with dynamic routes", class = "m-3"),
+      style = "text-decoration: none; color: black"
+    ),
+    Routes(
+      Route(
+        path = "/",
+        element = div(
+          # tags$a() necessary to observe `url_hash` in session
+          tags$a(
+            href = "#/project/1/overview",
+            "Project 1"
+          ),
+          tags$br(),
+          tags$a(
+            href = "#/project/2/overview", # go directly to overview
+            "Project 2"
+          )
+        )
+      ),
+      Route(
+        path = "project/:id/*", 
+        element = div(
+          NavLink.shinyInput(
+            inputId = "overview",
+            to = "overview",
+            "Overview"
+          ),
+          tags$br(),
+          NavLink.shinyInput(
+            inputId = "analysis",
+            to = "analysis",
+            "Analysis"
+          ),
+          Outlet()
+        ),
+        children = list(
+          reactRouter::Route(
+            path = "overview",
+            element = uiOutput("uiOverview")
+          ),
+          reactRouter::Route(
+            path = "analysis",
+            element = uiOutput("uiAnalysis")
+          )
+        )
+      )
+    )
+  )
+)
+
+server <- function(input, output, session) {
+  
+  # Necessary to update `url_hash` to get "" (homepage), "1/analysis" and "2/analysis"
+  observeEvent(c(input$home, input$overview, input$analysis), {
+    session$reload()
+  })
+  
+  url_hash <- shiny::reactiveVal(value = NA)
+
+  # update reactive values based on url hash
+  shiny::observe({
+    current_url_hash <- session$clientData$url_hash
+    print(current_url_hash)
+    url_hash(current_url_hash)
+  })
+  
+  output$uiOverview <- renderUI({
+    url_hash()
+  })
+  output$uiAnalysis <- renderUI({
+    url_hash()
+  })
+}
+
+shinyApp(ui, server)
+```
+
+Run a more advanced example of dynamic routes with:
+
+```r
+reactRouterExample("dynamic-segments")
 ```
 
 ### Alternatives

@@ -52,7 +52,7 @@ Get started with a showcase example:
 
 ```r
 # print all examples available: reactRouterExample()
-reactRouterExample("basic")
+reactRouterExample("dynamic-segment")
 ```
 
 Read the vignette [here](https://felixluginbuhl.com/reactRouter/articles/introduction.html) for detailed use cases with Quarto and R Shiny.
