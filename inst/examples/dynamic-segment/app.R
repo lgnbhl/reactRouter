@@ -6,7 +6,6 @@ library(bslib)
 library(dplyr)
 library(tidyr)
 library(stringr)
-library(DT)
 
 # create list of nested datasets by id
 data_nested_by_id <- dplyr::starwars |>
@@ -61,7 +60,7 @@ cards_home <- purrr::map(
 )
 
 ui <- reactRouter::HashRouter(
-  bslib::page_navbar(fillable = T,
+  bslib::page_navbar(
     title = span(
       reactRouter::Link(
         to = "/", 
@@ -151,6 +150,35 @@ server <- function(input, output, session) {
     )
   })
   
+  data <- reactive({
+    req(url_hash_cleaned())
+    # get nested data
+    data_selected <- data_nested_by_id$data[[url_hash_cleaned()]]
+    
+    species <- data_selected |>
+      count(species, sort = TRUE) |>
+      na.omit() |>
+      pull(species)
+    
+    oldest <- data_selected |>
+      arrange(desc(birth_year)) |>
+      head(1)
+    
+    tallest <- data_selected |>
+      arrange(desc(height)) |>
+      head(1)
+    
+    lightest <- data_selected |>
+      arrange(mass) |>
+      head(1)
+    
+    tibble(
+      indicator = c("Species", "Oldest", "Tallest", "Lightest"),
+      value = c(length(species), oldest$birth_year, tallest$height, lightest$height),
+      desc = c(paste(species, collapse = ", "), oldest$name, tallest$name, lightest$name)
+    )
+  })
+  
   output$uiOverview <- renderUI({
     layout_column_wrap(
       width = 1/2,
@@ -170,26 +198,36 @@ server <- function(input, output, session) {
           paste0("'", data_nested_by_id$id[url_hash_cleaned()], "'")
         )
       ),
-      card(
-        card_header("Package documentation"),
-        card_body(shiny::markdown("Learn more about **reactRouter** [here](https://felixluginbuhl.com/reactRouter/)."))
+      layout_column_wrap(
+        width = 1/2,
+        heights_equal = "row",
+        value_box(
+          title = "Species",
+          showcase = shiny::icon("users"),
+          value = filter(data(), indicator == "Species")$value,
+          shiny::markdown(filter(data(), indicator == "Species")$desc)
+        ),
+        value_box(
+          title = "Oldest",
+          showcase = shiny::icon("person-cane"),
+          value = filter(data(), indicator == "Oldest")$value,
+          shiny::markdown(filter(data(), indicator == "Oldest")$desc)
+        ),
+        value_box(
+          title = "Tallest",
+          showcase = shiny::icon("up-long"),
+          value = filter(data(), indicator == "Tallest")$value,
+          shiny::markdown(filter(data(), indicator == "Tallest")$desc)
+        ),
+        value_box(
+          title = "Lightest",
+          showcase = shiny::icon("feather"),
+          value = filter(data(), indicator == "Lightest")$value,
+          shiny::markdown(filter(data(), indicator == "Lightest")$desc)
+        )
       )
     )
   })
-  
-  data <- reactive({
-    req(url_hash_cleaned())
-    # get nested data
-    data_nested_by_id$data[[url_hash_cleaned()]]
-  })
-  
-  output$table <- DT::renderDT(
-    DT::datatable(
-      data(), 
-      option = list(pageLength = 5), 
-      fillContainer = TRUE
-    )
-  )
   
   output$uiAnalysis <- renderUI({
     layout_column_wrap(
@@ -200,17 +238,12 @@ server <- function(input, output, session) {
         tags$p(
           tags$b("Current cleaned hash url: "),
           paste0("'", url_hash_cleaned(), "'")
-        ),
-        tags$p(
-          tags$b(tags$code("title"), "of the data: "),
-          paste0("'", data_nested_by_id$title[url_hash_cleaned()], "'")
-        ),
-        tags$p(
-          tags$b(tags$code("id"), "of the data: "),
-          paste0("'", data_nested_by_id$id[url_hash_cleaned()], "'")
         )
       ),
-      card(DT::DTOutput("table"))
+      card(
+        card_header("Package documentation"),
+        card_body(shiny::markdown("Learn more about **reactRouter** [here](https://felixluginbuhl.com/reactRouter/)."))
+      )
     )
   })
   
