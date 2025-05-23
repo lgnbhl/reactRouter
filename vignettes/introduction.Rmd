@@ -398,7 +398,7 @@ server <- function(input, output, session) {
   url_hash <- shiny::reactiveVal(value = NA)
 
   # update reactive values based on url hash
-  shiny::observe({
+  observeEvent(session$clientData$url_hash, {
     current_url_hash <- session$clientData$url_hash
     print(current_url_hash)
     url_hash(current_url_hash)
