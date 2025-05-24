@@ -90,15 +90,13 @@ reactRouter::HashRouter(
     nav_item(
       reactRouter::NavLink(
         "Home", 
-        to = "/", 
-        style = JS('({isActive}) => { return isActive ? {color: "red", textDecoration: "none"} : {}; }')
+        to = "/"
       )
     ),
     nav_item(
       reactRouter::NavLink(
         "Analysis", 
-        to = "/analysis",
-        style = JS('({isActive}) => { return isActive ? {color: "red", textDecoration: "none"} : {}; }')
+        to = "/analysis"
       )
     ),
     reactRouter::Routes(
@@ -326,8 +324,6 @@ reactRouter::HashRouter(
 
 A minimal example using dynamic segments, i.e. using `Route(to = ":id/*")`.
 
-If you want to observe the `url_hash` of the shiny session, you need to use a workaround ([issue #4](https://github.com/lgnbhl/reactRouter/issues/4)) to get the correct `url_hash` path by reloading the session when the user click on a link, as showed below:
-
 ```r
 library(shiny)
 library(reactRouter)
@@ -335,8 +331,7 @@ library(bslib)
 
 ui <- HashRouter(
   bslib::page(
-    reactRouter::Link.shinyInput(
-      inputId = "home",
+    Link(
       to = "/", 
       h3("reactRouter with dynamic routes", class = "m-3"),
       style = "text-decoration: none; color: black"
@@ -346,13 +341,13 @@ ui <- HashRouter(
         path = "/",
         element = div(
           # tags$a() necessary to observe `url_hash` in session
-          tags$a(
-            href = "#/project/1/overview",
+          NavLink(
+            to = "project/1/overview",
             "Project 1"
           ),
           tags$br(),
-          tags$a(
-            href = "#/project/2/overview", # go directly to overview
+          NavLink(
+            to = "project/2/overview",
             "Project 2"
           )
         )
@@ -360,14 +355,12 @@ ui <- HashRouter(
       Route(
         path = "project/:id/*", 
         element = div(
-          NavLink.shinyInput(
-            inputId = "overview",
+          NavLink(
             to = "overview",
             "Overview"
           ),
           tags$br(),
-          NavLink.shinyInput(
-            inputId = "analysis",
+          NavLink(
             to = "analysis",
             "Analysis"
           ),
@@ -389,11 +382,6 @@ ui <- HashRouter(
 )
 
 server <- function(input, output, session) {
-  
-  # Necessary to update `url_hash` to get "" (homepage), "1/analysis" and "2/analysis"
-  observeEvent(c(input$home, input$overview, input$analysis), {
-    session$reload()
-  })
   
   url_hash <- shiny::reactiveVal(value = NA)
 

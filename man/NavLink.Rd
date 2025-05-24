@@ -6,9 +6,9 @@
 \alias{updateNavLink.shinyInput}
 \title{NavLink}
 \usage{
-NavLink(...)
+NavLink(..., reloadDocument = TRUE)
 
-NavLink.shinyInput(inputId, ...)
+NavLink.shinyInput(inputId, ..., reloadDocument = TRUE)
 
 updateNavLink.shinyInput(
   session = shiny::getDefaultReactiveDomain(),
@@ -19,6 +19,8 @@ updateNavLink.shinyInput(
 \arguments{
 \item{...}{Props to pass to element.}
 
+\item{reloadDocument}{Boolean. Default TRUE. Let browser handle the transition normally}
+
 \item{inputId}{ID of the component.}
 
 \item{session}{Object passed as the `session` argument to Shiny server.}
@@ -27,7 +29,10 @@ updateNavLink.shinyInput(
 A NavLink component.
 }
 \description{
-\url{https://reactrouter.com/6.30.0/components/nav-link}
+The `reloadDocument` can be used to skip client side routing and let the 
+browser handle the transition normally (as if it were an <a href>). In 
+React Router v6 `reloadDocument` if `FALSE`, but given shiny behavior, the
+`NavLink()` function makes it `TRUE` by default.
 
-\url{https://reactrouter.com/en/main/components/nav-link}
+\url{https://reactrouter.com/6.30.0/components/nav-link}
 }

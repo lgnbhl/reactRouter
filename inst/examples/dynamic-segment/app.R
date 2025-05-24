@@ -124,19 +124,15 @@ ui <- reactRouter::HashRouter(
 
 server <- function(input, output, session) {
   
-  # issue #4: https://github.com/lgnbhl/reactRouter/issues/4
-  # NOT NECESSARY AS WE NEED ONLY PROJECT ID, WORKING WITHOUT RELOADING THE SESSION
-  # observeEvent(c(input$home, input$overview, input$analysis), {
-  #   session$reload()
-  # })
-  
+  url_hash <- shiny::reactiveVal(value = NA)
   url_hash_cleaned <- shiny::reactiveVal(value = NA)
   
   # update reactive values based on url hash
   shiny::observe({
     current_url_hash <- sub("#/", "", session$clientData$url_hash)
     # print(current_url_hash)
-
+    url_hash(current_url_hash)
+    
     # extract numeric id from current url hash
     current_url_hash_cleaned <- as.integer(stringr::str_extract(current_url_hash, "\\d+"))
     # print(current_url_hash_cleaned)
@@ -185,6 +181,10 @@ server <- function(input, output, session) {
       class = "p-3",
       card(
         card_header("Session and data"),
+        tags$p(
+          tags$b("Current hash url: "),
+          paste0("'", url_hash(), "'")
+        ),
         tags$p(
           tags$b("Current cleaned hash url: "),
           paste0("'", url_hash_cleaned(), "'")
@@ -235,6 +235,10 @@ server <- function(input, output, session) {
       class = "p-3",
       card(
         card_header("Session and data"),
+        tags$p(
+          tags$b("Current hash url: "),
+          paste0("'", url_hash(), "'")
+        ),
         tags$p(
           tags$b("Current cleaned hash url: "),
           paste0("'", url_hash_cleaned(), "'")

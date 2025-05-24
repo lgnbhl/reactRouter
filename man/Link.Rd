@@ -6,9 +6,9 @@
 \alias{updateLink.shinyInput}
 \title{Link}
 \usage{
-Link(...)
+Link(..., reloadDocument = TRUE)
 
-Link.shinyInput(inputId, ...)
+Link.shinyInput(inputId, ..., reloadDocument = TRUE)
 
 updateLink.shinyInput(
   session = shiny::getDefaultReactiveDomain(),
@@ -19,6 +19,8 @@ updateLink.shinyInput(
 \arguments{
 \item{...}{Props to pass to element.}
 
+\item{reloadDocument}{Boolean. Default TRUE. Let browser handle the transition normally}
+
 \item{inputId}{ID of the component.}
 
 \item{session}{Object passed as the `session` argument to Shiny server.}
@@ -27,7 +29,10 @@ updateLink.shinyInput(
 A Link component.
 }
 \description{
-\url{https://reactrouter.com/6.30.0/components/link}
+The `reloadDocument` can be used to skip client side routing and let the 
+browser handle the transition normally (as if it were an <a href>). In 
+React Router v6 `reloadDocument` if `FALSE`, but given shiny behavior, the
+`Link()` function makes it `TRUE` by default.
 
-\url{https://reactrouter.com/en/main/components/link}
+\url{https://reactrouter.com/6.30.0/components/link}
 }
