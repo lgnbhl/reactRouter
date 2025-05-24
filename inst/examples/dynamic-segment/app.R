@@ -61,6 +61,7 @@ cards_home <- purrr::map(
 
 ui <- reactRouter::HashRouter(
   bslib::page_navbar(
+    window_title = "reactRouter | dynamic segments",
     title = span(
       reactRouter::Link(
         to = "/", 
