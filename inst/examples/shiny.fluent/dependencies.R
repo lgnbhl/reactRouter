@@ -1,0 +1,9 @@
+# This file allows packrat (used by rsconnect during deployment) to pick up dependencies.
+library(rhino)
+library(treesitter)
+library(treesitter.r)
+library(httr)
+library(shiny.fluent)
+library(reactRouter)
+library(stringdist)
+library(echarts4r)
