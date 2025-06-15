@@ -75,13 +75,13 @@ Route <- function(..., element, key = uuid::UUIDgenerate()) {
 #' Link
 #' 
 #' The `reloadDocument` can be used to skip client side routing and let the 
-#' browser handle the transition normally (as if it were an <a href>). In 
-#' React Router v6 `reloadDocument` if `FALSE`, but given shiny behavior, the
-#' `Link()` function makes it `TRUE` by default.
+#' browser handle the transition normally (as if it were an <a href>). Given 
+#' shiny behavior, using `reloadDocument = TRUE` allows to render correctly
+#' objects created in the server side.
 #' 
 #' @rdname Link
 #' @param ... Props to pass to element.
-#' @param reloadDocument Boolean. Default TRUE. Let browser handle the transition normally 
+#' @param reloadDocument Boolean. Default FALSE.
 #' @return A Link component.
 #' @export
 Link <- function(..., reloadDocument = TRUE) {
@@ -107,13 +107,13 @@ Navigate <- component('Navigate')
 #' NavLink
 #' 
 #' The `reloadDocument` can be used to skip client side routing and let the 
-#' browser handle the transition normally (as if it were an <a href>). In 
-#' React Router v6 `reloadDocument` if `FALSE`, but given shiny behavior, the
-#' `NavLink()` function makes it `TRUE` by default.
+#' browser handle the transition normally (as if it were an <a href>). Given 
+#' shiny behavior, using `reloadDocument = TRUE` allows to render correctly
+#' objects created in the server side.
 #' 
 #' @rdname NavLink
 #' @param ... Props to pass to element.
-#' @param reloadDocument Boolean. Default TRUE. Let browser handle the transition normally 
+#' @param reloadDocument Boolean. Default FALSE.
 #' @return A NavLink component.
 #' @export
 NavLink <- function(..., reloadDocument = TRUE) {
