@@ -6,7 +6,7 @@
 \alias{updateLink.shinyInput}
 \title{Link}
 \usage{
-Link(..., reloadDocument = FALSE)
+Link(..., reloadDocument = TRUE)
 
 Link.shinyInput(inputId, ..., reloadDocument = TRUE)
 

@@ -6,7 +6,7 @@
 \alias{updateNavLink.shinyInput}
 \title{NavLink}
 \usage{
-NavLink(..., reloadDocument = FALSE)
+NavLink(..., reloadDocument = TRUE)
 
 NavLink.shinyInput(inputId, ..., reloadDocument = TRUE)
 
