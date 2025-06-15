@@ -30,9 +30,9 @@ A Link component.
 }
 \description{
 The `reloadDocument` can be used to skip client side routing and let the 
-browser handle the transition normally (as if it were an <a href>). In 
-React Router v6 `reloadDocument` if `FALSE`, but given shiny behavior, the
-`Link()` function makes it `TRUE` by default.
+browser handle the transition normally (as if it were an <a href>). Given 
+shiny behavior, using `reloadDocument = TRUE` allows to render correctly
+objects created in the server side.
 
 \url{https://reactrouter.com/6.30.0/components/link}
 }

@@ -90,12 +90,14 @@ ui <- reactRouter::HashRouter(
           nav_item(
             NavLink(
               to = "overview", 
+              reloadDocument = TRUE,
               "Overview"
             )
           ),
           nav_item(
             NavLink(
               to = "analysis", 
+              reloadDocument = TRUE,
               "Analysis"
             )
           ),
@@ -103,6 +105,7 @@ ui <- reactRouter::HashRouter(
           nav_item(
             NavLink(
               to = "/", 
+              reloadDocument = TRUE,
               shiny::icon("home")
             )
           ),
