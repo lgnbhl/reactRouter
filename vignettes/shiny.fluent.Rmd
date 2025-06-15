@@ -22,21 +22,21 @@ This tutorial demonstrates how to build a dynamic Shiny application using `react
 
 Initially, ensure you have the necessary rhino package installed. You can do this by running the following command in your R console:
 
-```{r}
+```r
 # Install rhino if not yet installed
 install.packages("rhino")
 ```
 
 Next, you will need to create a new rhino project. If you haven't already set up a rhino project, you can do so by running the following command in your R console:
 
-```{r}
+```r
 # Initialize a new rhino project (will create project scaffolding)
 rhino::init()
 ```
 
 This will create a basic structure for your application. Add the following libraries to your `dependencies.R` file:
 
-```{r}
+```r
 # dependencies.R
 
 library(rhino) # App structure
@@ -51,7 +51,7 @@ library(treesitter.r) # Optional: R syntax support
 
 and then
 
-```{r}
+```r
 renv::snapshot()
 ```
 
@@ -72,7 +72,7 @@ The components of the application will be structured as follows:
 
 The final strucutre of the `app` will look like this:
 
-```
+```yml
 ├── app
 │   ├── js
 │   │   └── index.js
@@ -105,7 +105,7 @@ The final strucutre of the `app` will look like this:
 
 The main part of the application to address the routing and the UI components is in the `app.R` file. 
 
-```{r}
+```r
 # app / main.R
 
 box::use(
@@ -190,7 +190,7 @@ This function defines the overall layout and routing of the application using re
 
 You can now run your app locally with the following script:
 
-```{r}
+```r
 # run_dev.R
 
 rhino::build_js()
