@@ -1,0 +1,209 @@
+---
+title: "Tutorial: Using reactRouter with rhino and shiny.fluent"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Tutorial: Using reactRouter with rhino and shiny.fluent}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+![Tutorial: Using reactRouter with rhino and shiny.fluent](figures/reactRouterShinyFluent.gif)
+
+## Introduction
+
+This tutorial demonstrates how to build a dynamic Shiny application using `reactRouter` for routing and `shiny.fluent` for modern UI components, all within the `rhino` framework. We'll use [Dota 2](https://www.opendota.com/) API data as an example of routing multiple pages.
+
+Initially, ensure you have the necessary rhino package installed. You can do this by running the following command in your R console:
+
+```{r}
+# Install rhino if not yet installed
+install.packages("rhino")
+```
+
+Next, you will need to create a new rhino project. If you haven't already set up a rhino project, you can do so by running the following command in your R console:
+
+```{r}
+# Initialize a new rhino project (will create project scaffolding)
+rhino::init()
+```
+
+This will create a basic structure for your application. Add the following libraries to your `dependencies.R` file:
+
+```{r}
+# dependencies.R
+
+library(rhino) # App structure
+library(httr) # API requests
+library(shiny.fluent) # UI components
+library(reactRouter) # Client-side routing
+library(echarts4r) # Charting
+library(stringdist) # String matching
+library(treesitter) # Optional: Syntax parsing
+library(treesitter.r) # Optional: R syntax support
+```
+
+and then
+
+```{r}
+renv::snapshot()
+```
+
+Now we are ready to go.
+
+## Building the Application
+
+In this example, we will create a simple application that displays information about Dota 2 heroes. The application will have multiple routes, allowing users to navigate between different pages.
+
+The components of the application will be structured as follows:
+
+- home: the main page of the application, which will display a list of heroes
+- menu: a navigation menu for the application, allowing users to navigate between different pages
+- header: a header component that will be displayed on every page
+- details: a page containing detailed information about a specific hero
+- benchmark: a page that will display benchmark statistics for heroes
+- ranks: a page that will display the ranks of heroes based on their performance
+
+The final strucutre of the `app` will look like this:
+
+```
+├── app
+│   ├── js
+│   │   └── index.js
+│   ├── logic
+│   │   ├── data.R
+│   │   └── utils.R
+│   ├── main.R
+│   ├── static
+│   │   ├── css
+│   │   │   └── app.min.css
+│   │   ├── favicon.ico
+│   │   └── js
+│   │       └── app.min.js
+│   ├── styles
+│   │   └── main.scss
+│   └── view
+│       ├── benchmark.R
+│       ├── details.R
+│       ├── header.R
+│       ├── home.R
+│       ├── menu.R
+│       └── rank.R
+├── app.R
+├── config.yml
+├── dependencies.R
+├── renv.lock
+├── rhino.yml
+└── run_dev.R
+```
+
+The main part of the application to address the routing and the UI components is in the `app.R` file. 
+
+```{r}
+# app / main.R
+
+box::use(
+  app / view / home,
+  app / view / menu,
+  app / view / details,
+  app / view / benchmark,
+  app / view / rank
+)
+
+
+# Define UI with namespaced modules
+ui <- function(id) {
+  ns <- shiny::NS(id) # Namespace for module isolation
+  shiny.fluent::fluentPage(
+    reactRouter::HashRouter(
+      reactRouter::Routes(
+        # Home page route
+        reactRouter::Route(path = "/", element = home$ui(ns("home"))),
+
+        # Project-based nested routes
+        reactRouter::Route(
+          path = "/:projectId/*",
+          element = menu$ui(ns("menu")), # Common layout/menu
+          children = list(
+            reactRouter::Route(
+              path = "details",
+              element = details$ui(ns("details"))
+            ),
+            reactRouter::Route(
+              path = "benchmark",
+              element = benchmark$ui(ns("benchmark"))
+            ),
+            reactRouter::Route(
+              path = "rank",
+              element = rank$ui(ns("rank"))
+            )
+          )
+        ),
+
+        # Fallback for undefined routes
+        reactRouter::Route(path = "*", element = "Custom error 404")
+      )
+    )
+  )
+}
+
+#' @export
+server <- function(id) {
+  shiny::moduleServer(id, function(input, output, session) {
+    hero_selected <- home$server("home")
+
+    shiny::observe({
+      shiny::req(hero_selected())
+
+      print(paste0("hero_id selected: ", hero_selected()))
+    })
+
+    menu$server("menu", hero_selected = hero_selected)
+    details$server("details", hero_selected = hero_selected)
+    benchmark$server("benchmark", hero_selected = hero_selected)
+    rank$server("rank", hero_selected = hero_selected)
+  })
+}
+```
+
+This function defines the overall layout and routing of the application using reactRouter. It contains four key parts:
+
+1. Top-level routing via `HashRouter()` and `Routes()`.
+
+2. Root Route /: Displays the home page.
+
+3. Nested Route /:projectId/*:
+
+  1. Displays a layout (menu) and child routes (details, benchmark, rank).
+
+  2. Each sub-route renders a different module UI (e.g., details$ui, benchmark$ui).
+
+4. Fallback * Route: Catches any undefined paths and shows a custom 404 message.
+
+## Running the Application
+
+You can now run your app locally with the following script:
+
+```{r}
+# run_dev.R
+
+rhino::build_js()
+rhino::build_sass()
+shiny::runApp(port = 4929, launch.browser = FALSE)
+```
+
+## Recap
+
+In this tutorial, dynamic Shiny application using:
+
+- **`rhino`** for structured project setup.
+- **`shiny.fluent`** for modern and interactive UI.
+- **`reactRouter`** for dynamic and nested client-side routing.
+
+This setup provides flexibility, scalability, and maintainability for more complex Shiny applications.
