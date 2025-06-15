@@ -11,6 +11,15 @@ ui <- function(id) {
   ns <- shiny::NS(id)
   shiny::tagList(
     shiny.fluent::fluentPage(
+      waiter::use_waiter(),
+      waiter::waiterOnBusy(
+        color = "#C7C6C6",
+        html = shiny::tagList(
+          waiter::spin_fading_circles(),
+          "Fetching OpenDota API data and creating page..."
+        ),
+        fadeout = TRUE
+      ),
       reactRouter::HashRouter(
         reactRouter::Routes(
           reactRouter::Route(
