@@ -9,3 +9,4 @@ _\.new\.png$
 ^pkgdown
 ^docs
 ^data-raw
+inst\examples\shiny.fluent\renv

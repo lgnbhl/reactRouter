@@ -1,6 +1,7 @@
 # reactRouter 0.1.1
 
-* add example with **bslib**
+* fix #1
+* add more examples
 
 # reactRouter 0.1.0
 
