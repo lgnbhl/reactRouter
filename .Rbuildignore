@@ -10,3 +10,5 @@ _\.new\.png$
 ^docs
 ^data-raw
 inst\examples\shiny.fluent\renv
+^CRAN-SUBMISSION$
+^cran-comments.md
