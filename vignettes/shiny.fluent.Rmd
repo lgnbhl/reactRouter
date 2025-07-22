@@ -14,8 +14,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-![Tutorial: Using reactRouter with rhino and shiny.fluent](figures/reactRouterShinyFluent.gif)
-
 ## Introduction
 
 This tutorial demonstrates how to build a dynamic Shiny application using `reactRouter` for routing and `shiny.fluent` for modern UI components, all within the `rhino` framework. We'll use [Dota 2](https://www.opendota.com/) API data as an example of routing multiple pages.
