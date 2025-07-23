@@ -11,3 +11,5 @@ _\.new\.png$
 ^data-raw
 ^CRAN-SUBMISSION$
 ^cran-comments.md
+^inst/examples/shiny.fluent/.lintr
+^inst/examples/shiny.fluent/.renvignore
