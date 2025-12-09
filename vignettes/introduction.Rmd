@@ -119,13 +119,13 @@ reactRouter::HashRouter(
 
 <img style="border:1px solid black;" src="https://raw.githubusercontent.com/lgnbhl/reactRouter/master/man/figures/reactRouter-with-bslib.png" align="center" />
 
-### Usage with shinyMaterialUI
+### Usage with muiMaterial
 
-A minimal example using [shinyMaterialUI](https://felixluginbuhl.com/shinyMaterialUI/).
+A minimal example using [shinyMaterialUI](https://felixluginbuhl.com/muiMaterial/).
 
 ```r
-# remotes::install_github("lgnbhl/shinyMaterialUI")
-library(shinyMaterialUI)
+# remotes::install_github("lgnbhl/muiMaterial")
+library(muiMaterial)
 
 HashRouter(
   Box(
@@ -172,9 +172,9 @@ HashRouter(
 )
 ```
 
-<img style="border:1px solid black;" src="https://raw.githubusercontent.com/lgnbhl/reactRouter/master/man/figures/reactRouter-with-shinyMaterialUI.png" align="center" />
+<img style="border:1px solid black;" src="https://raw.githubusercontent.com/lgnbhl/reactRouter/master/man/figures/reactRouter-with-muiMaterial.png" align="center" />
 
-Find more examples with **shinyMaterialUI** [here](https://felixluginbuhl.com/shinyMaterialUI/).
+Find more examples with **muiMaterial** [here](https://felixluginbuhl.com/muiMaterial/).
 
 ### Usage with Shiny modules
 
