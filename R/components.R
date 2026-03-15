@@ -144,3 +144,40 @@ Outlet <- component('Outlet')
 #' @return A Routes component.
 #' @export
 Routes <- component('Routes')
+
+#' createHashRouter
+#'
+#' \url{https://reactrouter.com/6.30.0/routers/create-hash-router}
+#'
+#' Creates a hash router using the data router API.
+#' Use with \code{\link{createRoutesFromElements}} and \code{\link{Route}}.
+#'
+#' @rdname createHashRouter
+#' @param ... \code{\link{Route}} elements, typically wrapped in
+#'   \code{\link{createRoutesFromElements}}.
+#' @return A createHashRouter component.
+#' @export
+createHashRouter <- function(...) {
+  shiny.react::reactElement(
+    module = "@/reactRouter",
+    name = "CreateHashRouter",
+    props = shiny.react::asProps(...),
+    deps = reactRouterDependency()
+  )
+}
+
+#' createRoutesFromElements
+#'
+#' \url{https://reactrouter.com/6.30.0/utils/create-routes-from-elements}
+#'
+#' Wraps \code{\link{Route}} elements for use with \code{\link{createHashRouter}}.
+#' The actual conversion from JSX elements to route objects happens on the
+#' JavaScript side.
+#'
+#' @rdname createRoutesFromElements
+#' @param ... \code{\link{Route}} elements.
+#' @return A tag list of Route elements.
+#' @export
+createRoutesFromElements <- function(...) {
+  shiny::tagList(...)
+}
