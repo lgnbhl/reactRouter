@@ -5,6 +5,8 @@
 ^LICENSE\.md$
 _\.new\.png$
 ^\.github$
+^\.claude$
+^\.vscode$
 ^_pkgdown.yml
 ^pkgdown
 ^docs

@@ -1,12 +1,11 @@
-# {shinytest2}: Ignore new debug snapshots for `$expect_values()`
-*_.new.png
 .Rproj.user
 .Rhistory
 .Rdata
 .httr-oauth
 .DS_Store
 .quarto
-
+.claude
+.vscode
 js/node_modules
 js/README.md
 docs
