@@ -14,3 +14,5 @@ inst/doc
 pkgdown
 CRAN-SUBMISSION
 .claude/settings.local.json
+inst/examples/shiny.fluent/.renvignore
+inst/examples/shiny.fluent/.lintr
