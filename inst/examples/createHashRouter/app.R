@@ -1,9 +1,9 @@
 # Minimal example using createHashRouter() and createRoutesFromElements()
 # This uses the data router API instead of the component-based <HashRouter> + <Routes>.
-# Run with: reactRouter::reactRouterExample("hash-router")
+# Demonstrates the `loader` argument with useLoaderData() to fetch and display data.
 
-library(shiny)
 library(reactRouter)
+library(htmltools)
 
 Home <- div(
   h2("Home"),
@@ -12,22 +12,37 @@ Home <- div(
 
 About <- div(
   h2("About"),
-  p("This is the About page.")
+  p("This page was loaded with data from a loader:"),
+  tags$blockquote(
+    useLoaderData(
+      tags$span(),
+      selector = "message"
+    )
+  ),
+  p(
+    tags$small(
+      "Loaded at: ",
+      useLoaderData(
+        tags$span(),
+        selector = "timestamp"
+      )
+    )
+  )
 )
 
 NoMatch <- div(
   h2("404 - Not Found"),
   p(
-    Link(to = "/", "Go back home")
+    NavLink(to = "/", "Go back home")
   )
 )
 
 Layout <- div(
   tags$nav(
     tags$ul(
-      tags$li(Link(to = "/", "Home")),
-      tags$li(Link(to = "/about", "About")),
-      tags$li(Link(to = "/nothing-here", "Nothing Here"))
+      tags$li(NavLink(to = "/", "Home")),
+      tags$li(NavLink(to = "/about", "About")),
+      tags$li(NavLink(to = "/nothing-here", "Nothing Here"))
     )
   ),
   tags$hr(),
@@ -40,12 +55,23 @@ ui <- createHashRouter(
       path = "/",
       element = Layout,
       Route(index = TRUE, element = Home),
-      Route(path = "about", element = About),
+      Route(
+        path = "about",
+        loader = JS(
+          "async () => {
+            await new Promise(r => setTimeout(r, 500));
+            return {
+              message: 'Hello from the About loader!',
+              timestamp: new Date().toLocaleTimeString()
+            };
+          }"
+        ),
+        element = About
+      ),
       Route(path = "*", element = NoMatch)
     )
   )
 )
 
-server <- function(input, output, session) {}
-
-shinyApp(ui, server)
+# htmltools::save_html(ui, "index.html")
+htmltools::browsable(ui)

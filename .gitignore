@@ -4,11 +4,13 @@
 .httr-oauth
 .DS_Store
 .quarto
-.claude
-.vscode
+.Renviron
 js/node_modules
 js/README.md
 docs
-inst/doc
 data-raw
-renv
+inst/doc
+/.quarto/
+pkgdown
+CRAN-SUBMISSION
+.claude/settings.local.json

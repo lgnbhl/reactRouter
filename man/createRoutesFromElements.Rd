@@ -16,7 +16,8 @@ A tag list of Route elements.
 \url{https://reactrouter.com/6.30.0/utils/create-routes-from-elements}
 }
 \details{
-Wraps \code{\link{Route}} elements for use with \code{\link{createHashRouter}}.
+Wraps \code{\link{Route}} elements for use with \code{\link{createBrowserRouter}},
+\code{\link{createHashRouter}}, or \code{\link{createMemoryRouter}}.
 The actual conversion from JSX elements to route objects happens on the
 JavaScript side.
 }

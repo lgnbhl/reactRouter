@@ -4,12 +4,17 @@
 \alias{Route}
 \title{Route}
 \usage{
-Route(..., element, key = uuid::UUIDgenerate())
+Route(..., element, loader = NULL, key = uuid::UUIDgenerate())
 }
 \arguments{
 \item{...}{Props to pass to element.}
 
 \item{element}{element wrapped in a `shiny::div()`.}
+
+\item{loader}{Optional. Can be:
+- A data.frame or list: serialized as a static JS loader
+- An R function: called at build time (no params available)
+- A JS() expression: passed through as-is}
 
 \item{key}{By default uses a UUID key in the `div()` of the `element` arg.}
 }
@@ -20,7 +25,7 @@ A Route component.
 \url{https://reactrouter.com/6.30.0/components/route}
 }
 \details{
-Internally the `element` is wrapped in a `shiny::div()` 
-with a UUID key so, in case R shiny is used, shiny can differentiate 
+Internally the `element` is wrapped in a `shiny::div()`
+with a UUID key so, in case R shiny is used, shiny can differentiate
 each element.
 }
