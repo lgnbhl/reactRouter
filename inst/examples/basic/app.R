@@ -48,44 +48,45 @@ NoMatch <- div(
   )
 )
 
-ui <- reactRouter::HashRouter(
-  div(
-    h1("Basic Example"),
-    tags$p(
-      paste0('This example demonstrates some of the core features of React Router
-          including nested reactRouter::Route(), reactRouter::Outlet(), 
-          reactRouter::Link(), and using a "*" route (aka "splat route") 
-          to render a "not found" page when someone visits an unrecognized URL.'
-      )
+Header <- div(
+  h1("Basic Example"),
+  tags$p(
+    paste0(
+      'This example demonstrates some of the core features of React Router
+        including reactRouter::createHashRouter(), reactRouter::createRoutesFromElements(),
+        nested reactRouter::Route(), reactRouter::Outlet(),
+        reactRouter::Link(), and using a "*" route (aka "splat route")
+        to render a "not found" page when someone visits an unrecognized URL.'
+    )
+  ),
+  Layout
+)
+
+ui <- RouterProvider(
+  Route(
+    path = "/",
+    element = Header,
+    Route(
+      index = TRUE,
+      element = Home
     ),
-    reactRouter::Routes(
-      Route(
-        path = "/",
-        element = Layout,
-        Route(
-          index = TRUE,
-          element = Home
-        ),
-        Route(
-          path = "about",
-          element = About
-        ),
-        Route(
-          path = "dashboard",
-          element = Dashboard
-        ),
-        # Using path="*"" means "match anything", so this route
-        # acts like a catch-all for URLs that we don't have explicit
-        # routes for.
-        Route(
-          path = "*",
-          element = NoMatch
-        )
-      )
+    Route(
+      path = "about",
+      element = About
+    ),
+    Route(
+      path = "dashboard",
+      element = Dashboard
+    ),
+    # Using path="*" means "match anything", so this route
+    # acts like a catch-all for URLs that we don't have explicit
+    # routes for.
+    Route(
+      path = "*",
+      element = NoMatch
     )
   )
 )
 
-server <- function(input, output, session) { }
-
-shinyApp(ui = ui, server = server)
+# htmltools::save_html(ui, "index.html")
+htmltools::browsable(ui)
