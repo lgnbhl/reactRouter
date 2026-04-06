@@ -121,6 +121,15 @@ Route <- function(..., element, loader = NULL, key = uuid::UUIDgenerate()) {
 #' @return A Link component.
 #' @export
 Link <- function(..., reloadDocument = FALSE) {
+  # Check if the user did NOT provide the argument
+  if (missing(reloadDocument)) {
+    lifecycle::deprecate_warn(
+      when = "0.1.2",
+      what = "Link(reloadDocument = 'default is now FALSE')",
+      details = "The default of `reloadDocument` was TRUE in version 0.1.1. It is now FALSE."
+    )
+  }
+
   shiny.react::reactElement(
     module = "react-router-dom",
     name = "Link",
@@ -155,6 +164,15 @@ Navigate <- component('Navigate')
 #' @return A NavLink component.
 #' @export
 NavLink <- function(..., reloadDocument = FALSE) {
+  # Check if the user did NOT provide the argument
+  if (missing(reloadDocument)) {
+    lifecycle::deprecate_warn(
+      when = "0.1.2",
+      what = "Link(reloadDocument = 'default is now FALSE')",
+      details = "The default of `reloadDocument` was TRUE in version 0.1.1. It is now FALSE."
+    )
+  }
+
   shiny.react::reactElement(
     module = "react-router-dom",
     name = "NavLink",

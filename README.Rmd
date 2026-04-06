@@ -21,6 +21,11 @@ dependencies <- jsonlite::fromJSON("js/package.json")$dependencies
 
 The goal of **reactRouter** is to provide a wrapper around [React Router (v6)](https://reactrouter.com/6.30.0).
 
+> [!CAUTION]
+> **Breaking Change in v.0.1.3** : `reloadDocument` is now FALSE by default in `NavLink()` and `Link()`. 
+> This default is in line with the official React Router library and necessary for data routing features.
+
+
 ### Usage
 
 You can easily add URL pages in a Quarto document or R Shiny app like so:

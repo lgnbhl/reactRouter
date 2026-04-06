@@ -20,7 +20,8 @@ Imports:
     shiny,
     shiny.react,
     checkmate,
-    uuid
+    uuid,
+    lifecycle
 Suggests:
     testthat (>= 3.0.0),
     chromote (>= 0.1.1.9001),
