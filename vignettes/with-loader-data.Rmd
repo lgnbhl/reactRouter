@@ -1,8 +1,8 @@
 ---
-title: "Using WithLoaderData"
+title: "Using useLoaderData"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Using WithLoaderData}
+  %\VignetteIndexEntry{Using useLoaderData}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -16,137 +16,88 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-`WithLoaderData()` is a generic wrapper component that connects React Router's
+`useLoaderData()` connects React Router's
 [`useLoaderData()`](https://reactrouter.com/6.30.0/hooks/use-loader-data) hook
-to any `shiny.react`-based child component. It injects client-side loader data
-into a specified prop of the child at render time — no Shiny server roundtrip
-required.
+to your UI. It calls the hook and injects the result into a component — either
+as text content inside a plain HTML element, or as a structured JavaScript value
+into any prop of a `shiny.react`-based component.
 
-This means you can use the full API of any React component (e.g.
-`muiDataGrid::DataGrid()`, `muiMaterial::Typography()`) and let
-`WithLoaderData()` supply the data from a JavaScript loader.
-
-## `useLoaderData` vs `WithLoaderData`
-
-Both components access React Router's `useLoaderData()` hook, but they differ
-in origin and purpose:
-
-`useLoaderData()` is a thin wrapper around React Router's own
-[`useLoaderData()`](https://reactrouter.com/6.30.0/hooks/use-loader-data) hook.
-It calls the hook and renders the result as text — it maps directly to the
-upstream React Router API.
-
-`WithLoaderData()` is a **custom helper created in this R package**. It does not
-correspond to any React Router component. It was designed to bridge the gap
-between React Router's loader system and `shiny.react`-based R packages by
-injecting loader data as a structured JavaScript value into a child component's
-prop via `React.cloneElement()`.
-
-Because `WithLoaderData()` relies on `React.cloneElement()`, the child must be a
-component built on the
-[`shiny.react`](https://appsilon.github.io/shiny.react/) framework. Examples of
-R packages that provide compatible components include:
-
-- [`muiDataGrid`](https://github.com/anthropic/muiDataGrid) — MUI X Data Grid
-- [`muiMaterial`](https://github.com/anthropic/muiMaterial) — MUI Material components
-- [`muiCharts`](https://github.com/anthropic/muiCharts) — MUI X Charts
-- [`muiTreeView`](https://github.com/anthropic/muiTreeView) — MUI X Tree View
-- [`shiny.fluent`](https://appsilon.github.io/shiny.fluent/) — Microsoft Fluent
-  UI components
-- [`shiny.blueprint`](https://appsilon.github.io/shiny.blueprint/) — Palantir
-  Blueprint UI components
-- [`shinyNextUI`](https://github.com/anthropic/shinyNextUI) — NextUI components
-
-Standard `htmltools` tags (`tags$div`, `tags$h3`, etc.) are **not**
-`shiny.react` components, so they cannot be used as the `child` of
-`WithLoaderData()`. For rendering loader data inside plain HTML elements, use
-`useLoaderData()` instead.
-
-| | `useLoaderData()` | `WithLoaderData()` |
-|---|---|---|
-| **Origin** | React Router hook (upstream API) | Custom wrapper (this package) |
-| **Output** | Text or JSON string rendered directly in the DOM | Raw JS value (object, array, number) injected as a prop |
-| **Use case** | Display loader values in HTML elements (`h3`, `p`, `span`, etc.) | Feed structured loader data into `shiny.react` component props (`rows`, `value`, `items`, etc.) |
-| **Requires `prop`?** | No | Yes — you must specify which prop to inject into |
-| **Requires `child`?** | No — it *is* the rendered output | Yes — needs a `shiny.react`-based component |
-
-**Use `useLoaderData()` when you want to render a value as text:**
-
-```r
-tags$h3(useLoaderData(selector = "name"))      # renders "Alice"
-tags$pre(useLoaderData())                      # renders full JSON string
-```
-
-**Use `WithLoaderData()` when a `shiny.react` component needs the data as a
-structured JS object or array:**
-
-```r
-WithLoaderData(
-  prop = "rows",
-  field = "people",
-  child = muiDataGrid::DataGrid()
-)
-```
-
-The key distinction is data format: `useLoaderData()` always converts to a
-string (via `String()` or `JSON.stringify()`), while `WithLoaderData()` passes
-the raw JavaScript value. A data grid needs an actual array of objects for its
-`rows` prop — a JSON string would not work. Conversely, for displaying a user's
-name inside an `<h3>`, `useLoaderData(selector = "name")` is simpler and more
-direct than wrapping a child component with `WithLoaderData()`.
-
-## How it works
-
-React Router [data routers](https://reactrouter.com/6.30.0/routers/picking-a-router)
-(`createHashRouter`, `createBrowserRouter`, `createMemoryRouter`) support
-`loader` functions — JavaScript functions that fetch data before a route renders.
-Components on that route can access the loader's return value via the
-`useLoaderData()` hook.
-
-In plain React, you would write:
-
-```js
-function PeoplePage() {
-  const data = useLoaderData();
-  return <DataGrid rows={data.people} columns={columns} />;
-}
-```
-
-Since R cannot call React hooks directly, `WithLoaderData()` bridges this gap.
-It wraps a child component, calls `useLoaderData()` at render time, and injects
-the result into whichever prop you specify via `React.cloneElement()`.
+Use it inside a `Route` that has a `loader` function.
 
 ## Arguments
 
 | Argument | Required | Description |
 |----------|----------|-------------|
-| `prop` | yes | The name of the child's prop to inject data into (e.g. `"rows"`, `"children"`, `"value"`). |
-| `child` | yes | A `shiny.react`-based component that will receive the loader data as the specified prop. |
-| `field` | no | A key to extract from the loader data object. If `NULL` (default), the entire loader data is passed. |
+| `into` | yes | The component that will receive the loader data. Can be a plain `htmltools` tag (e.g. `tags$h3()`) or a `shiny.react`-based component. |
+| `as` | no | The prop name to inject data into. Defaults to `"children"`. |
+| `selector` | no | A key to extract from the loader data object. If `NULL` (default), the entire loader data is passed. |
 
-## Designing your loader
+## Rendering text in HTML elements
 
-The React Router community recommends that each loader returns **exactly the
-shape the consuming component needs**. This keeps things simple and avoids
-the need for the `field` argument:
+Pass any `htmltools` tag as `into` to render loader data as text. This is the
+simplest use case — no extra configuration needed:
+
+```r
+# Render a single field as text
+useLoaderData(tags$h3(), selector = "name")      # renders the "name" field
+useLoaderData(tags$pre())                         # renders full JSON string
+```
+
+Full example with dynamic route parameters:
+
+```r
+library(reactRouter)
+library(htmltools)
+library(dplyr)
+
+people_json <- dplyr::starwars |>
+  mutate(id = dplyr::row_number()) |>
+  jsonlite::toJSON(dataframe = "rows", auto_unbox = TRUE)
+
+RouterProvider(
+  Route(
+    path = "/",
+    element = div(Outlet()),
+    Route(
+      path = "people/:id",
+      loader = JS(sprintf(
+        "({ params }) => {
+          const db = %s;
+          const person = db.find(row => row.id == params.id);
+          if (!person) throw new Response('Not found', { status: 404 });
+          return person;
+        }",
+        people_json
+      )),
+      element = div(
+        useLoaderData(tags$h3(), selector = "name"),
+        useLoaderData(tags$span(), selector = "gender")
+      )
+    )
+  )
+)
+```
+
+## Injecting structured data into shiny.react components
+
+Pass a `shiny.react`-based component as `into` and specify the target prop with
+`as`. The loader data (or a `selector` field from it) is injected as the raw
+JavaScript value — not converted to a string.
+
+This is needed whenever a component expects an actual array or object for a
+prop, for example `rows` in a data grid or `options` in an autocomplete.
 
 ```r
 library(reactRouter)
 library(muiDataGrid)
 library(htmltools)
 
-# Loader returns the array directly — no field needed
 loader <- JS("async () => {
   const res = await fetch('https://swapi.info/api/people');
   return (await res.json()).map((p, i) => ({
     id: i, name: p.name, height: p.height
   }));
 }")
-
-columns <- JS("[
-  { field: 'name',   headerName: 'Name',   flex: 1 },
-  { field: 'height', headerName: 'Height', width: 100 }
-]")
 
 RouterProvider(
   Route(
@@ -154,57 +105,59 @@ RouterProvider(
     loader = loader,
     element = div(
       style = "height: 400px;",
-      WithLoaderData(
-        prop = "rows",
-        child = muiDataGrid::DataGrid(columns = columns)
+      useLoaderData(
+        muiDataGrid::DataGrid(
+          columns = JS("[
+            { field: 'name',   headerName: 'Name',   flex: 1 },
+            { field: 'height', headerName: 'Height', width: 100 }
+          ]")
+        ),
+        as = "rows"
       )
     )
   )
 )
 ```
 
-When a single loader serves multiple components on the same route, use `field`
-to extract the relevant key:
+When the loader returns an object with multiple fields, use `selector` to
+extract the relevant one:
 
 ```r
-library(reactRouter)
-library(muiDataGrid)
-library(muiMaterial)
-library(htmltools)
-
-# Loader returns multiple datasets — use field to pick one
 loader <- JS("async () => {
   const res = await fetch('https://swapi.info/api/people');
-  const people = await res.json();
+  const data = await res.json();
   return {
-    title: people.length + ' characters found',
-    people: people.map((p, i) => ({
-      id: i, name: p.name, height: p.height
-    }))
+    names: data.map(p => p.name).sort(),
+    people: data.map((p, i) => ({ id: i, name: p.name, height: p.height }))
   };
 }")
-
-columns <- JS("[
-  { field: 'name',   headerName: 'Name',   flex: 1 },
-  { field: 'height', headerName: 'Height', width: 100 }
-]")
 
 RouterProvider(
   Route(
     path = "/",
     loader = loader,
     element = div(
-      WithLoaderData(
-        prop = "children",
-        field = "title",
-        child = muiMaterial::Typography(variant = "h5")
+      useLoaderData(
+        muiMaterial::Autocomplete(
+          renderInput = JS(
+            "(params) => React.createElement(window.jsmodule['@mui/material'].TextField, {...params, label: 'Name'})"
+          ),
+          multiple = TRUE
+        ),
+        as = "options",
+        selector = "names"
       ),
       div(
         style = "height: 400px;",
-        WithLoaderData(
-          prop = "rows",
-          field = "people",
-          child = muiDataGrid::DataGrid(columns = columns)
+        useLoaderData(
+          muiDataGrid::DataGrid(
+            columns = JS("[
+              { field: 'name',   headerName: 'Name',   flex: 1 },
+              { field: 'height', headerName: 'Height', width: 100 }
+            ]")
+          ),
+          as = "rows",
+          selector = "people"
         )
       )
     )
@@ -212,44 +165,33 @@ RouterProvider(
 )
 ```
 
-However, the React Router best practice is to prefer **nested routes with their
-own loaders** over a single loader returning multiple datasets. Each route
-should own its data:
+## Designing your loader
+
+The React Router community recommends that each loader returns **exactly the
+shape the consuming component needs**. This avoids the need for `selector`:
 
 ```r
-library(reactRouter)
-library(muiDataGrid)
-library(muiMaterial)
-library(htmltools)
-
-stats_loader <- JS("async () => {
-  const res = await fetch('https://swapi.info/api/people');
-  const people = await res.json();
-  return { summary: people.length + ' characters in database' };
-}")
-
-people_loader <- JS("async () => {
+# Loader returns the array directly — no selector needed
+loader <- JS("async () => {
   const res = await fetch('https://swapi.info/api/people');
   return (await res.json()).map((p, i) => ({
     id: i, name: p.name, height: p.height
   }));
 }")
 
-columns <- JS("[
-  { field: 'name',   headerName: 'Name',   flex: 1 },
-  { field: 'height', headerName: 'Height', width: 100 }
-]")
+useLoaderData(muiDataGrid::DataGrid(columns = columns), as = "rows")
+```
 
+When a single route renders multiple components with different data needs,
+consider splitting into nested routes — each with its own loader:
+
+```r
 RouterProvider(
   Route(
     path = "/",
     loader = stats_loader,
     element = div(
-      WithLoaderData(
-        prop = "children",
-        field = "summary",
-        child = muiMaterial::Typography(variant = "h5")
-      ),
+      useLoaderData(tags$h2(), selector = "summary"),
       Outlet()
     ),
     Route(
@@ -257,10 +199,7 @@ RouterProvider(
       loader = people_loader,
       element = div(
         style = "height: 400px;",
-        WithLoaderData(
-          prop = "rows",
-          child = muiDataGrid::DataGrid(columns = columns)
-        )
+        useLoaderData(muiDataGrid::DataGrid(columns = columns), as = "rows")
       )
     )
   )
@@ -269,47 +208,21 @@ RouterProvider(
 
 ## Works with any shiny.react component
 
-`WithLoaderData()` is not tied to any specific package. It works with any
-component built on `shiny.react`, because it simply injects a prop value
-via `React.cloneElement()`. Here are some examples:
+`useLoaderData()` works with any component built on `shiny.react` — it simply
+injects a prop value via `React.cloneElement()`. Examples of compatible
+packages:
 
-**muiDataGrid::DataGrid** — inject loader data as `rows`:
+- [`muiDataGrid`](https://github.com/lgnbhl/muiDataGrid) — MUI X Data Grid
+- [`muiMaterial`](https://github.com/lgnbhl/muiMaterial) — MUI Material components
+- [`muiCharts`](https://github.com/lgnbhl/muiCharts) — MUI X Charts
+- [`muiTreeView`](https://github.com/lgnbhl/muiTreeView) — MUI X Tree View
+- [`shiny.fluent`](https://appsilon.github.io/shiny.fluent/) — Microsoft Fluent UI components
+- [`shiny.blueprint`](https://appsilon.github.io/shiny.blueprint/) — Palantir Blueprint UI components
 
-```r
-library(reactRouter)
-library(muiDataGrid)
-library(htmltools)
+Standard `htmltools` tags (`tags$div`, `tags$h3`, etc.) only support text
+injection (the default `as = "children"` with no structured data).
 
-loader <- JS("async () => {
-  const res = await fetch('https://swapi.info/api/people');
-  return (await res.json()).map((p, i) => ({
-    id: i, name: p.name, height: p.height, gender: p.gender
-  }));
-}")
-
-RouterProvider(
-  Route(
-    path = "/",
-    loader = loader,
-    element = div(
-      style = "height: 400px;",
-      WithLoaderData(
-        prop = "rows",
-        child = muiDataGrid::DataGrid(
-          columns = JS("[
-            { field: 'name',   headerName: 'Name',   flex: 1 },
-            { field: 'height', headerName: 'Height', width: 100 },
-            { field: 'gender', headerName: 'Gender', width: 100 }
-          ]"),
-          pageSizeOptions = JS("[5, 10, 25]")
-        )
-      )
-    )
-  )
-)
-```
-
-For interactive charts, you can inject loader data as `dataset` in **muiCharts** components:
+**muiCharts::BarChart** — inject loader data as `dataset`:
 
 ```r
 library(reactRouter)
@@ -330,46 +243,16 @@ RouterProvider(
   Route(
     path = "/",
     loader = loader,
-    element = WithLoaderData(
-      prop = "dataset",
-      child = muiCharts::BarChart(
+    element = useLoaderData(
+      muiCharts::BarChart(
         series = list(
-          list(
-            dataKey = "height", label = "Height (cm)"
-          ),
-          list(
-            dataKey = "mass",   label = "Mass (kg)"
-          )
+          list(dataKey = "height", label = "Height (cm)"),
+          list(dataKey = "mass",   label = "Mass (kg)")
         ),
-        xAxis = list(
-          list(scaleType = 'band', dataKey = 'name')
-        ),
+        xAxis = list(list(scaleType = "band", dataKey = "name")),
         height = 400
-      )
-    )
-  )
-)
-```
-
-**muiMaterial::Typography** — inject loader data as text content:
-
-```r
-library(reactRouter)
-library(muiMaterial)
-library(htmltools)
-
-loader <- JS("async () => {
-  return { title: 'Hello from the loader!' };
-}")
-
-RouterProvider(
-  Route(
-    path = "/",
-    loader = loader,
-    element = WithLoaderData(
-      prop = "children",
-      field = "title",
-      child = muiMaterial::Typography(variant = "h1")
+      ),
+      as = "dataset"
     )
   )
 )
@@ -377,8 +260,8 @@ RouterProvider(
 
 ## Injecting into multiple props
 
-If you need to inject loader data into more than one prop of the same component,
-nest `WithLoaderData()` calls:
+To inject loader data into more than one prop of the same component, nest
+`useLoaderData()` calls:
 
 ```r
 library(reactRouter)
@@ -390,7 +273,7 @@ loader <- JS("async () => {
   const people = await res.json();
   return {
     columnDefs: [
-      { field: 'name', headerName: 'Name', flex: 1 },
+      { field: 'name',   headerName: 'Name',   flex: 1 },
       { field: 'height', headerName: 'Height', width: 100 }
     ],
     people: people.map((p, i) => ({ id: i, name: p.name, height: p.height }))
@@ -403,26 +286,26 @@ RouterProvider(
     loader = loader,
     element = div(
       style = "height: 400px;",
-      WithLoaderData(
-        prop = "columns",
-        field = "columnDefs",
-        child = WithLoaderData(
-          prop = "rows",
-          field = "people",
-          child = muiDataGrid::DataGrid()
-        )
+      useLoaderData(
+        useLoaderData(
+          muiDataGrid::DataGrid(),
+          as = "rows",
+          selector = "people"
+        ),
+        as = "columns",
+        selector = "columnDefs"
       )
     )
   )
 )
 ```
 
-Each wrapper extracts its own `field` from the same `useLoaderData()` result and
-injects it into the specified `prop`.
+Each call extracts its own `selector` from the same `useLoaderData()` result
+and injects it into the specified prop.
 
 ## Requirements
 
-`WithLoaderData()` requires a **data router** (`createHashRouter`,
+`useLoaderData()` requires a **data router** (`createHashRouter`,
 `createBrowserRouter`, or `createMemoryRouter`) because only data routers
 support `loader` functions. It will not work with the component-based routers
 (`HashRouter`, `MemoryRouter`).
