@@ -17,19 +17,29 @@ total](https://cranlogs.r-pkg.org/badges/grand-total/reactRouter)](https://cran.
 The goal of **reactRouter** is to provide a wrapper around [React Router
 (v6)](https://reactrouter.com/6.30.0).
 
+> \[!CAUTION\] **Breaking Change in v.0.1.3** : `reloadDocument` is now
+> FALSE by default in `NavLink()` and `Link()`. Set
+> `reloadDocument = TRUE` only when target routes contain Shiny
+> server-rendered output like `uiOutput()` / `renderUI()`.
+
 ### Usage
 
-You can easily add URL pages in Quarto document or R shiny like so:
+You can easily add URL pages in a Quarto document or R Shiny app like
+so:
 
 ``` r
 library(reactRouter)
 
-HashRouter(
-  NavLink(to = "/", "Main"),
-  NavLink(to = "/analysis", "Analysis"),
-  Routes(
-    Route(path = "/", element = "Main content"),
-    Route(path = "/analysis", element = "Analysis content")
+RouterProvider(
+  Route(
+    path = "/",
+    element = div(
+      NavLink(to = "/", "Main"),
+      NavLink(to = "/analysis", "Analysis"),
+      Outlet()
+    ),
+    Route(index = TRUE, element = "Main content"),
+    Route(path = "analysis", element = "Analysis content")
   )
 )
 ```
@@ -48,12 +58,32 @@ Get started with a showcase example:
 
 ``` r
 # print all examples available: reactRouterExample()
-reactRouterExample("basic")
+reactRouterExample("dynamic-segment")
 ```
 
 Read the vignette
 [here](https://felixluginbuhl.com/reactRouter/articles/introduction.html)
 for detailed use cases with Quarto and R Shiny.
+
+### Choosing a router
+
+The simplest way to add routing is `RouterProvider()`, which defaults to
+hash-based routing and works in Shiny apps, static HTML, and Quarto
+documents:
+
+``` r
+RouterProvider(
+  Route(path = "/", element = ..., Route(...))
+)
+# type = "hash" (default) — URL shows /#/about, bookmarkable
+# type = "memory"         — URL never changes, great for embedded widgets
+```
+
+Lower-level functions (`createHashRouter()`, `createMemoryRouter()`,
+`HashRouter()`, `MemoryRouter()`, `BrowserRouter()`) are also available
+for more control. See the [Choosing a
+router](https://felixluginbuhl.com/reactRouter/articles/routers.html)
+vignette for details and code examples.
 
 ### Contribute
 
