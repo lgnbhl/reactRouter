@@ -17,7 +17,7 @@ total](https://cranlogs.r-pkg.org/badges/grand-total/reactRouter)](https://cran.
 The goal of **reactRouter** is to provide a wrapper around [React Router
 (v6)](https://reactrouter.com/6.30.0).
 
-> \[!CAUTION\] **Breaking Change in v.0.1.3** : `reloadDocument` is now
+> \[!CAUTION\] **Breaking Change in v.0.1.2** : `reloadDocument` is now
 > FALSE by default in `NavLink()` and `Link()`. Set
 > `reloadDocument = TRUE` only when target routes contain Shiny
 > server-rendered output like `uiOutput()` / `renderUI()`.
