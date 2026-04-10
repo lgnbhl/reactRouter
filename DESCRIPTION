@@ -1,7 +1,7 @@
 Package: reactRouter
 Type: Package
 Title: 'React Router' for 'shiny' Apps and 'Quarto'
-Version: 0.1.2
+Version: 0.2.0
 Authors@R: c(
     person(given = "Felix", family = "Luginbuhl", role = c("aut", "cre"), email = "felix.luginbuhl@protonmail.ch", comment = c(ORCID = "0009-0008-6625-2899")),
     person(given = "Andryas", family = "Waurzenczak", role = c("ctb")),

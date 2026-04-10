@@ -8,7 +8,7 @@ reactRouterDependency <- function() {
     name = "reactRouter",
     version = "0.0.1",
     package = "reactRouter",
-    src = c(file = "reactRouter-6.30.0"),
+    src = c(file = "reactRouter"),
     script = "react-router-dom.js"
   )
 }

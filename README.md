@@ -10,17 +10,18 @@ status](https://www.r-pkg.org/badges/version/reactRouter)](https://CRAN.R-projec
 [![Grand
 total](https://cranlogs.r-pkg.org/badges/grand-total/reactRouter)](https://cran.r-project.org/package=reactRouter)
 [![R-CMD-check](https://github.com/lgnbhl/reactRouter/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/lgnbhl/reactRouter/actions/workflows/R-CMD-check.yaml)
-[![](https://img.shields.io/badge/react--router--dom-6.30.0-blue.svg)](https://reactrouter.com/6.30.0)
+[![](https://img.shields.io/badge/react--router--dom-7.14.0-blue.svg)](https://reactrouter.com)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Follow-E4405F?style=social&logo=linkedin)](https://www.linkedin.com/in/FelixLuginbuhl)
 <!-- badges: end -->
 
-The goal of **reactRouter** is to provide a wrapper around [React Router
-(v6)](https://reactrouter.com/6.30.0).
+The goal of **reactRouter** is to provide a wrapper around [React
+Router](https://reactrouter.com).
 
-> \[!CAUTION\] **Breaking Change in v.0.1.2** : `reloadDocument` is now
+> \[!CAUTION\] **Breaking Change in v.0.2.0** : `reloadDocument` is now
 > FALSE by default in `NavLink()` and `Link()`. Set
 > `reloadDocument = TRUE` only when target routes contain Shiny
-> server-rendered output like `uiOutput()` / `renderUI()`.
+> server-rendered output like `uiOutput()` / `renderUI()` in dynamic
+> segments (`/:id/`).
 
 ### Usage
 
@@ -29,6 +30,7 @@ so:
 
 ``` r
 library(reactRouter)
+library(htmltools)
 
 RouterProvider(
   Route(
@@ -52,38 +54,15 @@ RouterProvider(
 install.packages("reactRouter")
 ```
 
-### Example
+### Resources
 
-Get started with a showcase example:
-
-``` r
-# print all examples available: reactRouterExample()
-reactRouterExample("dynamic-segment")
-```
-
-Read the vignette
-[here](https://felixluginbuhl.com/reactRouter/articles/introduction.html)
-for detailed use cases with Quarto and R Shiny.
-
-### Choosing a router
-
-The simplest way to add routing is `RouterProvider()`, which defaults to
-hash-based routing and works in Shiny apps, static HTML, and Quarto
-documents:
-
-``` r
-RouterProvider(
-  Route(path = "/", element = ..., Route(...))
-)
-# type = "hash" (default) — URL shows /#/about, bookmarkable
-# type = "memory"         — URL never changes, great for embedded widgets
-```
-
-Lower-level functions (`createHashRouter()`, `createMemoryRouter()`,
-`HashRouter()`, `MemoryRouter()`, `BrowserRouter()`) are also available
-for more control. See the [Choosing a
-router](https://felixluginbuhl.com/reactRouter/articles/routers.html)
-vignette for details and code examples.
+- [Package documentation](https://felixluginbuhl.com/reactRouter/)
+- [Getting Started
+  vignette](https://felixluginbuhl.com/reactRouter/articles/introduction.html)
+- [All R
+  examples](https://github.com/lgnbhl/reactRouter/tree/main/inst/examples)
+- [Official Material UI
+  docs](https://mui.com/material-ui/getting-started/)
 
 ### Contribute
 

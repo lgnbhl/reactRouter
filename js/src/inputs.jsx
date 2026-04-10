@@ -136,7 +136,7 @@ export function RouterProvider({ type, fallbackElement, children, ...props }) {
     if (routerType === 'browser') return ReactRouter.createBrowserRouter(routes, props);
     if (routerType === 'memory') return ReactRouter.createMemoryRouter(routes, props);
     return ReactRouter.createHashRouter(routes, props);
-  }, []);
+  }, [children]);
   return React.createElement(ReactRouter.RouterProvider, { router, fallbackElement });
 }
 

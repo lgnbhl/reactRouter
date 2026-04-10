@@ -2,12 +2,10 @@
 # Demonstrates Await() which renders content once a deferred loader promise
 # resolves, enabling non-blocking ("streaming") data loading.
 #
-# The loader uses ReactRouterDom.defer() to return a slow promise alongside
-# fast data. The fast data renders immediately; Await() waits for the slow
-# promise and streams in the result without blocking the page transition.
-#
-# ReactRouterDom is exposed as a global by the package so it is accessible
-# inside JS() loader / action strings.
+# The loader returns a slow promise alongside fast data (no defer() needed in
+# React Router v7 — just return the object directly). The fast data renders
+# immediately; Await() waits for the slow promise and streams in the result
+# without blocking the page transition.
 
 library(reactRouter)
 library(htmltools)
@@ -65,7 +63,7 @@ ui <- RouterProvider(
             }), 2000)
           );
 
-          return ReactRouterDom.defer({ summary, details });
+          return { summary, details };
         }"
       ),
       element = div(

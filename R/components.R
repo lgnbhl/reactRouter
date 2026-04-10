@@ -124,7 +124,7 @@ Link <- function(..., reloadDocument = FALSE) {
   # Check if the user did NOT provide the argument
   if (missing(reloadDocument)) {
     lifecycle::deprecate_warn(
-      when = "0.1.2",
+      when = "0.2.0",
       what = "Link(reloadDocument = 'default is now FALSE')",
       details = "The default of `reloadDocument` was TRUE in version 0.1.1. It is now FALSE."
     )
@@ -167,7 +167,7 @@ NavLink <- function(..., reloadDocument = FALSE) {
   # Check if the user did NOT provide the argument
   if (missing(reloadDocument)) {
     lifecycle::deprecate_warn(
-      when = "0.1.2",
+      when = "0.2.0",
       what = "Link(reloadDocument = 'default is now FALSE')",
       details = "The default of `reloadDocument` was TRUE in version 0.1.1. It is now FALSE."
     )
@@ -351,13 +351,14 @@ ScrollRestoration <- component('ScrollRestoration')
 #'
 #' Renders \code{into} when a deferred loader promise resolves, injecting the
 #' resolved value (or a \code{selector} from it) \code{as} a prop.
-#' Use inside a \code{\link{Route}} whose \code{loader} returns a
-#' \code{defer()} object (written via \code{\link{JS}}).
+#' Use inside a \code{\link{Route}} whose \code{loader} returns an object
+#' containing a promise (written via \code{\link{JS}}). In React Router v7,
+#' simply return the object directly — no \code{defer()} wrapper is needed.
 #'
 #' @inheritParams hook-wrapper
-#' @param resolveKey Character. The key in the loader's \code{defer()} return
-#'   value that holds the promise (e.g. if the loader returns
-#'   \code{defer(\{ data: promise \})}, set \code{resolveKey = "data"}).
+#' @param resolveKey Character. The key in the loader's return value that holds
+#'   the promise (e.g. if the loader returns \code{\{ data: promise \}},
+#'   set \code{resolveKey = "data"}).
 #' @param errorElement Element to render if the promise rejects.
 #' @param fallback Element shown while the promise is pending. Defaults to a
 #'   plain \code{"Loading\u2026"} span.
