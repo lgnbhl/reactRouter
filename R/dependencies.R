@@ -6,7 +6,7 @@
 reactRouterDependency <- function() {
   htmltools::htmlDependency(
     name = "reactRouter",
-    version = "0.0.1",
+    version = as.character(utils::packageVersion("reactRouter")),
     package = "reactRouter",
     src = c(file = "reactRouter"),
     script = "react-router-dom.js"
