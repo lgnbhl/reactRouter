@@ -128,6 +128,69 @@ export function useResolvedPath({ to, selector, as, into, ...rest }) {
   return React.cloneElement(into, { [as]: safeAs(as, value), ...rest });
 }
 
+export function useFetcher({ selector, as, into, fetcherKey, ...rest }) {
+  const fetcher = ReactRouter.useFetcher(fetcherKey ? { key: fetcherKey } : undefined);
+  const value = selector ? getPath(fetcher, selector) : fetcher.state;
+  return React.cloneElement(into, { [as]: safeAs(as, value), ...rest });
+}
+
+export function useFetchers({ selector, as, into, ...rest }) {
+  const fetchers = ReactRouter.useFetchers();
+  const value = selector ? fetchers.map(f => getPath(f, selector)) : fetchers;
+  return React.cloneElement(into, { [as]: safeAs(as, value), ...rest });
+}
+
+export function useRevalidator({ selector, as, into, ...rest }) {
+  const revalidator = ReactRouter.useRevalidator();
+  const value = selector ? getPath(revalidator, selector) : revalidator.state;
+  return React.cloneElement(into, { [as]: safeAs(as, value), ...rest });
+}
+
+export function useBlocker({ shouldBlock, selector, as, into, ...rest }) {
+  const blocker = ReactRouter.useBlocker(shouldBlock ?? false);
+  const value = selector ? getPath(blocker, selector) : blocker.state;
+  return React.cloneElement(into, { [as]: safeAs(as, value), ...rest });
+}
+
+export function useOutletContext({ selector, as, into, ...rest }) {
+  const context = ReactRouter.useOutletContext();
+  const value = selector ? getPath(context, selector) : context;
+  return React.cloneElement(into, { [as]: safeAs(as, value), ...rest });
+}
+
+
+// FetcherForm — a <form> bound to a fetcher instance.
+// Use alongside useFetcher(fetcherKey = "...") to observe state/data.
+export function FetcherForm({ fetcherKey, children, ...props }) {
+  const fetcher = ReactRouter.useFetcher(fetcherKey ? { key: fetcherKey } : undefined);
+  return React.createElement(fetcher.Form, props, children);
+}
+
+// RevalidatorButton — calls revalidator.revalidate() on click.
+// If `into` is provided, injects onClick + disabled into that element (hook-wrapper style).
+// Otherwise renders a plain <button>. Automatically disabled while revalidation is in progress.
+export function RevalidatorButton({ into, children, style, disabled, ...props }) {
+  const revalidator = ReactRouter.useRevalidator();
+  const isLoading = revalidator.state !== 'idle';
+  if (into) {
+    return React.cloneElement(into, {
+      onClick: () => revalidator.revalidate(),
+      disabled: disabled || isLoading,
+      ...props,
+    });
+  }
+  return React.createElement(
+    'button',
+    {
+      ...props,
+      style,
+      disabled: disabled || isLoading,
+      onClick: () => revalidator.revalidate(),
+    },
+    children
+  );
+}
+
 // RouterProvider — unified entry point: select type = "hash" | "browser" | "memory"
 export function RouterProvider({ type, fallbackElement, children, ...props }) {
   const routerType = type || 'hash';

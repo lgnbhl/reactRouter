@@ -798,3 +798,249 @@ useResolvedPath <- function(into, as = "children", selector = NULL, to, ...) {
   class(tag) <- c("reactRouter", class(tag))
   tag
 }
+
+#' FetcherForm
+#'
+#' \url{https://reactrouter.com/api/hooks/useFetcher}
+#'
+#' Renders a \code{<form>} that is bound to a fetcher instance, allowing
+#' data submission or loading without a page-level navigation.
+#' Use \code{fetcherKey} to share the fetcher state with one or more
+#' \code{\link{useFetcher}} calls in the same route element.
+#'
+#' @param ... Child elements (inputs, buttons, etc.) and additional HTML
+#'   attributes passed to the underlying \code{<form>}.
+#' @param method Character. HTTP method: \code{"get"} or \code{"post"}.
+#' @param action Character. The route path to submit to.
+#' @param fetcherKey Character. Optional key to share this fetcher across
+#'   components (must match the \code{fetcherKey} used in \code{useFetcher}).
+#'
+#' @rdname FetcherForm
+#' @export
+FetcherForm <- function(..., method = "get", action = NULL, fetcherKey = NULL) {
+  tag <- shiny.react::reactElement(
+    module = "@/reactRouter",
+    name = "FetcherForm",
+    props = shiny.react::asProps(
+      method = method,
+      action = action,
+      fetcherKey = fetcherKey,
+      ...
+    ),
+    deps = reactRouterDependency()
+  )
+  class(tag) <- c("reactRouter", class(tag))
+  tag
+}
+
+#' RevalidatorButton
+#'
+#' \url{https://reactrouter.com/api/hooks/useRevalidator}
+#'
+#' Calls \code{revalidator.revalidate()} when clicked, triggering a re-run of
+#' the current route's loader without navigating. The button is automatically
+#' disabled while revalidation is in progress.
+#'
+#' When \code{into} is supplied the component behaves like the other hook
+#' wrappers (\code{useRevalidator}, \code{useFetcher}, etc.): it injects
+#' \code{onClick} and \code{disabled} into \code{into} via
+#' \code{React.cloneElement}, so any React element can act as the trigger —
+#' for example a \code{muiMaterial::Button()}.
+#'
+#' When \code{into} is \code{NULL} (the default) a plain \code{<button>} is
+#' rendered instead, with child elements passed via \code{...}.
+#'
+#' @param ... When \code{into = NULL}: child elements (label text / HTML) and
+#'   extra HTML attributes for the \code{<button>}.  When \code{into} is set:
+#'   additional props merged into the cloned element.
+#' @param into Optional React element to receive the \code{onClick} /
+#'   \code{disabled} props (hook-wrapper style).
+#' @param style Character. Inline CSS style string (only used when
+#'   \code{into = NULL}).
+#'
+#' @rdname RevalidatorButton
+#' @export
+RevalidatorButton <- function(..., into = NULL, style = NULL) {
+  tag <- shiny.react::reactElement(
+    module = "@/reactRouter",
+    name = "RevalidatorButton",
+    props = shiny.react::asProps(
+      into = into,
+      style = style,
+      ...
+    ),
+    deps = reactRouterDependency()
+  )
+  class(tag) <- c("reactRouter", class(tag))
+  tag
+}
+
+#' useFetcher
+#'
+#' \url{https://reactrouter.com/api/hooks/useFetcher}
+#'
+#' Calls the \code{useFetcher()} hook and injects the result (or a
+#' \code{selector} from it) \code{as} a prop of the \code{into} component.
+#' Use to fetch data or submit forms without causing a navigation.
+#' The fetcher object has \code{state} (\code{"idle"}/\code{"loading"}/\code{"submitting"}) and
+#' \code{data} (the response from a loader or action).
+#'
+#' @inheritParams hook-wrapper
+#' @param fetcherKey Character. Optional key to share a fetcher across
+#'   components (e.g. \code{"my-fetcher"}).
+#'
+#' @rdname useFetcher
+#' @export
+useFetcher <- function(
+  into,
+  as = "children",
+  selector = "state",
+  fetcherKey = NULL,
+  ...
+) {
+  tag <- shiny.react::reactElement(
+    module = "@/reactRouter",
+    name = "useFetcher",
+    props = shiny.react::asProps(
+      as = as,
+      into = into,
+      selector = selector,
+      fetcherKey = fetcherKey,
+      ...
+    ),
+    deps = reactRouterDependency()
+  )
+  class(tag) <- c("reactRouter", class(tag))
+  tag
+}
+
+#' useFetchers
+#'
+#' \url{https://reactrouter.com/api/hooks/useFetchers}
+#'
+#' Calls the \code{useFetchers()} hook and injects the result (or a
+#' \code{selector} mapped over each fetcher) \code{as} a prop of the
+#' \code{into} component. Returns an array of all active fetchers.
+#' Useful for showing a global loading indicator.
+#'
+#' @inheritParams hook-wrapper
+#'
+#' @rdname useFetchers
+#' @export
+useFetchers <- function(into, as = "children", selector = NULL, ...) {
+  tag <- shiny.react::reactElement(
+    module = "@/reactRouter",
+    name = "useFetchers",
+    props = shiny.react::asProps(
+      as = as,
+      into = into,
+      selector = selector,
+      ...
+    ),
+    deps = reactRouterDependency()
+  )
+  class(tag) <- c("reactRouter", class(tag))
+  tag
+}
+
+#' useRevalidator
+#'
+#' \url{https://reactrouter.com/api/hooks/useRevalidator}
+#'
+#' Calls the \code{useRevalidator()} hook and injects the result (or a
+#' \code{selector} from it) \code{as} a prop of the \code{into} component.
+#' Returns the revalidation \code{state} (\code{"idle"} or \code{"loading"}).
+#' Useful for showing loading feedback during manual or polling revalidation.
+#'
+#' @inheritParams hook-wrapper
+#'
+#' @rdname useRevalidator
+#' @export
+useRevalidator <- function(into, as = "children", selector = "state", ...) {
+  tag <- shiny.react::reactElement(
+    module = "@/reactRouter",
+    name = "useRevalidator",
+    props = shiny.react::asProps(
+      as = as,
+      into = into,
+      selector = selector,
+      ...
+    ),
+    deps = reactRouterDependency()
+  )
+  class(tag) <- c("reactRouter", class(tag))
+  tag
+}
+
+#' useBlocker
+#'
+#' \url{https://reactrouter.com/api/hooks/useBlocker}
+#'
+#' Calls the \code{useBlocker()} hook and injects the blocker's \code{state}
+#' (or another \code{selector} field) \code{as} a prop of the \code{into}
+#' component. Use to intercept navigation — e.g. warn the user about unsaved
+#' changes before they leave a route.
+#'
+#' The blocker \code{state} is one of \code{"unblocked"} (default),
+#' \code{"blocked"} (navigation intercepted), or \code{"proceeding"}
+#' (user confirmed, navigation in progress).
+#'
+#' @inheritParams hook-wrapper
+#' @param shouldBlock A \code{\link{JS}} function receiving
+#'   \code{\{ currentLocation, nextLocation, historyAction \}} and returning
+#'   \code{true} to block navigation or \code{false} to allow it.
+#'   Pass \code{FALSE} to disable blocking entirely (the default).
+#'
+#' @rdname useBlocker
+#' @export
+useBlocker <- function(
+  into,
+  as = "children",
+  selector = "state",
+  shouldBlock = FALSE,
+  ...
+) {
+  tag <- shiny.react::reactElement(
+    module = "@/reactRouter",
+    name = "useBlocker",
+    props = shiny.react::asProps(
+      as = as,
+      into = into,
+      selector = selector,
+      shouldBlock = shouldBlock,
+      ...
+    ),
+    deps = reactRouterDependency()
+  )
+  class(tag) <- c("reactRouter", class(tag))
+  tag
+}
+
+#' useOutletContext
+#'
+#' \url{https://reactrouter.com/api/hooks/useOutletContext}
+#'
+#' Calls the \code{useOutletContext()} hook and injects the context value
+#' (or a \code{selector} from it) \code{as} a prop of the \code{into}
+#' component. The context is whatever was passed to the parent route's
+#' \code{Outlet(context = ...)} call.
+#'
+#' @inheritParams hook-wrapper
+#'
+#' @rdname useOutletContext
+#' @export
+useOutletContext <- function(into, as = "children", selector = NULL, ...) {
+  tag <- shiny.react::reactElement(
+    module = "@/reactRouter",
+    name = "useOutletContext",
+    props = shiny.react::asProps(
+      as = as,
+      into = into,
+      selector = selector,
+      ...
+    ),
+    deps = reactRouterDependency()
+  )
+  class(tag) <- c("reactRouter", class(tag))
+  tag
+}

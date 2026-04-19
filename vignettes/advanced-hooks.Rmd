@@ -1,0 +1,199 @@
+---
+title: "Advanced hooks: useBlocker, useOutletContext, useAsyncValue, useAsyncError"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Advanced hooks: useBlocker, useOutletContext, useAsyncValue, useAsyncError}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Overview
+
+This vignette covers four hooks that address specific routing patterns beyond
+basic data loading and navigation:
+
+| Hook | What it does |
+|---|---|
+| `useBlocker()` | Intercept navigation — e.g. warn about unsaved changes |
+| `useOutletContext()` | Read data passed from a parent route through `Outlet(context = ...)` |
+
+They work inside data routers (`RouterProvider()`, `createHashRouter()`,
+`createMemoryRouter()`).
+
+---
+
+## `useBlocker()`
+
+`useBlocker()` intercepts navigation when a JavaScript condition returns
+`true`. It exposes a `state` field:
+
+| State | Meaning |
+|---|---|
+| `"unblocked"` | No navigation is being intercepted (default) |
+| `"blocked"` | A navigation was intercepted — show a confirmation UI |
+| `"proceeding"` | User confirmed; navigation is in progress |
+
+### Arguments
+
+| Argument | Required | Description |
+|---|---|---|
+| `into` | yes | Component that receives the value |
+| `as` | no | Prop to inject into. Defaults to `"children"` |
+| `selector` | no | Field from the blocker object. Defaults to `"state"` |
+| `shouldBlock` | no | A `JS()` function receiving `{ currentLocation, nextLocation, historyAction }` and returning `true` to block or `false` to allow. Defaults to `FALSE` (never blocks). |
+
+### Show blocker state
+
+```r
+useBlocker(
+  tags$span(),
+  shouldBlock = JS(
+    "({ currentLocation, nextLocation }) =>
+      currentLocation.pathname !== nextLocation.pathname"
+  )
+)
+# renders "unblocked", "blocked", or "proceeding"
+```
+
+### Full example
+
+The companion components `BlockerProceedButton()` and `BlockerResetButton()`
+let the user confirm or cancel the blocked navigation:
+
+```r
+library(reactRouter)
+library(htmltools)
+
+should_block <- JS(
+  "({ currentLocation, nextLocation }) =>
+    currentLocation.pathname !== nextLocation.pathname"
+)
+
+RouterProvider(
+  Route(
+    path = "/",
+    element = div(
+      NavLink(to = "/",      "Home"),
+      NavLink(to = "/other", "Other page"),
+      Outlet()
+    ),
+    Route(
+      index = TRUE,
+      element = div(
+        tags$h3("Home — blocker active"),
+        tags$p("Blocker state: ", useBlocker(tags$code(), shouldBlock = should_block)),
+        # Shown when state = "blocked":
+        tags$p("Leave without saving?"),
+        BlockerProceedButton("Leave",  shouldBlock = should_block),
+        BlockerResetButton( "Stay",    shouldBlock = should_block)
+      )
+    ),
+    Route(
+      path = "other",
+      element = div(tags$h3("Other page"))
+    )
+  )
+)
+```
+
+`shouldBlock` must be the **same JS function object** passed to all three —
+`useBlocker`, `BlockerProceedButton`, and `BlockerResetButton` — so they all
+reference the same blocker instance.
+
+### Conditional blocking
+
+Pass a condition that depends on form state embedded in the JS:
+
+```r
+# Block only when a specific query param indicates a dirty form
+JS("({ nextLocation }) => nextLocation.pathname === '/confirm'")
+
+# Always block (useful for testing)
+JS("() => true")
+
+# Never block
+FALSE  # the default
+```
+
+---
+
+## `useOutletContext()`
+
+Parent routes can pass data to child routes through `Outlet(context = ...)`.
+Any child route reads that data with `useOutletContext()`, avoiding prop-drilling
+through deeply nested layouts.
+
+### Arguments
+
+| Argument | Required | Description |
+|---|---|---|
+| `into` | yes | Component that receives the value |
+| `as` | no | Prop to inject into. Defaults to `"children"` |
+| `selector` | no | Field to extract from the context object. `NULL` (default) injects the full context as JSON |
+
+### Passing context from a parent route
+
+Add a `context` argument to `Outlet()`:
+
+```r
+Route(
+  path = "/",
+  element = div(
+    # Pass a named list — any R object that serialises to JSON
+    Outlet(context = list(user = "Alice", role = "admin")),
+    NavLink(to = "/profile", "Profile")
+  ),
+  Route(
+    path = "profile",
+    element = div(
+      tags$p("Name: ",  useOutletContext(tags$span(), selector = "user")),
+      tags$p("Role: ",  useOutletContext(tags$span(), selector = "role"))
+    )
+  )
+)
+```
+
+### Full example
+
+```r
+library(reactRouter)
+library(htmltools)
+
+user <- list(name = "Alice", role = "admin", email = "alice@example.com")
+
+RouterProvider(
+  Route(
+    path = "/",
+    element = div(
+      NavLink(to = "/",        "Dashboard"),
+      NavLink(to = "/profile", "Profile"),
+      Outlet(context = user)
+    ),
+    Route(
+      index = TRUE,
+      element = div(
+        tags$p("Welcome, ",
+               useOutletContext(tags$strong(), selector = "name"))
+      )
+    ),
+    Route(
+      path = "profile",
+      element = div(
+        tags$p("Name: ",  useOutletContext(tags$span(), selector = "name")),
+        tags$p("Email: ", useOutletContext(tags$span(), selector = "email")),
+        tags$p("Role: ",  useOutletContext(tags$span(), selector = "role"))
+      )
+    )
+  )
+)
+```
+
+The context is passed once at the layout level and is available to every
+child route without repeating it in each `element`.

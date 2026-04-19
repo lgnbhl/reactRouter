@@ -1,4 +1,4 @@
-# Await example
+# Await example — classic into= mode
 # Demonstrates Await() which renders content once a deferred loader promise
 # resolves, enabling non-blocking ("streaming") data loading.
 #
@@ -6,6 +6,9 @@
 # React Router v7 — just return the object directly). The fast data renders
 # immediately; Await() waits for the slow promise and streams in the result
 # without blocking the page transition.
+#
+# See also: inst/examples/useAsyncValue/app.R for the children passthrough mode
+# (into = NULL) which allows multiple useAsyncValue() hooks inside one Await.
 
 library(reactRouter)
 library(htmltools)

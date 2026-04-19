@@ -1,0 +1,238 @@
+---
+title: "Using useFetcher, useFetchers, and useRevalidator"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using useFetcher, useFetchers, and useRevalidator}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Overview
+
+React Router v7 provides hooks and components for managing data fetching outside
+of normal navigation:
+
+| Function | Role |
+|---|---|
+| `FetcherForm()` | A `<form>` bound to a fetcher — submits without navigating |
+| `useFetcher()` | Read a fetcher's `state` and `data` |
+| `useFetchers()` | Read the states of all active fetchers |
+| `RevalidatorButton()` | A `<button>` that re-runs the current route's loader |
+| `useRevalidator()` | Read the revalidation `state` |
+
+These only work inside a data router
+(`RouterProvider()`, `createHashRouter()`, or `createMemoryRouter()`).
+
+---
+
+## `FetcherForm()` and `useFetcher()`
+
+### The `FetcherForm` / `useFetcher` pair
+
+`Form()` triggers a page-level navigation (changing the URL and running the
+destination route's loader). `FetcherForm()` does the same data fetch or
+action **without navigating**: the URL, scroll position, and current route
+remain unchanged.
+
+`useFetcher()` reads the state of a specific fetcher. The two functions are
+linked by a shared `fetcherKey` string.
+
+```r
+# Form side — submit to /search without navigating
+FetcherForm(
+  fetcherKey = "my-search",
+  method = "get",
+  action = "/search",
+  tags$input(type = "search", name = "q"),
+  tags$button(type = "submit", "Search")
+)
+
+# Display side — read state and data from the same fetcher
+useFetcher(tags$span(), fetcherKey = "my-search", selector = "state")
+useFetcher(tags$span(), fetcherKey = "my-search", selector = "data.count")
+```
+
+### `FetcherForm()` arguments
+
+| Argument | Required | Description |
+|----------|----------|-------------|
+| `...` | yes | Child elements (inputs, buttons, etc.) and HTML attributes |
+| `method` | no | `"get"` (default) or `"post"` |
+| `action` | no | Route path to submit to |
+| `fetcherKey` | no | Shared key to link with `useFetcher()` calls |
+
+### `useFetcher()` arguments
+
+| Argument | Required | Description |
+|----------|----------|-------------|
+| `into` | yes | Component that receives the value |
+| `as` | no | Prop to inject into. Defaults to `"children"` |
+| `selector` | no | Field from the fetcher object. Defaults to `"state"` |
+| `fetcherKey` | no | Must match the `fetcherKey` in `FetcherForm()` |
+
+The fetcher object fields available via `selector`:
+
+| Selector | Value |
+|---|---|
+| `"state"` | `"idle"` / `"loading"` / `"submitting"` |
+| `"data"` | Full response from the loader or action |
+| `"data.myField"` | Nested field from the response |
+
+### Full example: inline search
+
+```r
+library(reactRouter)
+library(htmltools)
+library(jsonlite)
+
+people_json <- jsonlite::toJSON(
+  data.frame(name = c("Alice", "Bob", "Charlie", "David", "Eve")),
+  dataframe = "rows",
+  auto_unbox = TRUE
+)
+
+RouterProvider(
+  Route(
+    path = "/",
+    element = div(
+      tags$h2("Inline search"),
+      FetcherForm(
+        fetcherKey = "search",
+        method = "get",
+        action = "/search",
+        tags$input(type = "search", name = "q", placeholder = "Search..."),
+        tags$button(type = "submit", "Search")
+      ),
+      tags$p("Status: ", useFetcher(tags$strong(), fetcherKey = "search", selector = "state")),
+      tags$p("Matches: ", useFetcher(tags$strong(), fetcherKey = "search", selector = "data.count")),
+      Outlet()
+    ),
+    Route(index = TRUE, element = div()),
+    Route(
+      path = "search",
+      loader = JS(sprintf(
+        "({ request }) => {
+          const q = new URL(request.url).searchParams.get('q') || '';
+          const db = %s;
+          const hits = db.filter(r => r.name.toLowerCase().includes(q.toLowerCase()));
+          return { count: hits.length, results: hits };
+        }",
+        people_json
+      )),
+      element = div()
+    )
+  )
+)
+```
+
+---
+
+## `useFetchers()`
+
+`useFetchers()` returns all currently active fetchers. This is useful for a
+**global loading indicator** that shows whenever any background fetch is in
+progress, regardless of which component started it.
+
+### Arguments
+
+| Argument | Required | Description |
+|----------|----------|-------------|
+| `into` | yes | Component that receives the value |
+| `as` | no | Prop to inject into. Defaults to `"children"` |
+| `selector` | no | Field to extract from **each** fetcher. If `NULL` (default), returns the full array as JSON |
+
+### Example: monitor all active fetchers
+
+```r
+# Renders a JSON array of state strings whenever fetchers are active:
+# e.g. '["loading","idle"]'
+useFetchers(tags$code(), selector = "state")
+```
+
+When no fetchers are active the result is `"[]"`. Combine with a parent layout
+route to show a site-wide spinner:
+
+```r
+Route(
+  path = "/",
+  element = div(
+    tags$p("Active fetchers: ", useFetchers(tags$code(), selector = "state")),
+    Outlet()
+  ),
+  # child routes with FetcherForm calls ...
+)
+```
+
+---
+
+## `RevalidatorButton()` and `useRevalidator()`
+
+Revalidation re-runs the current route's loader **without a page-level
+navigation**. This is distinct from navigation (which changes the URL) and
+from fetchers (which load a different route in the background).
+
+### `RevalidatorButton()`
+
+`RevalidatorButton()` renders a `<button>` that calls
+`revalidator.revalidate()` when clicked. It is automatically disabled while
+revalidation is in progress.
+
+```r
+RevalidatorButton(
+  "Refresh data",
+  style = "padding: 6px 14px; cursor: pointer;"
+)
+```
+
+### `useRevalidator()` arguments
+
+| Argument | Required | Description |
+|----------|----------|-------------|
+| `into` | yes | Component that receives the value |
+| `as` | no | Prop to inject into. Defaults to `"children"` |
+| `selector` | no | Field from the revalidator. Defaults to `"state"` |
+
+The revalidator `state` is `"idle"` at rest and `"loading"` while the loader
+is re-running.
+
+### Full example: manual refresh button
+
+```r
+library(reactRouter)
+library(htmltools)
+
+RouterProvider(
+  Route(
+    path = "/",
+    loader = JS(
+      "async () => {
+        await new Promise(r => setTimeout(r, 1000));
+        return { time: new Date().toLocaleTimeString() };
+      }"
+    ),
+    element = div(
+      tags$p("Loaded at: ",        useLoaderData(tags$strong(), selector = "time")),
+      tags$p("Revalidation state: ", useRevalidator(tags$span())),
+      RevalidatorButton("Refresh", style = "padding: 6px 14px; cursor: pointer;")
+    ),
+    Route(index = TRUE, element = div())
+  )
+)
+```
+
+---
+
+## Comparison
+
+| Hook / Component | Triggers | State visible via | URL changes? |
+|---|---|---|---|
+| `Form()` + `useNavigation()` | page navigation | `useNavigation(selector = "state")` | Yes |
+| `FetcherForm()` + `useFetcher()` | background fetch | `useFetcher(selector = "state")` | No |
+| `RevalidatorButton()` + `useRevalidator()` | loader re-run | `useRevalidator()` | No |

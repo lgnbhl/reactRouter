@@ -22,9 +22,9 @@ that will receive the hook data as the specified prop.}
 data into (by default \code{"children"} for text display, \code{"rows"} for
 a data grid, \code{"value"} for an input).}
 
-\item{resolveKey}{Character. The key in the loader's \code{defer()} return
-value that holds the promise (e.g. if the loader returns
-\code{defer(\{ data: promise \})}, set \code{resolveKey = "data"}).}
+\item{resolveKey}{Character. The key in the loader's return value that holds
+the promise (e.g. if the loader returns \code{\{ data: promise \}},
+set \code{resolveKey = "data"}).}
 
 \item{selector}{Character. Optional key to extract from the hook data object.
 If \code{NULL} (the default), the entire data is passed.}
@@ -42,6 +42,7 @@ plain \code{"Loading\u2026"} span.}
 \details{
 Renders \code{into} when a deferred loader promise resolves, injecting the
 resolved value (or a \code{selector} from it) \code{as} a prop.
-Use inside a \code{\link{Route}} whose \code{loader} returns a
-\code{defer()} object (written via \code{\link{JS}}).
+Use inside a \code{\link{Route}} whose \code{loader} returns an object
+containing a promise (written via \code{\link{JS}}). In React Router v7,
+simply return the object directly — no \code{defer()} wrapper is needed.
 }
