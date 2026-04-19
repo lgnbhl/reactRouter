@@ -130,7 +130,7 @@ export function useResolvedPath({ to, selector, as, into, ...rest }) {
 
 export function useFetcher({ selector, as, into, fetcherKey, ...rest }) {
   const fetcher = ReactRouter.useFetcher(fetcherKey ? { key: fetcherKey } : undefined);
-  const value = selector ? getPath(fetcher, selector) : fetcher.state;
+  const value = selector ? getPath(fetcher, selector) : fetcher;
   return React.cloneElement(into, { [as]: safeAs(as, value), ...rest });
 }
 

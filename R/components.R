@@ -168,7 +168,7 @@ NavLink <- function(..., reloadDocument = FALSE) {
   if (missing(reloadDocument)) {
     lifecycle::deprecate_warn(
       when = "0.2.0",
-      what = "Link(reloadDocument = 'default is now FALSE')",
+      what = "NavLink(reloadDocument = 'default is now FALSE')",
       details = "The default of `reloadDocument` was TRUE in version 0.1.1. It is now FALSE."
     )
   }
@@ -894,7 +894,7 @@ RevalidatorButton <- function(..., into = NULL, style = NULL) {
 useFetcher <- function(
   into,
   as = "children",
-  selector = "state",
+  selector = NULL,
   fetcherKey = NULL,
   ...
 ) {
