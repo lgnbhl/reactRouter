@@ -12,6 +12,8 @@
 ^inst/helpers$
 ^data-raw$
 ^vignettes$
+^inst/examples/shiny\.fluent$
+^inst/examples/dynamic-segment$
 ^renovate.json
 ^reinstall.sh$
 ^cran-comments\.md$
