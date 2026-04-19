@@ -63,7 +63,8 @@ ui <- RouterProvider(
     Route(
       path = "search",
       loader = JS(sprintf(
-        "({ request }) => {
+        "async ({ request }) => {
+          await new Promise(resolve => setTimeout(resolve, 800));
           const q = new URL(request.url).searchParams.get('q') || '';
           const db = %s;
           const hits = db.filter(r =>

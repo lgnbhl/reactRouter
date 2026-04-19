@@ -7,8 +7,6 @@
 # immediately; Await() waits for the slow promise and streams in the result
 # without blocking the page transition.
 #
-# See also: inst/examples/useAsyncValue/app.R for the children passthrough mode
-# (into = NULL) which allows multiple useAsyncValue() hooks inside one Await.
 
 library(reactRouter)
 library(htmltools)

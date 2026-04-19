@@ -4,8 +4,8 @@
 # In this example a checkbox marks the form as "dirty". Navigating away
 # while dirty triggers the blocker and changes its state to "blocked".
 #
-# Note: to let the user confirm or cancel the blocked navigation, use
-# BlockerProceedButton() and BlockerResetButton() (see companion buttons).
+# Note: to let the user confirm or cancel the blocked navigation, call
+# blocker.proceed() or blocker.reset() via a custom JS action.
 
 library(reactRouter)
 library(htmltools)
@@ -43,11 +43,11 @@ ui <- RouterProvider(
           tags$code('"blocked"'),
           " and navigation is intercepted.",
           tags$br(),
-          "Use ",
-          tags$code("BlockerProceedButton()"),
+          "Call ",
+          tags$code("blocker.proceed()"),
           " / ",
-          tags$code("BlockerResetButton()"),
-          " (coming next) to confirm or cancel."
+          tags$code("blocker.reset()"),
+          " via a custom JS action to confirm or cancel."
         )
       )
     ),
