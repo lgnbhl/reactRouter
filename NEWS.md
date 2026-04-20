@@ -3,6 +3,7 @@
 - CRAN submission
 - update React Router to v.7
 - added components from React Router v.7 as R functions, including hooks.
+- BREAKING CHANGE: `RouterProvider` use "router" argument with `create*Router()` functions.
 - warning message regarding BREAKING CHANGE `reloadDocument`: now FALSE by default
 
 # reactRouter 0.1.2
