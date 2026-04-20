@@ -49,8 +49,8 @@ Layout <- div(
   Outlet()
 )
 
-ui <- createHashRouter(
-  createRoutesFromElements(
+ui <- RouterProvider(
+  router = createHashRouter(
     Route(
       path = "/",
       element = Layout,

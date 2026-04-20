@@ -14,7 +14,7 @@ useNavigationType(into, as = "children", ...)
 \item{...}{Additional props to pass to the component.}
 }
 \description{
-\url{https://reactrouter.com/6.30.0/hooks/use-navigation-type}
+\url{https://api.reactrouter.com/v7/functions/react-router.useNavigationType.html}
 }
 \details{
 Calls the \code{useNavigationType()} hook and injects the result

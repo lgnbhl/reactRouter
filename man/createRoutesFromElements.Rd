@@ -13,11 +13,17 @@ createRoutesFromElements(...)
 A tag list of Route elements.
 }
 \description{
-\url{https://reactrouter.com/6.30.0/utils/create-routes-from-elements}
+\url{https://api.reactrouter.com/v7/variables/react-router.createRoutesFromElements.html}
 }
 \details{
-Wraps \code{\link{Route}} elements for use with \code{\link{createBrowserRouter}},
-\code{\link{createHashRouter}}, or \code{\link{createMemoryRouter}}.
-The actual conversion from JSX elements to route objects happens on the
-JavaScript side.
+Optional compatibility alias. In R, \code{\link{createHashRouter}},
+\code{\link{createBrowserRouter}}, and \code{\link{createMemoryRouter}}
+accept \code{\link{Route}} elements directly, so wrapping them in
+\code{createRoutesFromElements()} is not required. The function is kept
+so that examples copied verbatim from the React Router v7 documentation
+(\code{createHashRouter(createRoutesFromElements(...))}) keep working.
+
+The actual JSX-to-route-object conversion always happens on the
+JavaScript side; this R function simply bundles its arguments into a
+tag list.
 }

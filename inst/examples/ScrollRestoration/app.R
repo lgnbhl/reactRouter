@@ -43,17 +43,19 @@ Layout <- div(
 )
 
 ui <- RouterProvider(
-  Route(
-    path = "/",
-    element = Layout,
-    Route(index = TRUE, element = long_page("Home", "#e8f4fd")),
-    Route(path = "news", element = long_page("News", "#fdf6e8")),
+  router = createMemoryRouter(
     Route(
-      path = "about",
-      element = div(
-        tags$h3("About"),
-        tags$p(
-          "This page is short — scrolling back to 'Home' or 'News' restores your previous position."
+      path = "/",
+      element = Layout,
+      Route(index = TRUE, element = long_page("Home", "#e8f4fd")),
+      Route(path = "news", element = long_page("News", "#fdf6e8")),
+      Route(
+        path = "about",
+        element = div(
+          tags$h3("About"),
+          tags$p(
+            "This page is short — scrolling back to 'Home' or 'News' restores your previous position."
+          )
         )
       )
     )

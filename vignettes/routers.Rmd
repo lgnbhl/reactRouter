@@ -14,115 +14,113 @@ knitr::opts_chunk$set(
 )
 ```
 
-The **reactRouter** package provides multiple ways to add routing. `RouterProvider()` is the simplest entry point: just pass your `Route()` elements and pick a router type.
+The **reactRouter** package provides multiple ways to add routing. `RouterProvider()` is the recommended entry point: pass a router built with `createHashRouter()`, `createMemoryRouter()`, or `createBrowserRouter()` to its `router` argument.
 
-## `RouterProvider()` — the simplest way to get started
+## `RouterProvider()` — recommended entry point
 
-`RouterProvider()` is a unified wrapper that covers the most common use cases through its `type` argument:
+`RouterProvider()` renders a data router. It mirrors the React Router v7 composition pattern: you build a router with one of the `create*Router()` functions and pass it to the `router` argument.
 
-- `type = "hash"` (default) — hash-based routing (`/#/about`). Works in Shiny, Quarto, and static HTML. Routes are visible in the URL, so users can bookmark pages and use browser back/forward.
-- `type = "memory"` — in-memory routing. The URL never changes. Ideal for embedded widgets, multi-step wizards, or multiple independent routers on the same page.
-- `type = "browser"` — HTML5 History API (`/about`). Not recommended for use with R (see [BrowserRouter](#browserouter----not-recommended-in-r) below).
+```r
+RouterProvider(
+  router = createHashRouter(
+    Route(
+      path = "/",
+      element = div(
+        NavLink(to = "/",         "Home"),
+        NavLink(to = "/analysis", "Analysis"),
+        Outlet()
+      ),
+      Route(index = TRUE,        element = "Main content"),
+      Route(path = "analysis",   element = "Analysis content")
+    )
+  )
+)
+```
+
+### Arguments
+
+**`router`** — required. A router object produced by `createHashRouter()`, `createMemoryRouter()`, or `createBrowserRouter()`.
+
+**`fallbackElement`** — optional. An element shown while the initial route's `loader` is resolving (i.e. the loading state before the first route renders). Example:
+
+```r
+RouterProvider(
+  router   = createHashRouter( ... ),
+  fallbackElement = div("Loading…")
+)
+```
+
+---
+
+## Choosing a router
+
+The three `create*Router()` functions differ only in how they interact with the browser URL:
+
+| Function | URL style | Works on `file://` | Recommended |
+|---|---|---|---|
+| `createHashRouter()` | `/#/about` | yes | **yes — default choice** |
+| `createMemoryRouter()` | in-memory (no URL change) | yes | **yes — for embedded / multi-router pages** |
+| `createBrowserRouter()` | `/about` | no | no (see below) |
+
+---
+
+## `createHashRouter()` — recommended default
+
+`createHashRouter()` uses the URL hash (`/#/about`) for routing. Hash changes never trigger a real HTTP request, so the router works in Shiny apps, Quarto documents, and static HTML pages without any server configuration.
+
+**Why it works well with Shiny:**
+
+- Hash changes do not affect Shiny's HTTP layer.
+- `session$clientData$url_hash` updates reactively whenever the route changes.
+
+**Why it is preferred over the legacy `HashRouter()`:**
+
+- Unlocks the full data router API: `loader`, `action`, `errorElement`, `useLoaderData`, `useNavigation`, `useFetcher`, and deferred data via `Await`.
+- This is the model React Router is actively developing; `HashRouter()` is a legacy compatibility wrapper.
 
 ```r
 library(reactRouter)
 library(htmltools)
 
 RouterProvider(
-  # type = "hash" by default — change to type = "memory" if needed
-  Route(
-    path = "/",
-    element = div(
-      tags$nav(
-        tags$ul(
-          tags$li(NavLink(to = "/",      "Home")),
-          tags$li(NavLink(to = "/about", "About"))
-        )
+  router = createHashRouter(
+    Route(
+      path = "/",
+      element = div(
+        tags$nav(
+          tags$ul(
+            tags$li(NavLink(to = "/",      "Home")),
+            tags$li(NavLink(to = "/about", "About"))
+          )
+        ),
+        tags$hr(),
+        Outlet()
       ),
-      tags$hr(),
-      Outlet()
-    ),
-    Route(index = TRUE,   element = div(h2("Home"),  p("Welcome."))),
-    Route(path = "about", element = div(h2("About"), p("About page.")))
+      Route(index = TRUE,   element = div(h2("Home"),  p("Welcome."))),
+      Route(path = "about", element = div(h2("About"), p("About page.")))
+    )
   )
 )
 ```
-
-The lower-level functions (`createHashRouter()`, `createMemoryRouter()`, `HashRouter()`, `MemoryRouter()`) are also available and give you more control. They are described below.
-
-## Quick reference
-
-| Router / shortcut | URL style | Works on `file://` | Recommended |
-|---|---|---|---|
-| `RouterProvider(type = "hash")` | `/#/about` | yes | **yes — simplest** |
-| `RouterProvider(type = "memory")` | in-memory (no URL change) | yes | **yes — simplest** |
-| `createHashRouter()` | `/#/about` | yes | yes |
-| `createMemoryRouter()` | in-memory (no URL change) | yes | yes |
-| `HashRouter()` | `/#/about` | yes | no (legacy) |
-| `MemoryRouter()` | in-memory (no URL change) | yes | no (legacy) |
-| `RouterProvider(type = "browser")` / `BrowserRouter()` | `/about` | no | no |
-
----
-
-## `createHashRouter()` — recommended default for Shiny and static sites
-
-`createHashRouter` is the best default choice for R Shiny apps and static sites (Quarto, R Markdown HTML output). It uses the URL hash (the `#` fragment) for routing, so routes like `/#/about` are visible in the address bar. This means users can bookmark pages, share deep links, and use the browser back/forward buttons — all without requiring a server that handles URL rewriting.
-
-**Why it works well with Shiny:**
-
-- Hash changes (`/#/about`) never trigger a real HTTP request, so Shiny's server is not affected.
-- `session$clientData$url_hash` updates reactively whenever the route changes, letting the server know the current page.
-
-**Why it is preferred over `HashRouter`:**
-
-- Unlocks the full data router API: `loader`, `action`, `errorElement`, `useLoaderData`, `useNavigation`, `useFetcher`, and deferred data.
-- This is the model React Router is actively developing; `HashRouter` is a legacy compatibility wrapper.
-
-```r
-library(reactRouter)
-library(htmltools)
-
-createHashRouter(
-  Route(
-    path = "/",
-    element = div(
-      tags$nav(
-        tags$ul(
-          tags$li(NavLink(to = "/",      "Home")),
-          tags$li(NavLink(to = "/about", "About"))
-        )
-      ),
-      tags$hr(),
-      Outlet()
-    ),
-    Route(index = TRUE,   element = div(h2("Home"),  p("Welcome."))),
-    Route(path = "about", element = div(h2("About"), p("About page.")))
-  )
-)
-```
-
-Note: the default `reloadDocument = FALSE` is used here so that React Router handles navigation client-side without triggering a full page reload.
 
 ---
 
 ## `createMemoryRouter()` — recommended for in-memory routing
 
-`createMemoryRouter` keeps the routing state entirely in memory. It does not read or modify the browser URL at all, which means:
+`createMemoryRouter()` keeps routing state entirely in memory. It never reads or modifies the browser URL, which means:
 
-- It always starts at `/`, regardless of what the real URL is.
+- It always starts at `/`, regardless of the real URL.
 - Navigation updates the in-memory location but the browser address bar does not change.
 - Browser back/forward buttons and bookmarks do not reflect the current route.
 
-This makes it ideal for **internal-only navigation** — multi-step wizards, tabbed panels, or any UI where the route is an implementation detail rather than something the user should see or share. It is also the right choice when you need **multiple independent routers on the same page** (e.g. several routed widgets in a Shiny dashboard), since they don't touch the URL and therefore can't conflict with each other.
-
-`createMemoryRouter` works in Shiny apps, static HTML pages (`file://`), and Quarto output blocks.
+This makes it ideal for **internal-only navigation** — multi-step wizards, tabbed panels, or any UI where the route is an implementation detail rather than something the user should share or bookmark. It is also the right choice when you need **multiple independent routers on the same page** (e.g. several routed widgets in a Shiny dashboard), since they don't touch the URL and therefore can't conflict with each other.
 
 ```r
 library(reactRouter)
 library(htmltools)
 
-createMemoryRouter(
-  createRoutesFromElements(
+RouterProvider(
+  router = createMemoryRouter(
     Route(
       path = "/",
       element = div(
@@ -146,26 +144,38 @@ createMemoryRouter(
 
 | Scenario | Recommended router |
 |---|---|
-| Shiny app with bookmarkable/shareable routes | `createHashRouter` |
-| Static site (Quarto, R Markdown) with multiple pages | `createHashRouter` |
-| Shiny app with internal-only navigation (wizards, tabbed panels) | `createMemoryRouter` |
-| Multiple independent routed widgets on the same page | `createMemoryRouter` |
-| Embedded widget where the URL should not change | `createMemoryRouter` |
+| Shiny app with bookmarkable/shareable routes | `createHashRouter()` |
+| Static site (Quarto, R Markdown) with multiple pages | `createHashRouter()` |
+| Shiny app with internal-only navigation (wizards, tabbed panels) | `createMemoryRouter()` |
+| Multiple independent routed widgets on the same page | `createMemoryRouter()` |
+| Embedded widget where the URL should not change | `createMemoryRouter()` |
 
-In short: if the route should be visible in the URL (bookmarks, deep links, back/forward), use `createHashRouter`. If routing is purely an internal UI concern, use `createMemoryRouter`.
+In short: if the route should be visible in the URL (bookmarks, deep links, back/forward), use `createHashRouter()`. If routing is purely an internal UI concern, use `createMemoryRouter()`.
+
+---
+
+## `createBrowserRouter()` — not recommended in R
+
+`createBrowserRouter()` uses the HTML5 History API (`pushState`) for clean URLs (e.g. `/about` instead of `/#/about`). It is the standard router in full React web applications, but it is **not well-suited for use with this R package**:
+
+- **Static files (`file://`):** The URL path is a file system path (e.g. `/C:/Users/.../file.html`), not `/`. No route matches and the app immediately shows a 404.
+- **Shiny apps:** Clean URLs like `/about` require the server to rewrite all paths back to `/`. Shiny does not do this by default.
+- **Refreshing on a sub-route:** Even when served from a proper HTTP server, refreshing on `/about` will 404 unless the server is configured to rewrite all routes to `index.html`.
+
+`createBrowserRouter()` only works correctly in a full web application deployment (e.g. React served by Node.js, Express, or Nginx with URL rewriting). That scenario is outside the scope of this R package.
 
 ---
 
 ## Legacy: `HashRouter()` and `MemoryRouter()` — component API
 
-`HashRouter` and `MemoryRouter` are the older, component-based equivalents of `createHashRouter` and `createMemoryRouter`. They remain **fully supported** in this package and are safe to use in existing code.
+`HashRouter()` and `MemoryRouter()` are the older, component-based equivalents of `createHashRouter()` and `createMemoryRouter()`. They remain **fully supported** and are safe to use in existing code.
 
-**However, `RouterProvider()` (or `createHashRouter` / `createMemoryRouter`) is preferred for new code** because the component-based API:
+**However, `RouterProvider()` with `createHashRouter()` / `createMemoryRouter()` is preferred for new code** because the component-based API:
 
 - Does not support `loader`, `action`, `errorElement`, or any data router features.
 - Is not the direction React Router is developing toward.
 
-Use `HashRouter` or `MemoryRouter` only if you have a specific reason to stay with the component API (e.g. migrating an existing app incrementally).
+Use `HashRouter()` or `MemoryRouter()` only if you have a specific reason to stay with the component API (e.g. migrating an existing app incrementally).
 
 ```r
 # Legacy: component API — still works, but RouterProvider() is preferred
@@ -173,7 +183,7 @@ library(shiny)
 library(reactRouter)
 
 ui <- HashRouter(
-  NavLink(to = "/", reloadDocument = TRUE, "Home"), br(),
+  NavLink(to = "/",      reloadDocument = TRUE, "Home"), br(),
   NavLink(to = "/other", reloadDocument = TRUE, "Other"),
   Routes(
     Route(path = "/",      element = uiOutput("uiHome")),
@@ -193,18 +203,6 @@ shinyApp(ui, server)
 
 ---
 
-## `BrowserRouter()` — not recommended in R
-
-`BrowserRouter` uses the HTML5 History API (`pushState`) for clean URLs (e.g. `/about` instead of `/#/about`). It is the standard router in full React web applications, but it is **not well-suited for use with this R package**:
-
-- **Static files (`file://`):** On opening, the URL path is a file system path (e.g. `/C:/Users/.../file.html`), not `/`. No route matches, so the app immediately shows a 404.
-- **Shiny apps:** Clean URLs like `/about` require the server to rewrite all paths back to `/`. Shiny does not do this by default. Additionally, client-side navigation with `reloadDocument = FALSE` means the Shiny server has no way to know the current route without extra JavaScript workarounds.
-- **Refreshing on a sub-route:** Even when served from a proper HTTP server, refreshing the browser on `/about` will 404 unless the server is configured to rewrite all routes to `index.html`.
-
-`BrowserRouter` only works correctly in a full web application deployment (e.g. React served by Node.js, Express, or Nginx with URL rewriting). That scenario is outside the scope of this R package.
-
----
-
 ## Understanding `reloadDocument`
 
 `Link()` and `NavLink()` accept a `reloadDocument` prop that controls how navigation works. The default is `FALSE`, matching React Router's own default.
@@ -214,7 +212,7 @@ shinyApp(ui, server)
 React Router handles navigation **entirely on the client side** — it swaps the displayed route component without reloading the page. This is the correct behavior for:
 
 - **Static sites and Quarto documents** — there is no server to re-initialize. Client-side navigation provides smooth, instant route switching.
-- **`createMemoryRouter` and `MemoryRouter`** — a full page reload would reset the in-memory routing state back to `/`, breaking navigation entirely.
+- **`createMemoryRouter()` and `MemoryRouter()`** — a full page reload would reset the in-memory routing state back to `/`, breaking navigation entirely.
 - **Data router loaders and actions** — `loader` and `action` functions only execute during client-side navigations. A full page reload bypasses React Router and loaders will not run.
 
 ### `reloadDocument = TRUE`
@@ -236,6 +234,6 @@ Link(to = "/",         reloadDocument = TRUE, "Home")
 | Context | `reloadDocument` | Why |
 |---|---|---|
 | Static site / Quarto / R Markdown | `FALSE` (default) | No server; client-side navigation is smooth |
-| `createMemoryRouter` / `MemoryRouter` | `FALSE` (default) | Reload resets in-memory state to `/` |
+| `createMemoryRouter()` / `MemoryRouter()` | `FALSE` (default) | Reload resets in-memory state to `/` |
 | Data router with `loader`/`action` | `FALSE` (default) | Loaders only run on client-side navigations |
 | Shiny app with `uiOutput`/`renderUI` | `TRUE` | Server must re-initialize to render new content |

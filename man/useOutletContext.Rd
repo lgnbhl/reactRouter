@@ -20,7 +20,7 @@ If \code{NULL} (the default), the entire data is passed.}
 \item{...}{Additional props to pass to the component.}
 }
 \description{
-\url{https://reactrouter.com/api/hooks/useOutletContext}
+\url{https://api.reactrouter.com/v7/functions/react-router.useOutletContext.html}
 }
 \details{
 Calls the \code{useOutletContext()} hook and injects the context value

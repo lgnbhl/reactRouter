@@ -13,5 +13,5 @@ BrowserRouter(...)
 A BrowserRouter component.
 }
 \description{
-\url{https://reactrouter.com/6.30.0/router-components/browser-router}
+\url{https://api.reactrouter.com/v7/functions/react-router.BrowserRouter.html}
 }

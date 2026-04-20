@@ -17,48 +17,50 @@ should_block <- JS(
 )
 
 ui <- RouterProvider(
-  Route(
-    path = "/",
-    element = div(
-      style = "max-width: 480px; margin: 0 auto; padding: 20px; font-family: system-ui;",
-      tags$h2("useBlocker Example"),
-      tags$nav(tags$ul(
-        tags$li(NavLink(to = "/",        "Home (blocks if dirty)")),
-        tags$li(NavLink(to = "/clean",   "Clean page (no blocker)"))
-      )),
-      tags$hr(),
-      Outlet()
-    ),
+  router = createMemoryRouter(
     Route(
-      index = TRUE,
+      path = "/",
       element = div(
-        tags$h3("Home — with blocker"),
-        tags$p(
-          tags$strong("Blocker state: "),
-          useBlocker(tags$code(), shouldBlock = should_block)
-        ),
-        tags$p(
-          style = "color: #555; font-size: 0.9em;",
-          "Click 'Clean page' in the nav above. The blocker state changes to ",
-          tags$code('"blocked"'),
-          " and navigation is intercepted.",
-          tags$br(),
-          "Call ",
-          tags$code("blocker.proceed()"),
-          " / ",
-          tags$code("blocker.reset()"),
-          " via a custom JS action to confirm or cancel."
+        style = "max-width: 480px; margin: 0 auto; padding: 20px; font-family: system-ui;",
+        tags$h2("useBlocker Example"),
+        tags$nav(tags$ul(
+          tags$li(NavLink(to = "/", "Home (blocks if dirty)")),
+          tags$li(NavLink(to = "/clean", "Clean page (no blocker)"))
+        )),
+        tags$hr(),
+        Outlet()
+      ),
+      Route(
+        index = TRUE,
+        element = div(
+          tags$h3("Home — with blocker"),
+          tags$p(
+            tags$strong("Blocker state: "),
+            useBlocker(tags$code(), shouldBlock = should_block)
+          ),
+          tags$p(
+            style = "color: #555; font-size: 0.9em;",
+            "Click 'Clean page' in the nav above. The blocker state changes to ",
+            tags$code('"blocked"'),
+            " and navigation is intercepted.",
+            tags$br(),
+            "Call ",
+            tags$code("blocker.proceed()"),
+            " / ",
+            tags$code("blocker.reset()"),
+            " via a custom JS action to confirm or cancel."
+          )
         )
-      )
-    ),
-    Route(
-      path = "clean",
-      element = div(
-        tags$h3("Clean page"),
-        tags$p("No blocker on this route. Navigate freely."),
-        tags$p(
-          tags$strong("Blocker state: "),
-          useBlocker(tags$code(), shouldBlock = should_block)
+      ),
+      Route(
+        path = "clean",
+        element = div(
+          tags$h3("Clean page"),
+          tags$p("No blocker on this route. Navigate freely."),
+          tags$p(
+            tags$strong("Blocker state: "),
+            useBlocker(tags$code(), shouldBlock = should_block)
+          )
         )
       )
     )

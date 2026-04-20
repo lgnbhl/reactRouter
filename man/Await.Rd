@@ -37,7 +37,7 @@ plain \code{"Loading\u2026"} span.}
 \item{...}{Additional props to pass to the component.}
 }
 \description{
-\url{https://reactrouter.com/6.30.0/components/await}
+\url{https://api.reactrouter.com/v7/functions/react-router.Await.html}
 }
 \details{
 Renders \code{into} when a deferred loader promise resolves, injecting the

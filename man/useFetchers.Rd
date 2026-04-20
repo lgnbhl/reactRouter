@@ -20,7 +20,7 @@ If \code{NULL} (the default), the entire data is passed.}
 \item{...}{Additional props to pass to the component.}
 }
 \description{
-\url{https://reactrouter.com/api/hooks/useFetchers}
+\url{https://api.reactrouter.com/v7/functions/react-router.useFetchers.html}
 }
 \details{
 Calls the \code{useFetchers()} hook and injects the result (or a

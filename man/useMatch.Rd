@@ -23,7 +23,7 @@ If \code{NULL} (the default), the entire data is passed.}
 \item{...}{Additional props to pass to the component.}
 }
 \description{
-\url{https://reactrouter.com/6.30.0/hooks/use-match}
+\url{https://api.reactrouter.com/v7/functions/react-router.useMatch.html}
 }
 \details{
 Calls the \code{useMatch()} hook and injects the result (or a

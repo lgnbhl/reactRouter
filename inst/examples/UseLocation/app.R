@@ -28,11 +28,13 @@ Layout <- div(
 )
 
 ui <- RouterProvider(
-  Route(
-    path = "/",
-    element = Layout,
-    Route(index = TRUE, element = div(tags$p("Home page"))),
-    Route(path = "about", element = div(tags$p("About page")))
+  router = createMemoryRouter(
+    Route(
+      path = "/",
+      element = Layout,
+      Route(index = TRUE, element = div(tags$p("Home page"))),
+      Route(path = "about", element = div(tags$p("About page")))
+    )
   )
 )
 

@@ -13,5 +13,5 @@ Navigate(...)
 A Navigate component.
 }
 \description{
-\url{https://reactrouter.com/6.30.0/components/navigate}
+\url{https://api.reactrouter.com/v7/functions/react-router.Navigate.html}
 }

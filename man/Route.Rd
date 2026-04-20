@@ -22,7 +22,7 @@ Route(..., element, loader = NULL, key = uuid::UUIDgenerate())
 A Route component.
 }
 \description{
-\url{https://reactrouter.com/6.30.0/components/route}
+\url{https://api.reactrouter.com/v7/functions/react-router.Route.html}
 }
 \details{
 Internally the `element` is wrapped in a `shiny::div()`

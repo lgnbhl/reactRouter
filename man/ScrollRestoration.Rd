@@ -15,7 +15,7 @@ and \code{storageKey} (Character, custom \code{sessionStorage} key).}
 A ScrollRestoration component.
 }
 \description{
-\url{https://reactrouter.com/6.30.0/components/scroll-restoration}
+\url{https://api.reactrouter.com/v7/functions/react-router.ScrollRestoration.html}
 }
 \details{
 Emulates the browser's scroll restoration on location changes after loaders

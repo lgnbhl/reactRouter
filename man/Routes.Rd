@@ -13,5 +13,5 @@ Routes(...)
 A Routes component.
 }
 \description{
-\url{https://reactrouter.com/6.30.0/components/routes}
+\url{https://api.reactrouter.com/v7/functions/react-router.Routes.html}
 }

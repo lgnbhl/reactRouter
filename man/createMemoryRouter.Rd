@@ -7,14 +7,15 @@
 createMemoryRouter(...)
 }
 \arguments{
-\item{...}{\code{\link{Route}} elements, typically wrapped in
-\code{\link{createRoutesFromElements}}.}
+\item{...}{\code{\link{Route}} elements. Pass directly, or (optionally)
+wrapped in \code{\link{createRoutesFromElements}} to mirror the
+official React Router v7 API.}
 }
 \value{
 A createMemoryRouter component.
 }
 \description{
-\url{https://reactrouter.com/6.30.0/routers/create-memory-router}
+\url{https://api.reactrouter.com/v7/functions/react-router.createMemoryRouter.html}
 }
 \details{
 Creates a memory router using the data router API. Routing state is kept

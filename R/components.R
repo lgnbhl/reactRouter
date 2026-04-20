@@ -23,7 +23,7 @@ component <- function(name, module = 'react-router-dom') {
 
 #' HashRouter
 #' @rdname HashRouter
-#' @description \url{https://reactrouter.com/6.30.0/router-components/hash-router}
+#' @description \url{https://api.reactrouter.com/v7/functions/react-router.HashRouter.html}
 #' @param ... Props to pass to element.
 #' @return A HashRouter component.
 #' @export
@@ -40,7 +40,7 @@ HashRouter <- function(...) {
 
 #' BrowserRouter
 #' @rdname BrowserRouter
-#' @description \url{https://reactrouter.com/6.30.0/router-components/browser-router}
+#' @description \url{https://api.reactrouter.com/v7/functions/react-router.BrowserRouter.html}
 #' @param ... Props to pass to element.
 #' @return A BrowserRouter component.
 #' @export
@@ -57,7 +57,7 @@ BrowserRouter <- function(...) {
 
 #' MemoryRouter
 #' @rdname MemoryRouter
-#' @description \url{https://reactrouter.com/6.30.0/router-components/memory-router}
+#' @description \url{https://api.reactrouter.com/v7/functions/react-router.MemoryRouter.html}
 #' @param ... Props to pass to element.
 #' @return A MemoryRouter component.
 #' @export
@@ -74,7 +74,7 @@ MemoryRouter <- function(...) {
 
 #' Route
 #'
-#' \url{https://reactrouter.com/6.30.0/components/route}
+#' \url{https://api.reactrouter.com/v7/functions/react-router.Route.html}
 #'
 #' Internally the `element` is wrapped in a `shiny::div()`
 #' with a UUID key so, in case R shiny is used, shiny can differentiate
@@ -107,6 +107,8 @@ Route <- function(..., element, loader = NULL, key = uuid::UUIDgenerate()) {
 }
 
 #' Link
+#'
+#' \url{https://api.reactrouter.com/v7/variables/react-router.Link.html}
 #'
 #' The `reloadDocument` prop controls whether clicking the link triggers a full
 #' page reload (`TRUE`) or client-side navigation (`FALSE`). The default is
@@ -143,13 +145,15 @@ Link <- function(..., reloadDocument = FALSE) {
 
 #' Navigate
 #' @rdname Navigate
-#' @description \url{https://reactrouter.com/6.30.0/components/navigate}
+#' @description \url{https://api.reactrouter.com/v7/functions/react-router.Navigate.html}
 #' @param ... Props to pass to element.
 #' @return A Navigate component.
 #' @export
 Navigate <- component('Navigate')
 
 #' NavLink
+#'
+#' \url{https://api.reactrouter.com/v7/variables/react-router.NavLink.html}
 #'
 #' The `reloadDocument` prop controls whether clicking the link triggers a full
 #' page reload (`TRUE`) or client-side navigation (`FALSE`). The default is
@@ -187,7 +191,7 @@ NavLink <- function(..., reloadDocument = FALSE) {
 
 #' Outlet
 #' @rdname Outlet
-#' @description \url{https://reactrouter.com/6.30.0/components/outlet}
+#' @description \url{https://api.reactrouter.com/v7/functions/react-router.Outlet.html}
 #' @param ... Props to pass to element.
 #' @return A Outlet component.
 #' @export
@@ -195,7 +199,7 @@ Outlet <- component('Outlet')
 
 #' Routes
 #' @rdname Routes
-#' @description \url{https://reactrouter.com/6.30.0/components/routes}
+#' @description \url{https://api.reactrouter.com/v7/functions/react-router.Routes.html}
 #' @param ... Props to pass to element.
 #' @return A Routes component.
 #' @export
@@ -203,7 +207,7 @@ Routes <- component('Routes')
 
 #' Form
 #' @rdname Form
-#' @description \url{https://reactrouter.com/6.30.0/components/form}
+#' @description \url{https://api.reactrouter.com/v7/variables/react-router.Form.html}
 #' @param ... Props to pass to element.
 #' @return A Form component.
 #' @export
@@ -211,14 +215,15 @@ Form <- component('Form')
 
 #' createBrowserRouter
 #'
-#' \url{https://reactrouter.com/6.30.0/routers/create-browser-router}
+#' \url{https://api.reactrouter.com/v7/functions/react-router.createBrowserRouter.html}
 #'
 #' Creates a browser router using the data router API.
 #' Use with \code{\link{createRoutesFromElements}} and \code{\link{Route}}.
 #'
 #' @rdname createBrowserRouter
-#' @param ... \code{\link{Route}} elements, typically wrapped in
-#'   \code{\link{createRoutesFromElements}}.
+#' @param ... \code{\link{Route}} elements. Pass directly, or (optionally)
+#'   wrapped in \code{\link{createRoutesFromElements}} to mirror the
+#'   official React Router v7 API.
 #' @return A createBrowserRouter component.
 #' @export
 createBrowserRouter <- function(...) {
@@ -234,14 +239,15 @@ createBrowserRouter <- function(...) {
 
 #' createHashRouter
 #'
-#' \url{https://reactrouter.com/6.30.0/routers/create-hash-router}
+#' \url{https://api.reactrouter.com/v7/functions/react-router.createHashRouter.html}
 #'
 #' Creates a hash router using the data router API.
 #' Use with \code{\link{createRoutesFromElements}} and \code{\link{Route}}.
 #'
 #' @rdname createHashRouter
-#' @param ... \code{\link{Route}} elements, typically wrapped in
-#'   \code{\link{createRoutesFromElements}}.
+#' @param ... \code{\link{Route}} elements. Pass directly, or (optionally)
+#'   wrapped in \code{\link{createRoutesFromElements}} to mirror the
+#'   official React Router v7 API.
 #' @return A createHashRouter component.
 #' @export
 createHashRouter <- function(...) {
@@ -257,12 +263,18 @@ createHashRouter <- function(...) {
 
 #' createRoutesFromElements
 #'
-#' \url{https://reactrouter.com/6.30.0/utils/create-routes-from-elements}
+#' \url{https://api.reactrouter.com/v7/variables/react-router.createRoutesFromElements.html}
 #'
-#' Wraps \code{\link{Route}} elements for use with \code{\link{createBrowserRouter}},
-#' \code{\link{createHashRouter}}, or \code{\link{createMemoryRouter}}.
-#' The actual conversion from JSX elements to route objects happens on the
-#' JavaScript side.
+#' Optional compatibility alias. In R, \code{\link{createHashRouter}},
+#' \code{\link{createBrowserRouter}}, and \code{\link{createMemoryRouter}}
+#' accept \code{\link{Route}} elements directly, so wrapping them in
+#' \code{createRoutesFromElements()} is not required. The function is kept
+#' so that examples copied verbatim from the React Router v7 documentation
+#' (\code{createHashRouter(createRoutesFromElements(...))}) keep working.
+#'
+#' The actual JSX-to-route-object conversion always happens on the
+#' JavaScript side; this R function simply bundles its arguments into a
+#' tag list.
 #'
 #' @rdname createRoutesFromElements
 #' @param ... \code{\link{Route}} elements.
@@ -276,7 +288,7 @@ createRoutesFromElements <- function(...) {
 
 #' createMemoryRouter
 #'
-#' \url{https://reactrouter.com/6.30.0/routers/create-memory-router}
+#' \url{https://api.reactrouter.com/v7/functions/react-router.createMemoryRouter.html}
 #'
 #' Creates a memory router using the data router API. Routing state is kept
 #' in memory and the browser URL is never read or modified, making it suitable
@@ -285,8 +297,9 @@ createRoutesFromElements <- function(...) {
 #' Use with \code{\link{createRoutesFromElements}} and \code{\link{Route}}.
 #'
 #' @rdname createMemoryRouter
-#' @param ... \code{\link{Route}} elements, typically wrapped in
-#'   \code{\link{createRoutesFromElements}}.
+#' @param ... \code{\link{Route}} elements. Pass directly, or (optionally)
+#'   wrapped in \code{\link{createRoutesFromElements}} to mirror the
+#'   official React Router v7 API.
 #' @return A createMemoryRouter component.
 #' @export
 createMemoryRouter <- function(...) {
@@ -302,26 +315,25 @@ createMemoryRouter <- function(...) {
 
 #' RouterProvider
 #'
-#' \url{https://reactrouter.com/6.30.0/routers/router-provider}
+#' \url{https://api.reactrouter.com/v7/functions/react-router.RouterProvider.html}
 #'
-#' A unified wrapper around data routers. Use the \code{type} argument to
-#' select the router variant: \code{"hash"} (default), \code{"memory"}, or
-#' \code{"browser"}. Internally equivalent to \code{\link{createHashRouter}},
-#' \code{\link{createMemoryRouter}}, or \code{\link{createBrowserRouter}}.
+#' Renders a data router. Mirrors the React Router v7 composition pattern:
+#' pass a router built with \code{\link{createHashRouter}},
+#' \code{\link{createBrowserRouter}}, or \code{\link{createMemoryRouter}} to
+#' the \code{router} argument.
 #'
 #' @rdname RouterProvider
-#' @param ... \code{\link{Route}} elements, typically via
-#'   \code{\link{createRoutesFromElements}}.
-#' @param type Character. One of \code{"hash"} (default), \code{"memory"},
-#'   or \code{"browser"}.
+#' @param router A router element produced by \code{\link{createHashRouter}},
+#'   \code{\link{createBrowserRouter}}, or \code{\link{createMemoryRouter}}.
+#' @param fallbackElement Element shown while the initial route's loader is
+#'   resolving.
 #' @return A RouterProvider component.
 #' @export
-RouterProvider <- function(..., type = c("hash", "memory", "browser")) {
-  type <- match.arg(type)
+RouterProvider <- function(router, fallbackElement = NULL) {
   tag <- shiny.react::reactElement(
     module = "@/reactRouter",
     name = "RouterProvider",
-    props = shiny.react::asProps(..., type = type),
+    props = shiny.react::asProps(router = router, fallbackElement = fallbackElement),
     deps = reactRouterDependency()
   )
   class(tag) <- c("reactRouter", class(tag))
@@ -330,7 +342,7 @@ RouterProvider <- function(..., type = c("hash", "memory", "browser")) {
 
 #' ScrollRestoration
 #'
-#' \url{https://reactrouter.com/6.30.0/components/scroll-restoration}
+#' \url{https://api.reactrouter.com/v7/functions/react-router.ScrollRestoration.html}
 #'
 #' Emulates the browser's scroll restoration on location changes after loaders
 #' have completed. Place once inside the root layout of a data router app.
@@ -347,7 +359,7 @@ ScrollRestoration <- component('ScrollRestoration')
 
 #' Await
 #'
-#' \url{https://reactrouter.com/6.30.0/components/await}
+#' \url{https://api.reactrouter.com/v7/functions/react-router.Await.html}
 #'
 #' Renders \code{into} when a deferred loader promise resolves, injecting the
 #' resolved value (or a \code{selector} from it) \code{as} a prop.
@@ -406,7 +418,7 @@ NULL
 
 #' useLoaderData
 #'
-#' \url{https://reactrouter.com/6.30.0/hooks/use-loader-data}
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useLoaderData.html}
 #'
 #' Calls the \code{useLoaderData()} hook and injects the result (or a
 #' \code{selector} from it) \code{as} a prop of the \code{into} component.
@@ -449,7 +461,7 @@ useLoaderData <- function(into, as = "children", selector = NULL, ...) {
 
 #' useActionData
 #'
-#' \url{https://reactrouter.com/6.30.0/hooks/use-action-data}
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useActionData.html}
 #'
 #' Calls the \code{useActionData()} hook and injects the result (or a
 #' \code{selector} from it) \code{as} a prop of the \code{into} component.
@@ -477,7 +489,7 @@ useActionData <- function(into, as = "children", selector = NULL, ...) {
 
 #' useLocation
 #'
-#' \url{https://reactrouter.com/6.30.0/utils/location}
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useLocation.html}
 #'
 #' Calls the \code{useLocation()} hook and injects the result (or a
 #' \code{selector} from it) \code{as} a prop of the \code{into} component.
@@ -506,7 +518,7 @@ useLocation <- function(into, as = "children", selector = NULL, ...) {
 
 #' useParams
 #'
-#' \url{https://reactrouter.com/6.30.0/hooks/use-params}
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useParams.html}
 #'
 #' Calls the \code{useParams()} hook and injects the result (or a
 #' \code{selector} from it) \code{as} a prop of the \code{into} component.
@@ -535,7 +547,7 @@ useParams <- function(into, as = "children", selector = NULL, ...) {
 
 #' useNavigation
 #'
-#' \url{https://reactrouter.com/6.30.0/hooks/use-navigation}
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useNavigation.html}
 #'
 #' Calls the \code{useNavigation()} hook and injects the result (or a
 #' \code{selector} from it) \code{as} a prop of the \code{into} component.
@@ -564,7 +576,7 @@ useNavigation <- function(into, as = "children", selector = NULL, ...) {
 
 #' useRouteLoaderData
 #'
-#' \url{https://reactrouter.com/6.30.0/hooks/use-route-loader-data}
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useRouteLoaderData.html}
 #'
 #' Calls the \code{useRouteLoaderData()} hook and injects the result (or a
 #' \code{selector} from it) \code{as} a prop of the \code{into} component.
@@ -601,7 +613,7 @@ useRouteLoaderData <- function(
 
 #' useRouteError
 #'
-#' \url{https://reactrouter.com/6.30.0/hooks/use-route-error}
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useRouteError.html}
 #'
 #' Calls the \code{useRouteError()} hook and injects the result (or a
 #' \code{selector} from it) \code{as} a prop of the \code{into} component.
@@ -629,7 +641,7 @@ useRouteError <- function(into, as = "children", selector = NULL, ...) {
 
 #' useNavigationType
 #'
-#' \url{https://reactrouter.com/6.30.0/hooks/use-navigation-type}
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useNavigationType.html}
 #'
 #' Calls the \code{useNavigationType()} hook and injects the result
 #' \code{as} a prop of the \code{into} component.
@@ -654,7 +666,7 @@ useNavigationType <- function(into, as = "children", ...) {
 
 #' useMatch
 #'
-#' \url{https://reactrouter.com/6.30.0/hooks/use-match}
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useMatch.html}
 #'
 #' Calls the \code{useMatch()} hook and injects the result (or a
 #' \code{selector} from it) \code{as} a prop of the \code{into} component.
@@ -685,7 +697,7 @@ useMatch <- function(into, as = "children", selector = NULL, pattern, ...) {
 
 #' useMatches
 #'
-#' \url{https://reactrouter.com/6.30.0/hooks/use-matches}
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useMatches.html}
 #'
 #' Calls the \code{useMatches()} hook and injects the result (or a
 #' \code{selector} extracted from each match) \code{as} a prop of the
@@ -713,7 +725,7 @@ useMatches <- function(into, as = "children", selector = NULL, ...) {
 
 #' useSearchParams
 #'
-#' \url{https://reactrouter.com/6.30.0/hooks/use-search-params}
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useSearchParams.html}
 #'
 #' Calls the \code{useSearchParams()} hook and injects the result
 #' \code{as} a prop of the \code{into} component. Use the \code{param}
@@ -746,7 +758,7 @@ useSearchParams <- function(into, as = "children", param = NULL, ...) {
 
 #' useHref
 #'
-#' \url{https://reactrouter.com/6.30.0/hooks/use-href}
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useHref.html}
 #'
 #' Calls the \code{useHref()} hook and injects the resolved href string
 #' \code{as} a prop of the \code{into} component.
@@ -771,7 +783,7 @@ useHref <- function(into, as = "children", to, ...) {
 
 #' useResolvedPath
 #'
-#' \url{https://reactrouter.com/6.30.0/hooks/use-resolved-path}
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useResolvedPath.html}
 #'
 #' Calls the \code{useResolvedPath()} hook and injects the result (or a
 #' \code{selector} from it) \code{as} a prop of the \code{into} component.
@@ -799,85 +811,9 @@ useResolvedPath <- function(into, as = "children", selector = NULL, to, ...) {
   tag
 }
 
-#' FetcherForm
-#'
-#' \url{https://reactrouter.com/api/hooks/useFetcher}
-#'
-#' Renders a \code{<form>} that is bound to a fetcher instance, allowing
-#' data submission or loading without a page-level navigation.
-#' Use \code{fetcherKey} to share the fetcher state with one or more
-#' \code{\link{useFetcher}} calls in the same route element.
-#'
-#' @param ... Child elements (inputs, buttons, etc.) and additional HTML
-#'   attributes passed to the underlying \code{<form>}.
-#' @param method Character. HTTP method: \code{"get"} or \code{"post"}.
-#' @param action Character. The route path to submit to.
-#' @param fetcherKey Character. Optional key to share this fetcher across
-#'   components (must match the \code{fetcherKey} used in \code{useFetcher}).
-#'
-#' @rdname FetcherForm
-#' @export
-FetcherForm <- function(..., method = "get", action = NULL, fetcherKey = NULL) {
-  tag <- shiny.react::reactElement(
-    module = "@/reactRouter",
-    name = "FetcherForm",
-    props = shiny.react::asProps(
-      method = method,
-      action = action,
-      fetcherKey = fetcherKey,
-      ...
-    ),
-    deps = reactRouterDependency()
-  )
-  class(tag) <- c("reactRouter", class(tag))
-  tag
-}
-
-#' RevalidatorButton
-#'
-#' \url{https://reactrouter.com/api/hooks/useRevalidator}
-#'
-#' Calls \code{revalidator.revalidate()} when clicked, triggering a re-run of
-#' the current route's loader without navigating. The button is automatically
-#' disabled while revalidation is in progress.
-#'
-#' When \code{into} is supplied the component behaves like the other hook
-#' wrappers (\code{useRevalidator}, \code{useFetcher}, etc.): it injects
-#' \code{onClick} and \code{disabled} into \code{into} via
-#' \code{React.cloneElement}, so any React element can act as the trigger —
-#' for example a \code{muiMaterial::Button()}.
-#'
-#' When \code{into} is \code{NULL} (the default) a plain \code{<button>} is
-#' rendered instead, with child elements passed via \code{...}.
-#'
-#' @param ... When \code{into = NULL}: child elements (label text / HTML) and
-#'   extra HTML attributes for the \code{<button>}.  When \code{into} is set:
-#'   additional props merged into the cloned element.
-#' @param into Optional React element to receive the \code{onClick} /
-#'   \code{disabled} props (hook-wrapper style).
-#' @param style Character. Inline CSS style string (only used when
-#'   \code{into = NULL}).
-#'
-#' @rdname RevalidatorButton
-#' @export
-RevalidatorButton <- function(..., into = NULL, style = NULL) {
-  tag <- shiny.react::reactElement(
-    module = "@/reactRouter",
-    name = "RevalidatorButton",
-    props = shiny.react::asProps(
-      into = into,
-      style = style,
-      ...
-    ),
-    deps = reactRouterDependency()
-  )
-  class(tag) <- c("reactRouter", class(tag))
-  tag
-}
-
 #' useFetcher
 #'
-#' \url{https://reactrouter.com/api/hooks/useFetcher}
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useFetcher.html}
 #'
 #' Calls the \code{useFetcher()} hook and injects the result (or a
 #' \code{selector} from it) \code{as} a prop of the \code{into} component.
@@ -916,7 +852,7 @@ useFetcher <- function(
 
 #' useFetchers
 #'
-#' \url{https://reactrouter.com/api/hooks/useFetchers}
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useFetchers.html}
 #'
 #' Calls the \code{useFetchers()} hook and injects the result (or a
 #' \code{selector} mapped over each fetcher) \code{as} a prop of the
@@ -945,7 +881,7 @@ useFetchers <- function(into, as = "children", selector = NULL, ...) {
 
 #' useRevalidator
 #'
-#' \url{https://reactrouter.com/api/hooks/useRevalidator}
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useRevalidator.html}
 #'
 #' Calls the \code{useRevalidator()} hook and injects the result (or a
 #' \code{selector} from it) \code{as} a prop of the \code{into} component.
@@ -974,7 +910,7 @@ useRevalidator <- function(into, as = "children", selector = "state", ...) {
 
 #' useBlocker
 #'
-#' \url{https://reactrouter.com/api/hooks/useBlocker}
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useBlocker.html}
 #'
 #' Calls the \code{useBlocker()} hook and injects the blocker's \code{state}
 #' (or another \code{selector} field) \code{as} a prop of the \code{into}
@@ -1018,7 +954,7 @@ useBlocker <- function(
 
 #' useOutletContext
 #'
-#' \url{https://reactrouter.com/api/hooks/useOutletContext}
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useOutletContext.html}
 #'
 #' Calls the \code{useOutletContext()} hook and injects the context value
 #' (or a \code{selector} from it) \code{as} a prop of the \code{into}

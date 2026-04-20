@@ -20,29 +20,26 @@ function getPath(obj, path) {
 export const Link = ButtonAdapter(ReactRouter.Link);
 export const NavLink = ButtonAdapter(ReactRouter.NavLink);
 
-export function CreateHashRouter({ children, ...props }) {
-  const router = React.useMemo(() => {
-    const routes = ReactRouter.createRoutesFromElements(children);
-    return ReactRouter.createHashRouter(routes, props);
-  }, []);
-  return React.createElement(ReactRouter.RouterProvider, { router });
+// createHashRouter / createBrowserRouter / createMemoryRouter are "spec"
+// components: they mirror the v7 factory functions and are only meaningful
+// as the `router` prop of RouterProvider — never rendered on their own.
+// If one is rendered directly (e.g. the user forgot to wrap it in
+// RouterProvider), we throw a helpful error instead of silently rendering
+// nothing.
+function makeRouterSpec(kind, rName) {
+  const Spec = function () {
+    throw new Error(
+      `${rName}() must be passed to RouterProvider(router = ${rName}(...)). ` +
+      `It cannot be rendered on its own.`
+    );
+  };
+  Spec.__routerKind = kind;
+  return Spec;
 }
 
-export function CreateBrowserRouter({ children, ...props }) {
-  const router = React.useMemo(() => {
-    const routes = ReactRouter.createRoutesFromElements(children);
-    return ReactRouter.createBrowserRouter(routes, props);
-  }, []);
-  return React.createElement(ReactRouter.RouterProvider, { router });
-}
-
-export function CreateMemoryRouter({ children, ...props }) {
-  const router = React.useMemo(() => {
-    const routes = ReactRouter.createRoutesFromElements(children);
-    return ReactRouter.createMemoryRouter(routes, props);
-  }, []);
-  return React.createElement(ReactRouter.RouterProvider, { router });
-}
+export const CreateHashRouter = makeRouterSpec('hash', 'createHashRouter');
+export const CreateBrowserRouter = makeRouterSpec('browser', 'createBrowserRouter');
+export const CreateMemoryRouter = makeRouterSpec('memory', 'createMemoryRouter');
 
 export function useLoaderData({ selector, as, into, ...rest }) {
   const data = ReactRouter.useLoaderData();
@@ -158,49 +155,25 @@ export function useOutletContext({ selector, as, into, ...rest }) {
   return React.cloneElement(into, { [as]: safeAs(as, value), ...rest });
 }
 
-
-// FetcherForm — a <form> bound to a fetcher instance.
-// Use alongside useFetcher(fetcherKey = "...") to observe state/data.
-export function FetcherForm({ fetcherKey, children, ...props }) {
-  const fetcher = ReactRouter.useFetcher(fetcherKey ? { key: fetcherKey } : undefined);
-  return React.createElement(fetcher.Form, props, children);
-}
-
-// RevalidatorButton — calls revalidator.revalidate() on click.
-// If `into` is provided, injects onClick + disabled into that element (hook-wrapper style).
-// Otherwise renders a plain <button>. Automatically disabled while revalidation is in progress.
-export function RevalidatorButton({ into, children, style, disabled, ...props }) {
-  const revalidator = ReactRouter.useRevalidator();
-  const isLoading = revalidator.state !== 'idle';
-  if (into) {
-    return React.cloneElement(into, {
-      onClick: () => revalidator.revalidate(),
-      disabled: disabled || isLoading,
-      ...props,
-    });
+// RouterProvider — mirrors the React Router v7 API:
+//   <RouterProvider router={createHashRouter(routes)} fallbackElement={...} />
+// `router` must be an element produced by createHashRouter(),
+// createBrowserRouter(), or createMemoryRouter().
+export function RouterProvider({ router, fallbackElement }) {
+  const kind = router && router.type && router.type.__routerKind;
+  if (!kind) {
+    throw new Error(
+      'RouterProvider: `router` must be createHashRouter(), createBrowserRouter(), or createMemoryRouter().'
+    );
   }
-  return React.createElement(
-    'button',
-    {
-      ...props,
-      style,
-      disabled: disabled || isLoading,
-      onClick: () => revalidator.revalidate(),
-    },
-    children
-  );
-}
-
-// RouterProvider — unified entry point: select type = "hash" | "browser" | "memory"
-export function RouterProvider({ type, fallbackElement, children, ...props }) {
-  const routerType = type || 'hash';
-  const router = React.useMemo(() => {
+  const { children, ...opts } = router.props || {};
+  const rrRouter = React.useMemo(() => {
     const routes = ReactRouter.createRoutesFromElements(children);
-    if (routerType === 'browser') return ReactRouter.createBrowserRouter(routes, props);
-    if (routerType === 'memory') return ReactRouter.createMemoryRouter(routes, props);
-    return ReactRouter.createHashRouter(routes, props);
-  }, [children]);
-  return React.createElement(ReactRouter.RouterProvider, { router, fallbackElement });
+    if (kind === 'browser') return ReactRouter.createBrowserRouter(routes, opts);
+    if (kind === 'memory') return ReactRouter.createMemoryRouter(routes, opts);
+    return ReactRouter.createHashRouter(routes, opts);
+  }, []);
+  return React.createElement(ReactRouter.RouterProvider, { router: rrRouter, fallbackElement });
 }
 
 // Await — renders into `into` when a deferred loader key resolves.

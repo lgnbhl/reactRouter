@@ -18,7 +18,7 @@ passed as a named list.}
 \item{...}{Additional props to pass to the component.}
 }
 \description{
-\url{https://reactrouter.com/6.30.0/hooks/use-search-params}
+\url{https://api.reactrouter.com/v7/functions/react-router.useSearchParams.html}
 }
 \details{
 Calls the \code{useSearchParams()} hook and injects the result

@@ -16,7 +16,7 @@ useHref(into, as = "children", to, ...)
 \item{...}{Additional props to pass to the component.}
 }
 \description{
-\url{https://reactrouter.com/6.30.0/hooks/use-href}
+\url{https://api.reactrouter.com/v7/functions/react-router.useHref.html}
 }
 \details{
 Calls the \code{useHref()} hook and injects the resolved href string

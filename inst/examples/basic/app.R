@@ -63,27 +63,29 @@ Header <- div(
 )
 
 ui <- RouterProvider(
-  Route(
-    path = "/",
-    element = Header,
+  router = createMemoryRouter(
     Route(
-      index = TRUE,
-      element = Home
-    ),
-    Route(
-      path = "about",
-      element = About
-    ),
-    Route(
-      path = "dashboard",
-      element = Dashboard
-    ),
-    # Using path="*" means "match anything", so this route
-    # acts like a catch-all for URLs that we don't have explicit
-    # routes for.
-    Route(
-      path = "*",
-      element = NoMatch
+      path = "/",
+      element = Header,
+      Route(
+        index = TRUE,
+        element = Home
+      ),
+      Route(
+        path = "about",
+        element = About
+      ),
+      Route(
+        path = "dashboard",
+        element = Dashboard
+      ),
+      # Using path="*" means "match anything", so this route
+      # acts like a catch-all for URLs that we don't have explicit
+      # routes for.
+      Route(
+        path = "*",
+        element = NoMatch
+      )
     )
   )
 )

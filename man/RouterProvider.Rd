@@ -4,24 +4,24 @@
 \alias{RouterProvider}
 \title{RouterProvider}
 \usage{
-RouterProvider(..., type = c("hash", "memory", "browser"))
+RouterProvider(router, fallbackElement = NULL)
 }
 \arguments{
-\item{...}{\code{\link{Route}} elements, typically via
-\code{\link{createRoutesFromElements}}.}
+\item{router}{A router element produced by \code{\link{createHashRouter}},
+\code{\link{createBrowserRouter}}, or \code{\link{createMemoryRouter}}.}
 
-\item{type}{Character. One of \code{"hash"} (default), \code{"memory"},
-or \code{"browser"}.}
+\item{fallbackElement}{Element shown while the initial route's loader is
+resolving.}
 }
 \value{
 A RouterProvider component.
 }
 \description{
-\url{https://reactrouter.com/6.30.0/routers/router-provider}
+\url{https://api.reactrouter.com/v7/functions/react-router.RouterProvider.html}
 }
 \details{
-A unified wrapper around data routers. Use the \code{type} argument to
-select the router variant: \code{"hash"} (default), \code{"memory"}, or
-\code{"browser"}. Internally equivalent to \code{\link{createHashRouter}},
-\code{\link{createMemoryRouter}}, or \code{\link{createBrowserRouter}}.
+Renders a data router. Mirrors the React Router v7 composition pattern:
+pass a router built with \code{\link{createHashRouter}},
+\code{\link{createBrowserRouter}}, or \code{\link{createMemoryRouter}} to
+the \code{router} argument.
 }

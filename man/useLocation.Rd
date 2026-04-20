@@ -20,7 +20,7 @@ If \code{NULL} (the default), the entire data is passed.}
 \item{...}{Additional props to pass to the component.}
 }
 \description{
-\url{https://reactrouter.com/6.30.0/utils/location}
+\url{https://api.reactrouter.com/v7/functions/react-router.useLocation.html}
 }
 \details{
 Calls the \code{useLocation()} hook and injects the result (or a

@@ -722,29 +722,31 @@ ui <- muiMaterialPage(
       style = "max-width: 480px; margin: 0 auto; padding: 40px; color: gray;",
       tags$h2("Loading application...")
     ),
-    Route(
-      path = "/",
-      element = root_element,
+    router = createHashRouter(
       Route(
-        index = TRUE,
-        loader = loader_all_films,
-        element = home_element
-      ),
-      Route(
-        path = "films/:id",
-        loader = loader_film,
-        element = film_element,
-        errorElement = error_el
-      ),
-      Route(
-        path = "people",
-        loader = loader_people,
-        element = people_element,
+        path = "/",
+        element = root_element,
         Route(
-          path = ":id",
-          loader = loader_person,
-          element = person_element,
+          index = TRUE,
+          loader = loader_all_films,
+          element = home_element
+        ),
+        Route(
+          path = "films/:id",
+          loader = loader_film,
+          element = film_element,
           errorElement = error_el
+        ),
+        Route(
+          path = "people",
+          loader = loader_people,
+          element = people_element,
+          Route(
+            path = ":id",
+            loader = loader_person,
+            element = person_element,
+            errorElement = error_el
+          )
         )
       )
     )

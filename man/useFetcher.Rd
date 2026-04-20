@@ -4,7 +4,7 @@
 \alias{useFetcher}
 \title{useFetcher}
 \usage{
-useFetcher(into, as = "children", selector = "state", fetcherKey = NULL, ...)
+useFetcher(into, as = "children", selector = NULL, fetcherKey = NULL, ...)
 }
 \arguments{
 \item{into}{A component (HTML tag or \pkg{shiny.react}-based element)
@@ -23,7 +23,7 @@ components (e.g. \code{"my-fetcher"}).}
 \item{...}{Additional props to pass to the component.}
 }
 \description{
-\url{https://reactrouter.com/api/hooks/useFetcher}
+\url{https://api.reactrouter.com/v7/functions/react-router.useFetcher.html}
 }
 \details{
 Calls the \code{useFetcher()} hook and injects the result (or a

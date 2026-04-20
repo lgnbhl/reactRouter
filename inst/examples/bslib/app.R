@@ -29,21 +29,23 @@ Layout <- bslib::page_navbar(
 )
 
 ui <- reactRouter::RouterProvider(
-  reactRouter::Route(
-    path = "/",
-    element = Layout,
+  router = createHashRouter(
     reactRouter::Route(
-      index = TRUE,
-      element = div(
-        tags$h3("Home page"),
-        p("A basic example of reactRouter with bslib.")
-      )
-    ),
-    reactRouter::Route(
-      path = "analysis",
-      element = "Content analysis"
-    ),
-    reactRouter::Route(path = "*", element = "Custom error 404")
+      path = "/",
+      element = Layout,
+      reactRouter::Route(
+        index = TRUE,
+        element = div(
+          tags$h3("Home page"),
+          p("A basic example of reactRouter with bslib.")
+        )
+      ),
+      reactRouter::Route(
+        path = "analysis",
+        element = "Content analysis"
+      ),
+      reactRouter::Route(path = "*", element = "Custom error 404")
+    )
   )
 )
 

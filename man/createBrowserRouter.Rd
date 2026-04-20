@@ -7,14 +7,15 @@
 createBrowserRouter(...)
 }
 \arguments{
-\item{...}{\code{\link{Route}} elements, typically wrapped in
-\code{\link{createRoutesFromElements}}.}
+\item{...}{\code{\link{Route}} elements. Pass directly, or (optionally)
+wrapped in \code{\link{createRoutesFromElements}} to mirror the
+official React Router v7 API.}
 }
 \value{
 A createBrowserRouter component.
 }
 \description{
-\url{https://reactrouter.com/6.30.0/routers/create-browser-router}
+\url{https://api.reactrouter.com/v7/functions/react-router.createBrowserRouter.html}
 }
 \details{
 Creates a browser router using the data router API.

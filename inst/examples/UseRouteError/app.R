@@ -4,32 +4,34 @@
 library(reactRouter)
 
 ui <- RouterProvider(
-  Route(
-    path = "/",
-    element = div(
-      tags$h2("useRouteError Example"),
-      tags$nav(tags$ul(
-        tags$li(NavLink(to = "/", "Home")),
-        tags$li(NavLink(to = "/broken", "Broken Page"))
-      )),
-      tags$hr(),
-      Outlet()
-    ),
+  router = createMemoryRouter(
     Route(
-      index = TRUE,
-      element = div(tags$p("Home page - try the broken link!"))
-    ),
-    Route(
-      path = "broken",
-      loader = JS(
-        "async () => { throw new Error('Something went wrong!'); }"
+      path = "/",
+      element = div(
+        tags$h2("useRouteError Example"),
+        tags$nav(tags$ul(
+          tags$li(NavLink(to = "/", "Home")),
+          tags$li(NavLink(to = "/broken", "Broken Page"))
+        )),
+        tags$hr(),
+        Outlet()
       ),
-      element = div(tags$p("This should not render.")),
-      errorElement = div(
-        tags$h3(style = "color: red;", "Error!"),
-        tags$p(
-          "Error message: ",
-          useRouteError(tags$span(), selector = "message")
+      Route(
+        index = TRUE,
+        element = div(tags$p("Home page - try the broken link!"))
+      ),
+      Route(
+        path = "broken",
+        loader = JS(
+          "async () => { throw new Error('Something went wrong!'); }"
+        ),
+        element = div(tags$p("This should not render.")),
+        errorElement = div(
+          tags$h3(style = "color: red;", "Error!"),
+          tags$p(
+            "Error message: ",
+            useRouteError(tags$span(), selector = "message")
+          )
         )
       )
     )

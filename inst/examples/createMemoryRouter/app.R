@@ -44,8 +44,8 @@ Layout <- div(
   Outlet()
 )
 
-ui <- createMemoryRouter(
-  createRoutesFromElements(
+ui <- RouterProvider(
+  router = createMemoryRouter(
     Route(
       path = "/",
       element = Layout,

@@ -18,10 +18,10 @@ The goal of **reactRouter** is to provide a wrapper around [React
 Router](https://reactrouter.com).
 
 > \[!CAUTION\] **Breaking Change in v.0.2.0** : `reloadDocument` is now
-> FALSE by default in `NavLink()` and `Link()`. Set
-> `reloadDocument = TRUE` only when target routes contain Shiny
-> server-rendered output like `uiOutput()` / `renderUI()` in dynamic
-> segments (`/:id/`).
+> FALSE by default in `NavLink()`, `NavLink.shinyInput()`, `Link()` and
+> `Link.shinyInput()`. Set `reloadDocument = TRUE` only when target
+> routes contain Shiny server-rendered output like `uiOutput()` /
+> `renderUI()` in dynamic segments (`/:id/`).
 
 ### Usage
 
@@ -33,15 +33,17 @@ library(reactRouter)
 library(htmltools)
 
 RouterProvider(
-  Route(
-    path = "/",
-    element = div(
-      NavLink(to = "/", "Main"),
-      NavLink(to = "/analysis", "Analysis"),
-      Outlet()
-    ),
-    Route(index = TRUE, element = "Main content"),
-    Route(path = "analysis", element = "Analysis content")
+  router = createHashRouter(
+    Route(
+      path = "/",
+      element = div(
+        NavLink(to = "/", "Main"),
+        NavLink(to = "/analysis", "Analysis"),
+        Outlet()
+      ),
+      Route(index = TRUE, element = "Main content"),
+      Route(path = "analysis", element = "Analysis content")
+    )
   )
 )
 ```

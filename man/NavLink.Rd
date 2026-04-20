@@ -8,7 +8,7 @@
 \usage{
 NavLink(..., reloadDocument = FALSE)
 
-NavLink.shinyInput(inputId, ..., reloadDocument = TRUE)
+NavLink.shinyInput(inputId, ..., reloadDocument = FALSE)
 
 updateNavLink.shinyInput(
   session = shiny::getDefaultReactiveDomain(),
@@ -29,11 +29,14 @@ updateNavLink.shinyInput(
 A NavLink component.
 }
 \description{
+\url{https://api.reactrouter.com/v7/variables/react-router.NavLink.html}
+
+\url{https://api.reactrouter.com/v7/variables/react-router.NavLink.html}
+}
+\details{
 The `reloadDocument` prop controls whether clicking the link triggers a full
 page reload (`TRUE`) or client-side navigation (`FALSE`). The default is
 `FALSE`, matching React Router's own default. Set `reloadDocument = TRUE` in
 Shiny apps that use server-rendered UI (`uiOutput`/`renderUI`) so that
 Shiny can re-initialize and read the new URL hash.
-
-\url{https://reactrouter.com/6.30.0/components/nav-link}
 }

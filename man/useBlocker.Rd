@@ -25,7 +25,7 @@ Pass \code{FALSE} to disable blocking entirely (the default).}
 \item{...}{Additional props to pass to the component.}
 }
 \description{
-\url{https://reactrouter.com/api/hooks/useBlocker}
+\url{https://api.reactrouter.com/v7/functions/react-router.useBlocker.html}
 }
 \details{
 Calls the \code{useBlocker()} hook and injects the blocker's \code{state}
