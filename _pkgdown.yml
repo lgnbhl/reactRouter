@@ -18,14 +18,14 @@ navbar:
     href: articles/introduction.html
   - text: Articles
     menu:
-    - text: Introduction to reactRouter
-      href: articles/introduction.html
     - text: Choosing a router
       href: articles/routers.html
-    - text: Using useLoaderData
+    - text: Using Data Loaders
       href: articles/useLoaderData.html
-    - text: Tutorial with rhino and shiny.fluent
-      href: articles/shiny.fluent.html
+    - text: Using Form and Fetchers
+      href: articles/useFetcher.html
+    - text: Advanced Hooks
+      href: articles/advanced-hooks.html
   - text: Reference
     href: reference/index.html
   - text: News
