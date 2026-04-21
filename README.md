@@ -17,12 +17,6 @@ total](https://cranlogs.r-pkg.org/badges/grand-total/reactRouter)](https://cran.
 The goal of **reactRouter** is to provide a wrapper around [React
 Router](https://reactrouter.com).
 
-> \[!CAUTION\] **Breaking Change in v.0.2.0** : `reloadDocument` is now
-> FALSE by default in `NavLink()`, `NavLink.shinyInput()`, `Link()` and
-> `Link.shinyInput()`. Set `reloadDocument = TRUE` only when target
-> routes contain Shiny server-rendered output like `uiOutput()` /
-> `renderUI()` in dynamic segments (`/:id/`).
-
 ### Usage
 
 You can easily add URL pages in a Quarto document or R Shiny app like
@@ -37,8 +31,8 @@ RouterProvider(
     Route(
       path = "/",
       element = div(
-        NavLink(to = "/", "Main"),
-        NavLink(to = "/analysis", "Analysis"),
+        NavLink(to = "/", "Main"), " | ",
+        NavLink(to = "/analysis", "Analysis"), hr(),
         Outlet()
       ),
       Route(index = TRUE, element = "Main content"),
