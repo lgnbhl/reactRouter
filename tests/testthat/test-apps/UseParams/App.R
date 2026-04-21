@@ -1,28 +1,26 @@
 library(shiny)
 
-ui <- fluidPage(
-  reactRouter::createHashRouter(
-    reactRouter::createRoutesFromElements(
+ui <- reactRouter::RouterProvider(
+  router = reactRouter::createHashRouter(
+    reactRouter::Route(
+      path = "/",
+      element = div(
+        reactRouter::Outlet()
+      ),
       reactRouter::Route(
-        path = "/",
+        path = "user/:id",
         element = div(
-          reactRouter::Outlet()
-        ),
-        reactRouter::Route(
-          path = "user/:id",
-          element = div(
-            div(
-              id = "paramId",
-              reactRouter::useParams(
-                tags$span(),
-                selector = "id"
-              )
-            ),
-            div(
-              id = "paramAll",
-              reactRouter::useParams(
-                tags$span()
-              )
+          div(
+            id = "paramId",
+            reactRouter::useParams(
+              tags$span(),
+              selector = "id"
+            )
+          ),
+          div(
+            id = "paramAll",
+            reactRouter::useParams(
+              tags$span()
             )
           )
         )

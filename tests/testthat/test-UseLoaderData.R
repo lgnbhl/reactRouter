@@ -22,4 +22,8 @@ test_that("useLoaderData() renders loader data", {
 
   loader_age <- app_data$get_text("#loaderAge")
   expect_equal(loader_age, "30")
+
+  # render = JS(...) path: receives full loader object, composes a string
+  loader_name_render <- app_data$get_text("#loaderNameRender")
+  expect_equal(loader_name_render, "Alice, age 30")
 })

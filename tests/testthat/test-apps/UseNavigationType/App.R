@@ -1,18 +1,16 @@
 library(shiny)
 
-ui <- fluidPage(
-  reactRouter::HashRouter(
-    div(
-      id = "navType",
-      reactRouter::useNavigationType(
-        tags$span()
-      )
-    ),
-    reactRouter::Routes(
-      reactRouter::Route(
-        path = "/*",
-        element = div(tags$p("content"))
-      )
+ui <- reactRouter::HashRouter(
+  div(
+    id = "navType",
+    reactRouter::useNavigationType(
+      tags$span()
+    )
+  ),
+  reactRouter::Routes(
+    reactRouter::Route(
+      path = "/*",
+      element = div(tags$p("content"))
     )
   )
 )

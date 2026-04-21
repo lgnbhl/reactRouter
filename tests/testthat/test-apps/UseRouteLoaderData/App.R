@@ -1,34 +1,32 @@
 library(shiny)
 
-ui <- fluidPage(
-  reactRouter::createHashRouter(
-    reactRouter::createRoutesFromElements(
+ui <- reactRouter::RouterProvider(
+  router = reactRouter::createHashRouter(
+    reactRouter::Route(
+      id = "root",
+      path = "/",
+      loader = reactRouter::JS(
+        "async () => { return { title: 'Root Data', version: 1 }; }"
+      ),
+      element = div(
+        reactRouter::Outlet()
+      ),
       reactRouter::Route(
-        id = "root",
-        path = "/",
-        loader = reactRouter::JS(
-          "async () => { return { title: 'Root Data', version: 1 }; }"
-        ),
+        path = "child",
         element = div(
-          reactRouter::Outlet()
-        ),
-        reactRouter::Route(
-          path = "child",
-          element = div(
-            div(
-              id = "rootDataAll",
-              reactRouter::useRouteLoaderData(
-                tags$span(),
-                routeId = "root"
-              )
-            ),
-            div(
-              id = "rootDataTitle",
-              reactRouter::useRouteLoaderData(
-                tags$span(),
-                routeId = "root",
-                selector = "title"
-              )
+          div(
+            id = "rootDataAll",
+            reactRouter::useRouteLoaderData(
+              tags$span(),
+              routeId = "root"
+            )
+          ),
+          div(
+            id = "rootDataTitle",
+            reactRouter::useRouteLoaderData(
+              tags$span(),
+              routeId = "root",
+              selector = "title"
             )
           )
         )

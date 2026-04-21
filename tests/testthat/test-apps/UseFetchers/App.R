@@ -1,23 +1,21 @@
 library(shiny)
 
-ui <- fluidPage(
-  reactRouter::createHashRouter(
-    reactRouter::createRoutesFromElements(
-      reactRouter::Route(
-        path = "/",
-        element = div(
-          div(
-            id = "fetchersAll",
-            reactRouter::useFetchers(
-              tags$span()
-            )
-          ),
-          reactRouter::Outlet()
+ui <- reactRouter::RouterProvider(
+  router = reactRouter::createHashRouter(
+    reactRouter::Route(
+      path = "/",
+      element = div(
+        div(
+          id = "fetchersAll",
+          reactRouter::useFetchers(
+            tags$span()
+          )
         ),
-        reactRouter::Route(
-          index = TRUE,
-          element = div(tags$p("home"))
-        )
+        reactRouter::Outlet()
+      ),
+      reactRouter::Route(
+        index = TRUE,
+        element = div(tags$p("home"))
       )
     )
   )

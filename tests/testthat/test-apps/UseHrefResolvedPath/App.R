@@ -1,7 +1,7 @@
 library(shiny)
 
-ui <- fluidPage(
-  reactRouter::HashRouter(
+ui <- reactRouter::RouterProvider(
+  router = reactRouter::createHashRouter(
     reactRouter::Routes(
       reactRouter::Route(
         path = "/",

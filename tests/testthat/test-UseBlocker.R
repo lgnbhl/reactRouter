@@ -6,7 +6,11 @@ test_that("useBlocker() renders blocker state", {
   )
   app$wait_for_idle()
 
-  # At rest with no navigation attempted, blocker state is "unblocked"
+  # into/as/selector path: default selector = "state"
   blocker_state <- app$get_text("#blockerState")
   expect_equal(blocker_state, "unblocked")
+
+  # render = JS(...) path: receives full blocker object, returns b.state
+  blocker_state_render <- app$get_text("#blockerStateRender")
+  expect_equal(blocker_state_render, "unblocked")
 })

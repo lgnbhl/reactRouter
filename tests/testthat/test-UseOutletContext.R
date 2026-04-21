@@ -15,4 +15,8 @@ test_that("useOutletContext() reads context passed through Outlet", {
   context_all <- app$get_text("#contextAll")
   expect_true(grepl('"user"', context_all))
   expect_true(grepl('"Alice"', context_all))
+
+  # render = JS(...) path: receives full context object, composes a string
+  context_render <- app$get_text("#contextRender")
+  expect_equal(context_render, "Alice (admin)")
 })
