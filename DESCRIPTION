@@ -8,9 +8,9 @@ Authors@R: c(
     )
 Maintainer: Felix Luginbuhl <felix.luginbuhl@protonmail.ch>
 Description: Provides a wrapper around the 'react-router-dom' 'React' library for use in
-  'Shiny' applications and 'Quarto' documents. Enables client-side routing with browser,
-  hash, and memory history strategies, nested routes, dynamic segments, data loaders,
-  actions, and navigation hooks.
+  'Shiny' applications and 'Quarto' documents. Enables client-side routing with hash,
+  and memory history strategies, nested routes, dynamic segments, data loaders, actions, 
+  and navigation hooks.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
