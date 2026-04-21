@@ -27,7 +27,10 @@ Suggests:
     chromote (>= 0.1.1.9001),
     shinytest2,
     knitr,
-    rmarkdown
+    rmarkdown,
+    dplyr,
+    muiMaterial,
+    muiDataGrid
 RoxygenNote: 7.3.3
 URL: https://felixluginbuhl.com/reactRouter/
 BugReports: https://github.com/lgnbhl/reactRouter/issues
