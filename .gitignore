@@ -13,6 +13,6 @@ inst/doc
 /.quarto/
 pkgdown
 CRAN-SUBMISSION
-.claude/settings.local.json
+/.claude/
 inst/examples/shiny.fluent/.renvignore
 inst/examples/shiny.fluent/.lintr
