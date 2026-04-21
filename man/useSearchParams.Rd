@@ -7,13 +7,17 @@
 useSearchParams(into = NULL, as = "children", param = NULL, render = NULL, ...)
 }
 \arguments{
-\item{into}{A component that will receive the value.}
+\item{into}{A component (HTML tag or \pkg{shiny.react}-based element)
+that will receive the hook data as the specified prop.}
 
-\item{as}{Character. The name of the component's prop to inject into.}
+\item{as}{Character. The name of the component's prop to inject the hook
+data into (by default \code{"children"} for text display, \code{"rows"} for
+a data grid, \code{"value"} for an input).}
 
-\item{param}{Character. Optional name of a single query parameter
-to extract (e.g. \code{"q"}). If \code{NULL}, all params are
-passed as a named list.}
+\item{render}{Optional \code{\link{JS}} function \code{(value) => ReactNode}
+used in place of \code{into}/\code{as}. Mirrors the native React Router
+pattern for cases where a single prop is not expressive enough (e.g.
+\code{JS("v => `${v.first} ${v.last}`")}).}
 
 \item{...}{Additional props to pass to the component.}
 }

@@ -327,9 +327,7 @@ useRouteError <- function(
 #' \code{as} a prop of the \code{into} component.
 #' Returns one of \code{"POP"}, \code{"PUSH"}, or \code{"REPLACE"}.
 #'
-#' @param into A component that will receive the value.
-#' @param as Character. The name of the component's prop to inject into.
-#' @param ... Additional props to pass to the component.
+#' @inheritParams hook-wrapper
 #'
 #' @rdname useNavigationType
 #' @export
@@ -415,12 +413,7 @@ useMatches <- function(
 #' \code{as} a prop of the \code{into} component. Use the \code{param}
 #' argument to extract a single query parameter by name.
 #'
-#' @param into A component that will receive the value.
-#' @param as Character. The name of the component's prop to inject into.
-#' @param param Character. Optional name of a single query parameter
-#'   to extract (e.g. \code{"q"}). If \code{NULL}, all params are
-#'   passed as a named list.
-#' @param ... Additional props to pass to the component.
+#' @inheritParams hook-wrapper
 #'
 #' @rdname useSearchParams
 #' @export
@@ -454,10 +447,8 @@ useSearchParams <- function(
 #' Calls the \code{useHref()} hook and injects the resolved href string
 #' \code{as} a prop of the \code{into} component.
 #'
+#' @inheritParams hook-wrapper
 #' @param to Character. The path to resolve.
-#' @param into A component that will receive the value.
-#' @param as Character. The name of the component's prop to inject into.
-#' @param ... Additional props to pass to the component.
 #'
 #' @rdname useHref
 #' @export
