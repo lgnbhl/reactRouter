@@ -17,15 +17,35 @@ function getPath(obj, path) {
   return path.split('.').reduce((acc, key) => acc?.[key], obj);
 }
 
+// Apply an optional `selector` (dotted path) to the raw hook result. With
+// `mapArray`, the selector is applied to each element.
+function applySelector(result, selector, mapArray) {
+  if (mapArray) {
+    return selector ? result.map(m => getPath(m, selector)) : result;
+  }
+  if (selector) {
+    return typeof result === 'object' ? getPath(result, selector) : result;
+  }
+  return result;
+}
+
+// Shared tail: either call the user's JS render function with the raw hook
+// result, or clone `into` and inject the selector-extracted value as the
+// `as` prop. `selector` is intentionally ignored on the render-prop path —
+// render receives the full hook value so it can navigate it freely (matches
+// React Router's native render-prop mental model).
+function injectValue({ result, selector, mapArray, render, into, as, rest }) {
+  if (typeof render === 'function') return render(result);
+  const value = applySelector(result, selector, mapArray);
+  return React.cloneElement(into, { [as]: safeAs(as, value), ...rest });
+}
+
 export const Link = ButtonAdapter(ReactRouter.Link);
 export const NavLink = ButtonAdapter(ReactRouter.NavLink);
 
 // createHashRouter / createBrowserRouter / createMemoryRouter are "spec"
 // components: they mirror the v7 factory functions and are only meaningful
 // as the `router` prop of RouterProvider — never rendered on their own.
-// If one is rendered directly (e.g. the user forgot to wrap it in
-// RouterProvider), we throw a helpful error instead of silently rendering
-// nothing.
 function makeRouterSpec(kind, rName) {
   const Spec = function () {
     throw new Error(
@@ -41,124 +61,46 @@ export const CreateHashRouter = makeRouterSpec('hash', 'createHashRouter');
 export const CreateBrowserRouter = makeRouterSpec('browser', 'createBrowserRouter');
 export const CreateMemoryRouter = makeRouterSpec('memory', 'createMemoryRouter');
 
-export function useLoaderData({ selector, as, into, ...rest }) {
-  const data = ReactRouter.useLoaderData();
-  const value = selector ? getPath(data, selector) : data;
-  return React.cloneElement(into, { [as]: safeAs(as, value), ...rest });
-}
-
-export function useActionData({ selector, as, into, ...rest }) {
-  const data = ReactRouter.useActionData();
-  const value = selector ? getPath(data, selector) : data;
-  return React.cloneElement(into, { [as]: safeAs(as, value), ...rest });
-}
-
-export function useLocation({ selector, as, into, ...rest }) {
-  const location = ReactRouter.useLocation();
-  const value = selector ? getPath(location, selector) : location;
-  return React.cloneElement(into, { [as]: safeAs(as, value), ...rest });
-}
-
-export function useParams({ selector, as, into, ...rest }) {
-  const params = ReactRouter.useParams();
-  const value = selector ? getPath(params, selector) : params;
-  return React.cloneElement(into, { [as]: safeAs(as, value), ...rest });
-}
-
-export function useNavigation({ selector, as, into, ...rest }) {
-  const navigation = ReactRouter.useNavigation();
-  const value = selector ? getPath(navigation, selector) : navigation;
-  return React.cloneElement(into, { [as]: safeAs(as, value), ...rest });
-}
-
-export function useRouteLoaderData({ routeId, selector, as, into, ...rest }) {
-  const data = ReactRouter.useRouteLoaderData(routeId);
-  const value = selector ? getPath(data, selector) : data;
-  return React.cloneElement(into, { [as]: safeAs(as, value), ...rest });
-}
-
-export function useRouteError({ selector, as, into, ...rest }) {
-  const error = ReactRouter.useRouteError();
-  if (!error) return null;
-  const value = selector ? (typeof error === 'object' ? getPath(error, selector) : error) : error;
-  return React.cloneElement(into, { [as]: safeAs(as, value), ...rest });
-}
-
-export function useNavigationType({ as, into, ...rest }) {
-  const navType = ReactRouter.useNavigationType();
-  return React.cloneElement(into, { [as]: navType, ...rest });
-}
-
-export function useMatch({ pattern, selector, as, into, ...rest }) {
-  const match = ReactRouter.useMatch(pattern || '/');
-  if (!match) return null;
-  const value = selector ? getPath(match, selector) : match;
-  return React.cloneElement(into, { [as]: safeAs(as, value), ...rest });
-}
-
-export function useMatches({ selector, as, into, ...rest }) {
-  const matches = ReactRouter.useMatches();
-  const value = selector ? matches.map(m => getPath(m, selector)) : matches;
-  return React.cloneElement(into, { [as]: safeAs(as, value), ...rest });
-}
-
-export function useSearchParams({ param, as, into, ...rest }) {
-  const [searchParams] = ReactRouter.useSearchParams();
-  let value;
-  if (param) {
-    value = searchParams.get(param) ?? '';
-  } else {
-    value = {};
-    searchParams.forEach((v, key) => { value[key] = v; });
+// Generic dispatcher for any React Router hook that fits the common shape:
+//   value = ReactRouter[hook](hookArg?); optional dotted-path `selector`;
+//   render it via `render` JS function or by cloning `into` with `[as]=value`.
+//
+// The R wrapper for each hook passes a fixed `hook` string, so the same hook
+// is always invoked at the same position in the render tree — rules-of-hooks
+// compliant. Hooks with distinct argument or return shapes (useSearchParams,
+// useFetcher, Await) stay as dedicated components below.
+export function UseHook({
+  hook, hookArg, selector, as, into, render,
+  mapArray = false, nullIfFalsy = false, ...rest
+}) {
+  const fn = ReactRouter[hook];
+  if (typeof fn !== 'function') {
+    throw new Error(`UseHook: react-router-dom has no hook "${hook}"`);
   }
-  return React.cloneElement(into, { [as]: safeAs(as, value), ...rest });
+  const result = hookArg !== undefined ? fn(hookArg) : fn();
+  if (nullIfFalsy && !result) return null;
+  return injectValue({ result, selector, mapArray, render, into, as, rest });
 }
 
-export function useHref({ to, as, into, ...rest }) {
-  const href = ReactRouter.useHref(to || '.');
-  return React.cloneElement(into, { [as]: href, ...rest });
+export function useSearchParams({ param, as, into, render, ...rest }) {
+  const [searchParams] = ReactRouter.useSearchParams();
+  let result;
+  if (param) {
+    result = searchParams.get(param) ?? '';
+  } else {
+    result = {};
+    searchParams.forEach((v, key) => { result[key] = v; });
+  }
+  return injectValue({ result, render, into, as, rest });
 }
 
-export function useResolvedPath({ to, selector, as, into, ...rest }) {
-  const path = ReactRouter.useResolvedPath(to || '.');
-  const value = selector ? getPath(path, selector) : path;
-  return React.cloneElement(into, { [as]: safeAs(as, value), ...rest });
-}
-
-export function useFetcher({ selector, as, into, fetcherKey, ...rest }) {
+export function useFetcher({ selector, as, into, render, fetcherKey, ...rest }) {
   const fetcher = ReactRouter.useFetcher(fetcherKey ? { key: fetcherKey } : undefined);
-  const value = selector ? getPath(fetcher, selector) : fetcher;
-  return React.cloneElement(into, { [as]: safeAs(as, value), ...rest });
-}
-
-export function useFetchers({ selector, as, into, ...rest }) {
-  const fetchers = ReactRouter.useFetchers();
-  const value = selector ? fetchers.map(f => getPath(f, selector)) : fetchers;
-  return React.cloneElement(into, { [as]: safeAs(as, value), ...rest });
-}
-
-export function useRevalidator({ selector, as, into, ...rest }) {
-  const revalidator = ReactRouter.useRevalidator();
-  const value = selector ? getPath(revalidator, selector) : revalidator.state;
-  return React.cloneElement(into, { [as]: safeAs(as, value), ...rest });
-}
-
-export function useBlocker({ shouldBlock, selector, as, into, ...rest }) {
-  const blocker = ReactRouter.useBlocker(shouldBlock ?? false);
-  const value = selector ? getPath(blocker, selector) : blocker.state;
-  return React.cloneElement(into, { [as]: safeAs(as, value), ...rest });
-}
-
-export function useOutletContext({ selector, as, into, ...rest }) {
-  const context = ReactRouter.useOutletContext();
-  const value = selector ? getPath(context, selector) : context;
-  return React.cloneElement(into, { [as]: safeAs(as, value), ...rest });
+  return injectValue({ result: fetcher, selector, render, into, as, rest });
 }
 
 // RouterProvider — mirrors the React Router v7 API:
 //   <RouterProvider router={createHashRouter(routes)} fallbackElement={...} />
-// `router` must be an element produced by createHashRouter(),
-// createBrowserRouter(), or createMemoryRouter().
 export function RouterProvider({ router, fallbackElement }) {
   const kind = router && router.type && router.type.__routerKind;
   if (!kind) {
@@ -176,18 +118,15 @@ export function RouterProvider({ router, fallbackElement }) {
   return React.createElement(ReactRouter.RouterProvider, { router: rrRouter, fallbackElement });
 }
 
-// Await — renders into `into` when a deferred loader key resolves.
-// Automatically wraps in <Suspense> (required by React Router's Await).
-export function Await({ resolveKey, errorElement, fallback, as = 'children', into, selector, ...rest }) {
+// Await — renders `into` (or calls `render`) when a deferred loader key
+// resolves. Automatically wraps in <Suspense> (required by React Router's Await).
+export function Await({ resolveKey, errorElement, fallback, as = 'children', into, selector, render, ...rest }) {
   const data = ReactRouter.useLoaderData();
   const deferred = data?.[resolveKey];
   const awaitEl = React.createElement(
     ReactRouter.Await,
     { resolve: deferred, errorElement },
-    (value) => {
-      const extracted = selector ? getPath(value, selector) : value;
-      return React.cloneElement(into, { [as]: safeAs(as, extracted), ...rest });
-    }
+    (value) => injectValue({ result: value, selector, render, into, as, rest })
   );
   return React.createElement(
     React.Suspense,
