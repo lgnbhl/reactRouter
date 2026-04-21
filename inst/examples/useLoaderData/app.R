@@ -19,7 +19,7 @@ people_json <- dplyr::starwars |>
 # --- App -------------------------------------------------------------------------
 
 ui <- RouterProvider(
-  router = createMemoryRouter(
+  router = createHashRouter(
     Route(
       path = "/",
       element = div(

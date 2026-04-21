@@ -20,7 +20,7 @@ Layout <- div(
 )
 
 ui <- RouterProvider(
-  router = createMemoryRouter(
+  router = createHashRouter(
     Route(
       path = "/",
       element = Layout,

@@ -63,7 +63,7 @@ Header <- div(
 )
 
 ui <- RouterProvider(
-  router = createMemoryRouter(
+  router = createHashRouter(
     Route(
       path = "/",
       element = Header,

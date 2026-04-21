@@ -5,7 +5,7 @@ library(reactRouter)
 library(htmltools)
 
 ui <- RouterProvider(
-  router = createMemoryRouter(
+  router = createHashRouter(
     Route(
       path = "/",
       element = div(

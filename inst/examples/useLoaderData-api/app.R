@@ -23,7 +23,7 @@ loader_people <- JS(
 
 # -- UI --------------------------------------------------------------------
 ui <- RouterProvider(
-  router = createMemoryRouter(
+  router = createHashRouter(
     Route(
       path = "/",
       loader = loader_people,

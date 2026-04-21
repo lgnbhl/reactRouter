@@ -45,16 +45,18 @@ Layout <- div(
 )
 
 ui <- RouterProvider(
-  router = createMemoryRouter(
+  router = createHashRouter(
     Route(
       path = "/",
       element = Layout,
       Route(
         index = TRUE,
-        loader = JS("async () => {
+        loader = JS(
+          "async () => {
           await new Promise(r => setTimeout(r, 1500));
           return { message: 'Data loaded after 1.5 s!' };
-        }"),
+        }"
+        ),
         element = Home
       ),
       Route(path = "about", element = About)

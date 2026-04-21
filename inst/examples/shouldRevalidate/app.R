@@ -41,7 +41,7 @@ should_revalidate_root <- JS(
 )
 
 ui <- RouterProvider(
-  router = createMemoryRouter(
+  router = createHashRouter(
     Route(
       path = "/",
       loader = root_loader,
