@@ -31,6 +31,7 @@ Suggests:
     dplyr,
     muiMaterial,
     muiDataGrid
+Remotes: lgnbhl/muiDataGrid
 RoxygenNote: 7.3.3
 URL: https://felixluginbuhl.com/reactRouter/
 BugReports: https://github.com/lgnbhl/reactRouter/issues
