@@ -38,9 +38,9 @@ RouterProvider(
   router = createHashRouter(
     Route(
       path = "/",
-      element = htmltools::tags$div(
-        NavLink(to = "/", "Main"),
-        NavLink(to = "/analysis", "Analysis"),
+      element = div(
+        NavLink(to = "/", "Main"), " | ",
+        NavLink(to = "/analysis", "Analysis"), hr(),
         Outlet()
       ),
       Route(index = TRUE, element = "Main content"),
@@ -127,8 +127,6 @@ RouterProvider(
   )
 )
 ```
-
-<img style="border:1px solid black;" src="https://raw.githubusercontent.com/lgnbhl/reactRouter/master/man/figures/reactRouter-with-bslib.png" align="center" />
 
 ### Usage with muiMaterial
 
@@ -318,7 +316,8 @@ RouterProvider(
         element = div(
           tags$h2("Nothing to see here!"),
           tags$p(
-            Link(to = "/", "Go to the home page")
+            # reactRouter::Link() conflicts with muiMaterial::Link()
+            reactRouter::Link(to = "/", "Go to the home page")
           )
         )
       )

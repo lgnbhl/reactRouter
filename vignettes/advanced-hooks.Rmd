@@ -1,8 +1,8 @@
 ---
-title: "Advanced hooks: useBlocker, useOutletContext, useAsyncValue, useAsyncError"
+title: "Advanced hooks: useBlocker and useOutletContext"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Advanced hooks: useBlocker, useOutletContext, useAsyncValue, useAsyncError}
+  %\VignetteIndexEntry{Advanced hooks: useBlocker and useOutletContext}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-This vignette covers four hooks that address specific routing patterns beyond
+This vignette covers two hooks that address specific routing patterns beyond
 basic data loading and navigation:
 
 | Hook | What it does |
@@ -24,8 +24,36 @@ basic data loading and navigation:
 | `useBlocker()` | Intercept navigation — e.g. warn about unsaved changes |
 | `useOutletContext()` | Read data passed from a parent route through `Outlet(context = ...)` |
 
-They work inside data routers (`RouterProvider()`, `createHashRouter()`,
-`createMemoryRouter()`).
+Both hooks require a data router: `RouterProvider()` with
+`createHashRouter()`, `createBrowserRouter()`, or `createMemoryRouter()`.
+
+## Two ways to inject hook values
+
+Every hook wrapper in **reactRouter** offers two mutually exclusive ways to
+turn a hook value into UI. Pick whichever is more ergonomic for the case at
+hand — the API is identical across all hooks (`useLoaderData()`,
+`useParams()`, `useBlocker()`, `useOutletContext()`, …).
+
+**1. R-idiomatic (`into` + `as` + `selector`)** — the default.
+The hook value is cloned into an existing component as a single prop.
+Good for displaying one field, populating a data grid's `rows`, or feeding
+an input's `value`:
+
+```r
+useOutletContext(tags$span(), selector = "user.name")
+```
+
+**2. Native render-prop (`render = JS(...)`)** — the escape hatch.
+Pass a JS function `(value) => ReactNode`. Mirrors the official React
+Router pattern and is the right choice when one prop is not enough — e.g.
+combining several fields, conditional rendering, or template strings:
+
+```r
+useOutletContext(render = JS("u => `${u.name} (${u.role})`"))
+```
+
+When `render` is supplied, `into`, `as`, and `selector` are ignored —
+apply any selection inside the JS function directly.
 
 ---
 
@@ -44,10 +72,13 @@ They work inside data routers (`RouterProvider()`, `createHashRouter()`,
 
 | Argument | Required | Description |
 |---|---|---|
-| `into` | yes | Component that receives the value |
+| `into` | yes\* | Component that receives the value |
 | `as` | no | Prop to inject into. Defaults to `"children"` |
 | `selector` | no | Field from the blocker object. Defaults to `"state"` |
+| `render` | no | `JS()` function `(value) => ReactNode`. When supplied, replaces `into`/`as`/`selector`. |
 | `shouldBlock` | no | A `JS()` function receiving `{ currentLocation, nextLocation, historyAction }` and returning `true` to block or `false` to allow. Defaults to `FALSE` (never blocks). |
+
+\* `into` is required unless `render` is supplied.
 
 ### Show blocker state
 
@@ -62,12 +93,30 @@ useBlocker(
 # renders "unblocked", "blocked", or "proceeding"
 ```
 
-### Full example
+### Conditional UI with `render`
 
-The companion components `BlockerProceedButton()` and `BlockerResetButton()`
-let the user confirm or cancel the blocked navigation:
+Because `selector = "state"` only exposes the state string, use `render` when
+you need to branch on the full blocker object (e.g. show the target URL in
+the confirmation prompt):
 
 ```r
+useBlocker(
+  shouldBlock = should_block,
+  render = JS(
+    "b => b.state === 'blocked'
+      ? `Leave for ${b.location.pathname}?`
+      : null"
+  )
+)
+```
+
+### Full example
+
+The `render` function receives the full blocker object, including `b.proceed()` and
+`b.reset()` methods. Use them inside `onClick` handlers to build a real
+confirmation dialog:
+
+```{r}
 library(reactRouter)
 library(htmltools)
 
@@ -76,43 +125,70 @@ should_block <- JS(
     currentLocation.pathname !== nextLocation.pathname"
 )
 
+blocker_ui <- JS(
+  "b => {
+    const state = React.createElement('code', null, b.state);
+    if (b.state !== 'blocked') return state;
+    return React.createElement(React.Fragment, null,
+      state, ' — ',
+      React.createElement('button', { onClick: () => b.proceed() }, 'Leave'),
+      ' ',
+      React.createElement('button', { onClick: () => b.reset() }, 'Stay')
+    );
+  }"
+)
+
 RouterProvider(
-  Route(
-    path = "/",
-    element = div(
-      NavLink(to = "/",      "Home"),
-      NavLink(to = "/other", "Other page"),
-      Outlet()
-    ),
+  router = createHashRouter(
     Route(
-      index = TRUE,
+      path = "/",
       element = div(
-        tags$h3("Home — blocker active"),
-        tags$p("Blocker state: ", useBlocker(tags$code(), shouldBlock = should_block)),
-        # Shown when state = "blocked":
-        tags$p("Leave without saving?"),
-        BlockerProceedButton("Leave",  shouldBlock = should_block),
-        BlockerResetButton( "Stay",    shouldBlock = should_block)
+        tags$nav(tags$ul(
+          tags$li(NavLink(to = "/",      "Home")),
+          tags$li(NavLink(to = "/other", "Other page"))
+        )),
+        tags$hr(),
+        Outlet()
+      ),
+      Route(
+        index = TRUE,
+        element = div(
+          tags$h3("Home — blocker active"),
+          tags$p(
+            tags$strong("Blocker state: "),
+            useBlocker(shouldBlock = should_block, render = blocker_ui)
+          ),
+          tags$p(
+            style = "color: #555; font-size: 0.9em;",
+            "Click 'Other page'. The state changes to ",
+            tags$code('"blocked"'), " and two buttons appear.",
+            tags$br(),
+            tags$em("Leave"), " calls ", tags$code("b.proceed()"),
+            " to confirm navigation;",
+            tags$br(),
+            tags$em("Stay"), " calls ", tags$code("b.reset()"),
+            " to cancel and return to ", tags$code('"unblocked"'), "."
+          )
+        )
+      ),
+      Route(
+        path = "other",
+        element = div(
+          tags$h3("Other page"),
+          tags$p("No blocker here. Navigate freely.")
+        )
       )
-    ),
-    Route(
-      path = "other",
-      element = div(tags$h3("Other page"))
     )
   )
 )
 ```
 
-`shouldBlock` must be the **same JS function object** passed to all three —
-`useBlocker`, `BlockerProceedButton`, and `BlockerResetButton` — so they all
-reference the same blocker instance.
-
 ### Conditional blocking
 
-Pass a condition that depends on form state embedded in the JS:
+Pass any condition as the `shouldBlock` JS function:
 
 ```r
-# Block only when a specific query param indicates a dirty form
+# Block only when navigating to a specific path
 JS("({ nextLocation }) => nextLocation.pathname === '/confirm'")
 
 # Always block (useful for testing)
@@ -134,9 +210,12 @@ through deeply nested layouts.
 
 | Argument | Required | Description |
 |---|---|---|
-| `into` | yes | Component that receives the value |
+| `into` | yes\* | Component that receives the value |
 | `as` | no | Prop to inject into. Defaults to `"children"` |
-| `selector` | no | Field to extract from the context object. `NULL` (default) injects the full context as JSON |
+| `selector` | no | Field to extract from the context object. Dotted paths like `"user.name"` navigate nested objects. `NULL` (default) injects the full context. |
+| `render` | no | `JS()` function `(context) => ReactNode`. When supplied, replaces `into`/`as`/`selector`. |
+
+\* `into` is required unless `render` is supplied.
 
 ### Passing context from a parent route
 
@@ -162,33 +241,59 @@ Route(
 
 ### Full example
 
-```r
+```{r}
 library(reactRouter)
 library(htmltools)
 
-user <- list(name = "Alice", role = "admin", email = "alice@example.com")
+current_user <- list(name = "Alice", role = "admin", email = "alice@example.com")
 
 RouterProvider(
-  Route(
-    path = "/",
-    element = div(
-      NavLink(to = "/",        "Dashboard"),
-      NavLink(to = "/profile", "Profile"),
-      Outlet(context = user)
-    ),
+  router = createHashRouter(
     Route(
-      index = TRUE,
+      path = "/",
       element = div(
-        tags$p("Welcome, ",
-               useOutletContext(tags$strong(), selector = "name"))
-      )
-    ),
-    Route(
-      path = "profile",
-      element = div(
-        tags$p("Name: ",  useOutletContext(tags$span(), selector = "name")),
-        tags$p("Email: ", useOutletContext(tags$span(), selector = "email")),
-        tags$p("Role: ",  useOutletContext(tags$span(), selector = "role"))
+        tags$nav(tags$ul(
+          tags$li(NavLink(to = "/",        "Dashboard")),
+          tags$li(NavLink(to = "/profile", "Profile")),
+          tags$li(NavLink(to = "/settings","Settings"))
+        )),
+        tags$hr(),
+        Outlet(context = current_user)
+      ),
+      Route(
+        index = TRUE,
+        element = div(
+          tags$h3("Dashboard"),
+          tags$p(
+            "Welcome back, ",
+            tags$strong(useOutletContext(tags$span(), selector = "name")),
+            "!"
+          ),
+          tags$p("Your role: ", useOutletContext(tags$code(), selector = "role"))
+        )
+      ),
+      Route(
+        path = "profile",
+        element = div(
+          tags$h3("Profile"),
+          tags$p("Name: ",  useOutletContext(tags$span(), selector = "name")),
+          tags$p("Email: ", useOutletContext(tags$span(), selector = "email")),
+          tags$p("Role: ",  useOutletContext(tags$span(), selector = "role")),
+          tags$details(
+            tags$summary("Full context (JSON)"),
+            tags$pre(useOutletContext(tags$span()))
+          )
+        )
+      ),
+      Route(
+        path = "settings",
+        element = div(
+          tags$h3("Settings"),
+          tags$p(
+            "Editing settings for ",
+            tags$strong(useOutletContext(tags$span(), selector = "name"))
+          )
+        )
       )
     )
   )
@@ -197,3 +302,22 @@ RouterProvider(
 
 The context is passed once at the layout level and is available to every
 child route without repeating it in each `element`.
+
+### Combining fields with `render`
+
+`selector` extracts a single field. When you need to compose several fields
+into one output — a greeting, a formatted label, a conditional element —
+use `render` instead:
+
+```r
+useOutletContext(
+  render = JS(
+    "u => u.role === 'admin'
+      ? `${u.name} (admin — ${u.email})`
+      : u.name"
+  )
+)
+```
+
+This matches the React Router v7 idiom where the component itself decides
+how to consume the hook value, at the cost of a small amount of inline JS.
