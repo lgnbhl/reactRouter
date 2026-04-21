@@ -16,6 +16,10 @@ const config = {
     '@/shiny.react': 'jsmodule["@/shiny.react"]',
   },
   plugins: [new webpack.DefinePlugin({ 'process.env': '{}' })],
+  performance: {
+    maxAssetSize: 2097152, // 2 MiB
+    maxEntrypointSize: 2097152, // 2 MiB
+  },
 };
 
 module.exports = config;
