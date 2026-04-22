@@ -88,9 +88,15 @@ RouterProvider(
 
 ### Install
 
-```r
-#remotes::install_github("lgnbhl/reactRouter") # development version
+For current version 0.2.0 (coming soon on CRAN):
 
+```r
+remotes::install_github("lgnbhl/reactRouter") # development version
+```
+
+For older version 0.1.1 (older version on CRAN):
+
+```r
 install.packages("reactRouter")
 ```
 
