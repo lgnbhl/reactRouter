@@ -4,7 +4,7 @@
 \alias{useNavigationType}
 \title{useNavigationType}
 \usage{
-useNavigationType(into, as = "children", render = NULL, ...)
+useNavigationType(into = NULL, as = "children", render = NULL, ...)
 }
 \arguments{
 \item{into}{A component (HTML tag or \pkg{shiny.react}-based element)

@@ -15,6 +15,21 @@
 #' @keywords internal
 NULL
 
+validateTarget <- function(label, into, render) {
+  if (!is.null(render) && !inherits(render, "JS_EVAL")) {
+    stop(sprintf(
+      '%s(): `render` must be a JS() function, e.g. render = JS("v => v.name"). Got %s.',
+      label, class(render)[1]
+    ), call. = FALSE)
+  }
+  if (is.null(render) && is.null(into)) {
+    stop(sprintf(
+      '%s(): provide either `into` (a component to inject the value into) or `render` (a JS() function that returns a React element).',
+      label
+    ), call. = FALSE)
+  }
+}
+
 component <- function(name, module = 'react-router-dom') {
   function(...) {
     shiny.react::reactElement(
@@ -47,7 +62,7 @@ component <- function(name, module = 'react-router-dom') {
 #' @rdname Await
 #' @export
 Await <- function(
-  into,
+  into = NULL,
   as = "children",
   resolveKey,
   selector = NULL,
@@ -56,6 +71,7 @@ Await <- function(
   fallback = NULL,
   ...
 ) {
+  validateTarget("Await", into, render)
   tag <- shiny.react::reactElement(
     module = "@/reactRouter",
     name = "Await",
@@ -77,7 +93,8 @@ Await <- function(
 
 # Internal: build a React element that dispatches through the generic
 # `UseHook` JSX component. Every simple hook wrapper delegates here.
-useHookElement <- function(hook, ..., mapArray = FALSE, nullIfFalsy = FALSE) {
+useHookElement <- function(hook, into = NULL, render = NULL, ..., mapArray = FALSE, nullIfFalsy = FALSE) {
+  validateTarget(hook, into, render)
   tag <- shiny.react::reactElement(
     module = "@/reactRouter",
     name = "UseHook",
@@ -85,6 +102,8 @@ useHookElement <- function(hook, ..., mapArray = FALSE, nullIfFalsy = FALSE) {
       hook = hook,
       mapArray = mapArray,
       nullIfFalsy = nullIfFalsy,
+      into = into,
+      render = render,
       ...
     ),
     deps = reactRouterDependency()
@@ -331,7 +350,12 @@ useRouteError <- function(
 #'
 #' @rdname useNavigationType
 #' @export
-useNavigationType <- function(into, as = "children", render = NULL, ...) {
+useNavigationType <- function(
+  into = NULL,
+  as = "children",
+  render = NULL,
+  ...
+) {
   useHookElement(
     hook = "useNavigationType",
     into = into,
@@ -414,6 +438,7 @@ useMatches <- function(
 #' argument to extract a single query parameter by name.
 #'
 #' @inheritParams hook-wrapper
+#' @param param argument to extract a single query parameter by name.
 #'
 #' @rdname useSearchParams
 #' @export
@@ -424,6 +449,7 @@ useSearchParams <- function(
   render = NULL,
   ...
 ) {
+  validateTarget("useSearchParams", into, render)
   tag <- shiny.react::reactElement(
     module = "@/reactRouter",
     name = "useSearchParams",
@@ -519,7 +545,7 @@ useFetcher <- function(
   fetcherKey = NULL,
   ...
 ) {
-  # as useHookElement() doesn't know fetcherKey,
+  validateTarget("useFetcher", into, render)
   tag <- shiny.react::reactElement(
     module = "@/reactRouter",
     name = "useFetcher",

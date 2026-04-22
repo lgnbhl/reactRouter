@@ -14,6 +14,8 @@ that will receive the hook data as the specified prop.}
 data into (by default \code{"children"} for text display, \code{"rows"} for
 a data grid, \code{"value"} for an input).}
 
+\item{param}{argument to extract a single query parameter by name.}
+
 \item{render}{Optional \code{\link{JS}} function \code{(value) => ReactNode}
 used in place of \code{into}/\code{as}. Mirrors the native React Router
 pattern for cases where a single prop is not expressive enough (e.g.

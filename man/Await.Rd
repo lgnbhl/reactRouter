@@ -5,7 +5,7 @@
 \title{Await}
 \usage{
 Await(
-  into,
+  into = NULL,
   as = "children",
   resolveKey,
   selector = NULL,
