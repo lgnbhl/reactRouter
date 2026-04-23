@@ -2,7 +2,7 @@ test_that("useRouteError() renders error message", {
   skip_on_cran()
 
   app <- shinytest2::AppDriver$new(
-    app_dir = testthat::test_path("test-apps", "useRouteError")
+    app_dir = testthat::test_path("test-apps", "UseRouteError")
   )
   app$wait_for_idle()
 

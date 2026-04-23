@@ -2,7 +2,7 @@ test_that("useSearchParams() renders query parameters", {
   skip_on_cran()
 
   app <- shinytest2::AppDriver$new(
-    app_dir = testthat::test_path("test-apps", "useSearchParams")
+    app_dir = testthat::test_path("test-apps", "UseSearchParams")
   )
   app$wait_for_idle()
 

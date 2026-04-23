@@ -2,7 +2,7 @@ test_that("useLocation() renders location properties", {
   skip_on_cran()
 
   app <- shinytest2::AppDriver$new(
-    app_dir = testthat::test_path("test-apps", "useLocation")
+    app_dir = testthat::test_path("test-apps", "UseLocation")
   )
   app$wait_for_idle()
 

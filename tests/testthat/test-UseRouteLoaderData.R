@@ -2,7 +2,7 @@ test_that("useRouteLoaderData() accesses parent route loader data", {
   skip_on_cran()
 
   app <- shinytest2::AppDriver$new(
-    app_dir = testthat::test_path("test-apps", "useRouteLoaderData")
+    app_dir = testthat::test_path("test-apps", "UseRouteLoaderData")
   )
   app$wait_for_idle()
 

@@ -2,7 +2,7 @@ test_that("useMatch() renders match object or null", {
   skip_on_cran()
 
   app <- shinytest2::AppDriver$new(
-    app_dir = testthat::test_path("test-apps", "useMatch")
+    app_dir = testthat::test_path("test-apps", "UseMatch")
   )
   app$wait_for_idle()
 

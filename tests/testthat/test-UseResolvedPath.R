@@ -2,7 +2,7 @@ test_that("useHref() and useResolvedPath() resolve paths", {
   skip_on_cran()
 
   app <- shinytest2::AppDriver$new(
-    app_dir = testthat::test_path("test-apps", "useHrefResolvedPath")
+    app_dir = testthat::test_path("test-apps", "UseHrefResolvedPath")
   )
   app$wait_for_idle()
 

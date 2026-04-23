@@ -2,7 +2,7 @@ test_that("useLoaderData() renders loader data", {
   skip_on_cran()
 
   app <- shinytest2::AppDriver$new(
-    app_dir = testthat::test_path("test-apps", "useLoaderData")
+    app_dir = testthat::test_path("test-apps", "UseLoaderData")
   )
   app$wait_for_idle()
 

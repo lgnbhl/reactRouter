@@ -2,7 +2,7 @@ test_that("useMatches() renders route matches array", {
   skip_on_cran()
 
   app <- shinytest2::AppDriver$new(
-    app_dir = testthat::test_path("test-apps", "useMatchesActionData")
+    app_dir = testthat::test_path("test-apps", "UseMatchesActionData")
   )
   app$wait_for_idle()
 

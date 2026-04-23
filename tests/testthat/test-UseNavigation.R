@@ -2,7 +2,7 @@ test_that("useNavigation() renders navigation state", {
   skip_on_cran()
 
   app <- shinytest2::AppDriver$new(
-    app_dir = testthat::test_path("test-apps", "useNavigation")
+    app_dir = testthat::test_path("test-apps", "UseNavigation")
   )
   app$wait_for_idle()
 

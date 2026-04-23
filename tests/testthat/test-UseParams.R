@@ -2,7 +2,7 @@ test_that("useParams() renders route parameters", {
   skip_on_cran()
 
   app <- shinytest2::AppDriver$new(
-    app_dir = testthat::test_path("test-apps", "useParams")
+    app_dir = testthat::test_path("test-apps", "UseParams")
   )
   app$wait_for_idle()
 
