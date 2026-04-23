@@ -21,14 +21,18 @@ function applySelector(result, selector, mapArray) {
 // render receives the full hook value so it can navigate it freely
 // (matches React Router's native render-prop mental model).
 //
-// When `as === "children"` and the value is an object/array, it is
+// When `as === "children"` and the value is a plain object, it is
 // JSON-stringified to avoid React error #31 ("Objects are not valid as
-// a React child").
+// a React child"). Arrays of primitives (strings/numbers) are joined
+// with ", " so repeated query params or list-like loader data display
+// readably; arrays of objects still fall back to JSON.
 function injectValue({ result, selector, mapArray, render, into, as, rest }) {
   if (typeof render === 'function') return render(result);
   let value = applySelector(result, selector, mapArray);
   if (as === 'children' && value != null && typeof value === 'object') {
-    value = JSON.stringify(value, null, 2);
+    const isPrimitiveArray = Array.isArray(value) &&
+      value.every(v => typeof v === 'string' || typeof v === 'number');
+    value = isPrimitiveArray ? value.join(', ') : JSON.stringify(value, null, 2);
   }
   return React.cloneElement(into, { [as]: value, ...rest });
 }
@@ -59,16 +63,20 @@ export function UseHook({
 
 // Not routed through UseHook: the hook returns a tuple [searchParams, setter]
 // and `searchParams` is a URLSearchParams instance (not a plain object), so
-// the generic dotted-path `selector` can't walk it. Single-key lookup uses
-// `.get(param)`; otherwise we iterate with `.forEach` to build a plain object.
+// the generic dotted-path `selector` can't walk it. We use `.getAll(param)`
+// so repeated keys like `?tag=a&tag=b` are preserved; single-value keys
+// come back as a length-1 array, which R's vector semantics treat the same
+// as a scalar, and `injectValue` renders arrays of primitives readably.
 export function useSearchParams({ param, as, into, render, ...rest }) {
   const [searchParams] = ReactRouter.useSearchParams();
   let result;
   if (param) {
-    result = searchParams.get(param) ?? '';
+    result = searchParams.getAll(param);
   } else {
     result = {};
-    searchParams.forEach((v, key) => { result[key] = v; });
+    for (const key of new Set(searchParams.keys())) {
+      result[key] = searchParams.getAll(key);
+    }
   }
   return injectValue({ result, render, into, as, rest });
 }
