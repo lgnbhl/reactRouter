@@ -28,6 +28,7 @@ dependencies <- jsonlite::fromJSON("js/package.json")$dependencies
 - **URL-based navigation** — your application behaves like a real website, with a home page and multiple sub-pages (e.g. one per report or analysis), each with its own shareable URL.
 - **Reactivity without a server** — data loaders fetch and display data as users navigate, entirely in the browser, without requiring a running R server.
 - **Static hosting** — the output is plain HTML/JS, deployable to GitHub Pages, Netlify, Posit Connect, or any static file host (if you don't use it with Shiny).
+- **AI-friendly** — React Router is one of the most widely used JavaScript libraries, so AI tools like Claude, ChatGPT, or Copilot know it well. Ask an AI to generate React Router code, adapt it to R, and you're done — no React knowledge needed.
 
 Used alone, `reactRouter` brings the best of both worlds: the **reactivity of Shiny** (data that updates as users interact) and the **simplicity of Quarto** (multiple pages as static files, hostable anywhere, no server to maintain or pay for).
 

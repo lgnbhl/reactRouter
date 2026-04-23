@@ -31,6 +31,10 @@ its own. It extends whatever you are already building with new features:
 - **Static hosting** — the output is plain HTML/JS, deployable to GitHub
   Pages, Netlify, Posit Connect, or any static file host (if you don’t
   use it with Shiny).
+- **AI-friendly** — React Router is one of the most widely used
+  JavaScript libraries, so AI tools like Claude, ChatGPT, or Copilot
+  know it well. Ask an AI to generate React Router code, adapt it to R,
+  and you’re done — no React knowledge needed.
 
 Used alone, `reactRouter` brings the best of both worlds: the
 **reactivity of Shiny** (data that updates as users interact) and the
