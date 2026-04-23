@@ -17,16 +17,32 @@ NULL
 
 validateTarget <- function(label, into, render) {
   if (!is.null(render) && !inherits(render, "JS_EVAL")) {
-    stop(sprintf(
-      '%s(): `render` must be a JS() function, e.g. render = JS("v => v.name"). Got %s.',
-      label, class(render)[1]
-    ), call. = FALSE)
+    stop(
+      sprintf(
+        '%s(): `render` must be a JS() function, e.g. render = JS("v => v.name"). Got %s.',
+        label,
+        class(render)[1]
+      ),
+      call. = FALSE
+    )
+  }
+  if (!is.null(render) && !is.null(into)) {
+    stop(
+      sprintf(
+        '%s(): `render` and `into` are mutually exclusive — provide one or the other, not both.',
+        label
+      ),
+      call. = FALSE
+    )
   }
   if (is.null(render) && is.null(into)) {
-    stop(sprintf(
-      '%s(): provide either `into` (a component to inject the value into) or `render` (a JS() function that returns a React element).',
-      label
-    ), call. = FALSE)
+    stop(
+      sprintf(
+        '%s(): provide either `into` (a component to inject the value into) or `render` (a JS() function that returns a React element).',
+        label
+      ),
+      call. = FALSE
+    )
   }
 }
 
@@ -93,7 +109,14 @@ Await <- function(
 
 # Internal: build a React element that dispatches through the generic
 # `UseHook` JSX component. Every simple hook wrapper delegates here.
-useHookElement <- function(hook, into = NULL, render = NULL, ..., mapArray = FALSE, nullIfFalsy = FALSE) {
+useHookElement <- function(
+  hook,
+  into = NULL,
+  render = NULL,
+  ...,
+  mapArray = FALSE,
+  nullIfFalsy = FALSE
+) {
   validateTarget(hook, into, render)
   tag <- shiny.react::reactElement(
     module = "@/reactRouter",
@@ -435,10 +458,18 @@ useMatches <- function(
 #'
 #' Calls the \code{useSearchParams()} hook and injects the result
 #' \code{as} a prop of the \code{into} component. Use the \code{param}
-#' argument to extract a single query parameter by name.
+#' argument to extract a query parameter by name.
+#'
+#' Values are always returned as character vectors so that repeated keys
+#' (e.g. \code{"?tag=a&tag=b"}) are preserved. When injected as
+#' \code{"children"}, vectors are joined with \code{", "}; for custom
+#' formatting, use \code{render}.
 #'
 #' @inheritParams hook-wrapper
-#' @param param argument to extract a single query parameter by name.
+#' @param param Character. Name of a single query parameter to extract.
+#'   Returns a character vector of all values for that key (length 0 if
+#'   absent, length 1+ otherwise). When \code{NULL}, returns a named list
+#'   mapping each key to its vector of values.
 #'
 #' @rdname useSearchParams
 #' @export
