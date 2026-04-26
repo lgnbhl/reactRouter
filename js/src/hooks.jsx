@@ -68,7 +68,7 @@ export function UseHook({
 // come back as a length-1 array, which R's vector semantics treat the same
 // as a scalar, and `injectValue` renders arrays of primitives readably.
 export function useSearchParams({ param, as, into, render, ...rest }) {
-  const [searchParams] = ReactRouter.useSearchParams();
+  const [searchParams, setSearchParams] = ReactRouter.useSearchParams();
   let result;
   if (param) {
     result = searchParams.getAll(param);
@@ -78,6 +78,10 @@ export function useSearchParams({ param, as, into, render, ...rest }) {
       result[key] = searchParams.getAll(key);
     }
   }
+  // When using the render prop, pass the setter as a second argument so JS
+  // code can update query params programmatically:
+  //   render = JS("(val, setParams) => <button onClick={() => setParams({tag:'b'})}>...")
+  if (typeof render === 'function') return render(result, setSearchParams);
   return injectValue({ result, render, into, as, rest });
 }
 

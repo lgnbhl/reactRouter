@@ -696,6 +696,122 @@ useBlocker <- function(
   )
 }
 
+#' useNavigate
+#'
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useNavigate.html}
+#'
+#' Calls the \code{useNavigate()} hook and passes the navigate function
+#' to \code{render} (or injects it \code{as} a prop of \code{into}).
+#' The navigate function has signature \code{navigate(to, options?)}, e.g.
+#' \code{navigate("/about")} or \code{navigate(-1)} to go back.
+#'
+#' Because the hook returns a function (not a value), the \code{render}
+#' form is the natural way to use it:
+#' \preformatted{
+#'   useNavigate(render = JS(
+#'     "nav => <button onClick={() => nav('/about')}>Go</button>"
+#'   ))
+#' }
+#'
+#' @inheritParams hook-wrapper
+#'
+#' @rdname useNavigate
+#' @export
+useNavigate <- function(
+  into = NULL,
+  as = "children",
+  render = NULL,
+  ...
+) {
+  useHookElement(
+    hook = "useNavigate",
+    into = into,
+    as = as,
+    render = render,
+    ...
+  )
+}
+
+#' useSubmit
+#'
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useSubmit.html}
+#'
+#' Calls the \code{useSubmit()} hook and passes the submit function to
+#' \code{render} (or injects it \code{as} a prop of \code{into}).
+#' The submit function has signature \code{submit(target, options?)} and
+#' triggers a form submission (including calling the route's \code{action})
+#' without requiring a \code{\link{Form}} element.
+#' Only works inside a data router.
+#'
+#' @inheritParams hook-wrapper
+#'
+#' @examples
+#' \dontrun{
+#' useSubmit(render = JS(
+#'   "submit => <button onClick={() =>
+#'      submit({ intent: 'delete' }, { method: 'post' })
+#'    }>Delete</button>"
+#' ))
+#' }
+#'
+#' @rdname useSubmit
+#' @export
+useSubmit <- function(
+  into = NULL,
+  as = "children",
+  render = NULL,
+  ...
+) {
+  useHookElement(
+    hook = "useSubmit",
+    into = into,
+    as = as,
+    render = render,
+    ...
+  )
+}
+
+#' redirect (loader/action helper)
+#'
+#' \url{https://api.reactrouter.com/v7/functions/react-router.redirect.html}
+#'
+#' Returns a \code{\link{JS}} loader function that redirects to \code{to}.
+#' Pass as the \code{loader} argument of a \code{\link{Route}} to perform
+#' an unconditional redirect — typically used for guard routes that always
+#' send the user somewhere else.
+#'
+#' For conditional redirects inside a custom loader/action, use the global
+#' \code{window.reactRouterHelpers.redirect(to)} from your own \code{JS()}
+#' string, e.g.
+#' \preformatted{
+#'   loader = JS(
+#'     "async () => { if (!authed()) return window.reactRouterHelpers.redirect('/login'); ... }"
+#'   )
+#' }
+#'
+#' The \code{data} and \code{replace} helpers are exposed on the same global
+#' (\code{window.reactRouterHelpers.data}, \code{...replace}).
+#'
+#' @param to Character. Destination path.
+#' @return A \code{\link{JS}} expression suitable for the \code{loader}
+#'   argument of \code{\link{Route}}.
+#'
+#' @examples
+#' \dontrun{
+#' Route(path = "/old", loader = redirect("/new"), element = NULL)
+#' }
+#'
+#' @rdname redirect
+#' @export
+redirect <- function(to) {
+  if (!is.character(to) || length(to) != 1 || is.na(to)) {
+    stop("redirect(): `to` must be a single, non-NA character string.", call. = FALSE)
+  }
+  escaped <- gsub("\\\\", "\\\\\\\\", to)
+  escaped <- gsub('"', '\\\\"', escaped)
+  shiny.react::JS(sprintf('() => window.reactRouterHelpers.redirect("%s")', escaped))
+}
+
 #' useOutletContext
 #'
 #' \url{https://api.reactrouter.com/v7/functions/react-router.useOutletContext.html}
