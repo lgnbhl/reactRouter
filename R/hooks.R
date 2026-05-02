@@ -875,6 +875,163 @@ useInRouterContext <- function(
   )
 }
 
+#' useOutlet
+#'
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useOutlet.html}
+#'
+#' Calls the \code{useOutlet()} hook and injects the matched child route's
+#' element \code{as} a prop of the \code{into} component (or passes it to
+#' \code{render}). Returns \code{NULL} when no child route matches — useful for
+#' rendering a fallback inside a layout when the user is on the parent route.
+#'
+#' Differs from the \code{\link{Outlet}} component in that it returns the
+#' element as a value, so you can branch on whether a child route is matched.
+#'
+#' @inheritParams hook-wrapper
+#' @param context Optional value to expose to descendants via
+#'   \code{\link{useOutletContext}}.
+#'
+#' @examples
+#' \dontrun{
+#' # In a layout route: render the matched child, or a fallback if on the
+#' # parent route itself.
+#' useOutlet(
+#'   render = JS("o => o || <p>Pick a section from the menu.</p>")
+#' )
+#'
+#' # Inject the matched outlet element as the body of a wrapping <section>.
+#' useOutlet(into = shiny::tags$section(class = "page"))
+#' }
+#'
+#' @rdname useOutlet
+#' @export
+useOutlet <- function(
+  into = NULL,
+  as = "children",
+  render = NULL,
+  context = NULL,
+  ...
+) {
+  useHookElement(
+    hook = "useOutlet",
+    hookArg = context,
+    nullIfFalsy = TRUE,
+    into = into,
+    as = as,
+    render = render,
+    ...
+  )
+}
+
+#' useViewTransitionState
+#'
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useViewTransitionState.html}
+#'
+#' Calls the \code{useViewTransitionState()} hook and injects the boolean
+#' result \code{as} a prop of the \code{into} component. Returns \code{TRUE}
+#' while a View Transitions API navigation toward \code{to} is in progress.
+#' Pair with the \code{viewTransition} prop on \code{\link{Link}}/\code{\link{NavLink}}
+#' to drive transition-aware styling.
+#'
+#' @inheritParams hook-wrapper
+#' @param to Character. The destination path being transitioned to.
+#' @param relative Optional character. Either \code{"route"} (default) or
+#'   \code{"path"}.
+#'
+#' @rdname useViewTransitionState
+#' @export
+useViewTransitionState <- function(
+  into = NULL,
+  as = "children",
+  render = NULL,
+  to,
+  relative = NULL,
+  ...
+) {
+  validateTarget("useViewTransitionState", into, render)
+  tag <- shiny.react::reactElement(
+    module = "@/reactRouter",
+    name = "useViewTransitionState",
+    props = shiny.react::asProps(
+      as = as,
+      into = into,
+      render = render,
+      to = to,
+      relative = relative,
+      ...
+    ),
+    deps = reactRouterDependency()
+  )
+  class(tag) <- c("reactRouter", class(tag))
+  tag
+}
+
+#' useLinkClickHandler
+#'
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useLinkClickHandler.html}
+#'
+#' Calls the \code{useLinkClickHandler()} hook and exposes the returned click
+#' handler function via \code{render} (or injects it \code{as} a prop of
+#' \code{into}, e.g. \code{as = "onClick"}). Lets you build link-like
+#' components that drive client-side navigation without using
+#' \code{\link{Link}}.
+#'
+#' Because the hook returns a function, the \code{render} form is the natural
+#' fit:
+#' \preformatted{
+#'   useLinkClickHandler(
+#'     to = "/about",
+#'     render = JS("h => <span onClick={h} role='link'>About</span>")
+#'   )
+#' }
+#'
+#' @inheritParams hook-wrapper
+#' @param to Character. Destination path.
+#' @param replace Optional boolean. Replace the current entry in the history
+#'   stack instead of pushing a new one.
+#' @param state Optional. State value to attach to the new location.
+#' @param target Optional character. Anchor target (e.g. \code{"_blank"}).
+#' @param preventScrollReset Optional boolean. If \code{TRUE}, do not reset
+#'   scroll position on navigation.
+#' @param relative Optional character. Either \code{"route"} (default) or
+#'   \code{"path"}.
+#'
+#' @rdname useLinkClickHandler
+#' @export
+useLinkClickHandler <- function(
+  into = NULL,
+  as = "children",
+  render = NULL,
+  to,
+  replace = NULL,
+  state = NULL,
+  target = NULL,
+  preventScrollReset = NULL,
+  relative = NULL,
+  ...
+) {
+  validateTarget("useLinkClickHandler", into, render)
+  tag <- shiny.react::reactElement(
+    module = "@/reactRouter",
+    name = "useLinkClickHandler",
+    props = shiny.react::asProps(
+      as = as,
+      into = into,
+      render = render,
+      to = to,
+      replace = replace,
+      state = state,
+      target = target,
+      preventScrollReset = preventScrollReset,
+      relative = relative,
+      ...
+    ),
+    deps = reactRouterDependency()
+  )
+  class(tag) <- c("reactRouter", class(tag))
+  tag
+}
+
 #' useOutletContext
 #'
 #' \url{https://api.reactrouter.com/v7/functions/react-router.useOutletContext.html}

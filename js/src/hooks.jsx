@@ -109,6 +109,33 @@ export function UseRoutes({ routes, children }) {
   return ReactRouter.useRoutes(resolved);
 }
 
+// Not routed through UseHook: takes (to, opts) — two positional args.
+export function useViewTransitionState({ to, relative, as, into, render, ...rest }) {
+  const opts = relative ? { relative } : undefined;
+  const result = opts
+    ? ReactRouter.useViewTransitionState(to, opts)
+    : ReactRouter.useViewTransitionState(to);
+  return injectValue({ result, render, into, as, rest });
+}
+
+// Not routed through UseHook: returns a click handler function and accepts an
+// options object alongside `to`. The handler is most useful via `render` —
+// e.g. attach to a custom element's onClick — but can also be injected as a
+// prop of `into` (e.g. as = "onClick").
+export function useLinkClickHandler({
+  to, replace, state, target, preventScrollReset, relative,
+  as, into, render, ...rest
+}) {
+  const opts = {};
+  if (replace !== undefined) opts.replace = replace;
+  if (state !== undefined) opts.state = state;
+  if (target !== undefined) opts.target = target;
+  if (preventScrollReset !== undefined) opts.preventScrollReset = preventScrollReset;
+  if (relative !== undefined) opts.relative = relative;
+  const result = ReactRouter.useLinkClickHandler(to, opts);
+  return injectValue({ result, render, into, as, rest });
+}
+
 // Await — renders `into` (or calls `render`) when a deferred loader key
 // resolves. Automatically wraps in <Suspense> (required by React Router's Await).
 //
