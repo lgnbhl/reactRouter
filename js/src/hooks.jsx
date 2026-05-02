@@ -94,6 +94,21 @@ export function useFetcher({ selector, as, into, render, fetcherKey, ...rest }) 
   return injectValue({ result: fetcher, selector, render, into, as, rest });
 }
 
+// Not routed through UseHook: the hook accepts a routes array (not a single
+// positional value matching UseHook's `hookArg` shape) and returns a React
+// element that should be rendered directly, not injected into `into`.
+//
+// Accepts either:
+//   - `routes`: a plain JS array of route objects (the v7 "plain object" API)
+//   - `children`: Route() elements, converted via createRoutesFromElements
+// so users can pick whichever style they prefer.
+export function UseRoutes({ routes, children }) {
+  const resolved = routes
+    ? routes
+    : ReactRouter.createRoutesFromElements(children);
+  return ReactRouter.useRoutes(resolved);
+}
+
 // Await — renders `into` (or calls `render`) when a deferred loader key
 // resolves. Automatically wraps in <Suspense> (required by React Router's Await).
 //

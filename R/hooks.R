@@ -805,11 +805,74 @@ useSubmit <- function(
 #' @export
 redirect <- function(to) {
   if (!is.character(to) || length(to) != 1 || is.na(to)) {
-    stop("redirect(): `to` must be a single, non-NA character string.", call. = FALSE)
+    stop(
+      "redirect(): `to` must be a single, non-NA character string.",
+      call. = FALSE
+    )
   }
   escaped <- gsub("\\\\", "\\\\\\\\", to)
   escaped <- gsub('"', '\\\\"', escaped)
-  shiny.react::JS(sprintf('() => window.reactRouterHelpers.redirect("%s")', escaped))
+  shiny.react::JS(sprintf(
+    '() => window.reactRouterHelpers.redirect("%s")',
+    escaped
+  ))
+}
+
+#' useRoutes
+#'
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useRoutes.html}
+#'
+#' Builds a route tree from \code{\link{Route}} children (or a plain object
+#' \code{routes} array) and renders the matched route. The hook-based
+#' equivalent of \code{\link{Routes}} / \code{createRoutesFromElements} for
+#' code that prefers a configuration-as-data style. Must be called inside a
+#' router (\code{\link{RouterProvider}}, \code{\link{HashRouter}}, etc.).
+#'
+#' @param ... \code{\link{Route}} elements describing the route tree.
+#'   Ignored if \code{routes} is supplied.
+#' @param routes Optional. A \code{\link{JS}} expression evaluating to a plain
+#'   JavaScript array of route objects (e.g. \code{JS("[\{ path: '/', element: ... \}]")}),
+#'   used in place of \code{Route()} children.
+#'
+#' @rdname useRoutes
+#' @export
+useRoutes <- function(..., routes = NULL) {
+  tag <- shiny.react::reactElement(
+    module = "@/reactRouter",
+    name = "UseRoutes",
+    props = shiny.react::asProps(..., routes = routes),
+    deps = reactRouterDependency()
+  )
+  class(tag) <- c("reactRouter", class(tag))
+  tag
+}
+
+#' useInRouterContext
+#'
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useInRouterContext.html}
+#'
+#' Calls the \code{useInRouterContext()} hook and injects the boolean result
+#' \code{as} a prop of the \code{into} component. Useful inside reusable
+#' components that may be rendered with or without a surrounding router —
+#' guard router-only logic with this check before calling other hooks.
+#'
+#' @inheritParams hook-wrapper
+#'
+#' @rdname useInRouterContext
+#' @export
+useInRouterContext <- function(
+  into = NULL,
+  as = "children",
+  render = NULL,
+  ...
+) {
+  useHookElement(
+    hook = "useInRouterContext",
+    into = into,
+    as = as,
+    render = render,
+    ...
+  )
 }
 
 #' useOutletContext
