@@ -4,7 +4,7 @@
 \alias{dataResponse}
 \title{dataResponse (loader/action helper)}
 \usage{
-dataResponse(value = NULL, init = NULL)
+dataResponse(value, init = NULL)
 }
 \arguments{
 \item{value}{The payload to expose via \code{useLoaderData()} /

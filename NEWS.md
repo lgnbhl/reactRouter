@@ -5,7 +5,27 @@
   bundled examples and rejects anything else, closing a path-traversal vector
   in user-supplied input.
 - Security: `redirect()`, `replaceResponse()`, and `redirectDocument()` reject
-  `javascript:`, `data:`, and `vbscript:` URL schemes in `to`.
+  `javascript:`, `data:`, and `vbscript:` URL schemes in `to`, and now also
+  reject protocol-relative targets like `//evil.example.com/path` (which the
+  browser would treat as cross-origin). Use a full `https://...` URL if you
+  genuinely need a cross-origin redirect.
+- `Route()` now validates that `loader` and `action`, when non-NULL, inherit
+  from `JS_EVAL` -- mirroring the diagnostic quality of the hook wrappers
+  and surfacing a common mistake at call time instead of as a confusing
+  browser-side error.
+- `dataResponse()`: `value` is now a required argument (the previous
+  `value = NULL` default rarely produced what users wanted).
+- `matchPath()` now escapes a literal `?` in path patterns so that
+  `?`-containing literal segments no longer silently match the wrong thing.
+- `generatePath()` now percent-encodes `?` and `#` inside splat values so
+  the resulting URL is not mis-parsed downstream.
+- `RouterProvider` (JS): logs a one-shot dev-mode `console.warn` when the
+  `router`'s children change between renders. The router is created once
+  on mount and subsequent `Route()` changes are silently ignored;
+  remount the provider (e.g. via a `key` prop) to apply new routes.
+- `print.reactRouter()` falls back to plain `shiny.tag` printing if the
+  htmltools render path fails (e.g. on a partial install where the bundled
+  JS dependency is missing) instead of surfacing an opaque error.
 - Security: the `UseHook` JSX dispatcher now restricts the dispatched hook
   name to a fixed allowlist, preventing arbitrary lookups against the
   `react-router-dom` namespace via crafted props.

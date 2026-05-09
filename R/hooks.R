@@ -591,6 +591,11 @@ useFetcher <- function(
   ...
 ) {
   validateTarget("useFetcher", into, render)
+  # Routed through `customHookElement` (the @/reactRouter JSX shim) rather
+  # than the generic `useHookElement`/UseHook dispatcher because upstream
+  # `useFetcher` takes an options object `{ key }`, not a positional arg,
+  # and `{ key: undefined }` is not equivalent to passing nothing -- the
+  # generic single-positional `hookArg` cannot express that.
   customHookElement(
     "useFetcher",
     as = as,
@@ -752,6 +757,10 @@ useNavigate <- function(
 #' triggers a form submission (including calling the route's \code{action})
 #' without requiring a \code{\link{Form}} element.
 #' Only works inside a data router.
+#'
+#' Because the hook returns a function (not a value), the \code{into} form
+#' is rarely useful here -- prefer \code{render = JS(...)} so you can call
+#' the submit function from inside the rendered element.
 #'
 #' @inheritParams hook-wrapper
 #'

@@ -94,6 +94,16 @@ assertSafeRedirectTarget <- function(fn, to) {
       fn, deparse(to)
     ), call. = FALSE)
   }
+  # Protocol-relative URLs (//host/...) inherit the page's scheme and send
+  # the user off-origin. Safe by default: reject. Callers wanting a
+  # cross-origin absolute URL can spell out the full https:// form.
+  if (grepl("^\\s*//", to)) {
+    stop(sprintf(
+      "%s(): refusing protocol-relative URL in `to` = %s. ",
+      fn, deparse(to)
+    ), "Use a full https:// URL if you really want a cross-origin redirect.",
+    call. = FALSE)
+  }
 }
 
 #' redirect (loader/action helper)
@@ -263,7 +273,15 @@ redirectDocument <- function(to) {
 #'
 #' @name dataResponse
 #' @export
-dataResponse <- function(value = NULL, init = NULL) {
+dataResponse <- function(value, init = NULL) {
+  if (missing(value)) {
+    stop(
+      "dataResponse(): `value` is required -- pass the payload that ",
+      "useLoaderData()/useActionData() should expose. For an empty body, ",
+      "pass NULL explicitly.",
+      call. = FALSE
+    )
+  }
   serialize <- function(x) {
     if (inherits(x, "JS_EVAL")) {
       return(as.character(x))
@@ -364,10 +382,16 @@ generatePath <- function(path, params = list()) {
   encodeSegment <- function(v) utils::URLencode(as.character(v), reserved = TRUE)
 
   # Splat (`*`) — preserves slashes inside the value, unlike :params.
+  # `URLencode(reserved = FALSE)` keeps `/` (correct for a splat) but also
+  # leaves `?` and `#` raw, which would be mis-parsed downstream as the
+  # query/fragment delimiter. Percent-encode them explicitly.
   if (grepl("\\*", path)) {
     splat <- params[["*"]]
     if (is.null(splat)) splat <- ""
-    path <- gsub("\\*", utils::URLencode(as.character(splat), reserved = FALSE), path, fixed = FALSE)
+    encoded <- utils::URLencode(as.character(splat), reserved = FALSE)
+    encoded <- gsub("?", "%3F", encoded, fixed = TRUE)
+    encoded <- gsub("#", "%23", encoded, fixed = TRUE)
+    path <- gsub("\\*", encoded, path, fixed = FALSE)
   }
 
   # Iterate over :param[?] segments. We re-scan after each replacement so
@@ -452,33 +476,45 @@ matchPath <- function(pattern, pathname) {
   }
 
   # Parse `:param[?]` and `*` placeholders into a regex with named groups.
+  # Strategy: substitute placeholders to NUL-delimited sentinels first,
+  # then escape regex specials (including `?` — see issue #N), then
+  # substitute the sentinels for the actual regex fragments. Doing it in
+  # this order means a literal `?` or `*` in a path segment is treated as
+  # a literal character rather than as a regex meta.
   paramNames <- character()
   hasSplat <- FALSE
   rx <- spec$path
-  # Escape regex specials except ":", "*", and "?" which we transform.
-  rx <- gsub("([.+(){}\\[\\]\\\\^$|])", "\\\\\\1", rx, perl = TRUE)
+  OPT_TOKEN <- "\001OPT\001"
+  REQ_TOKEN <- "\001REQ\001"
+  SPLAT_TOKEN <- "\001SPLAT\001"
 
-  # :param? -> optional capturing group, including the leading slash.
+  # :param? -> optional sentinel.
   repeat {
     m <- regmatches(rx, regexpr("/:([A-Za-z_][A-Za-z0-9_]*)\\?", rx))
     if (length(m) == 0) break
     name <- sub("/:([A-Za-z_][A-Za-z0-9_]*)\\?", "\\1", m)
     paramNames <- c(paramNames, name)
-    rx <- sub("/:([A-Za-z_][A-Za-z0-9_]*)\\?", "(?:/([^/]+))?", rx)
+    rx <- sub("/:([A-Za-z_][A-Za-z0-9_]*)\\?", OPT_TOKEN, rx)
   }
-  # :param  -> required capturing group
+  # :param -> required sentinel.
   repeat {
     m <- regmatches(rx, regexpr(":([A-Za-z_][A-Za-z0-9_]*)", rx))
     if (length(m) == 0) break
     name <- sub(":([A-Za-z_][A-Za-z0-9_]*)", "\\1", m)
     paramNames <- c(paramNames, name)
-    rx <- sub(":([A-Za-z_][A-Za-z0-9_]*)", "([^/]+)", rx)
+    rx <- sub(":([A-Za-z_][A-Za-z0-9_]*)", REQ_TOKEN, rx)
   }
-  # `*` splat -> capture the rest (including slashes).
+  # `*` splat -> sentinel.
   if (grepl("\\*", rx)) {
     hasSplat <- TRUE
-    rx <- sub("\\*", "(.*)", rx)
+    rx <- sub("\\*", SPLAT_TOKEN, rx)
   }
+  # Now escape regex specials in the remaining literal text.
+  rx <- gsub("([.+?(){}\\[\\]\\\\^$|])", "\\\\\\1", rx, perl = TRUE)
+  # Substitute sentinels for their regex fragments.
+  rx <- gsub(OPT_TOKEN, "(?:/([^/]+))?", rx, fixed = TRUE)
+  rx <- gsub(REQ_TOKEN, "([^/]+)", rx, fixed = TRUE)
+  rx <- gsub(SPLAT_TOKEN, "(.*)", rx, fixed = TRUE)
 
   rx <- if (spec$end) paste0("^", rx, "/?$") else paste0("^", rx, "(?:/|$)")
   m <- regexec(rx, pathname, perl = TRUE, ignore.case = !spec$caseSensitive)

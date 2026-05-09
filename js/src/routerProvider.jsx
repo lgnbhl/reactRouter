@@ -55,5 +55,27 @@ export function RouterProvider({ router, fallbackElement }) {
     const routes = ReactRouter.createRoutesFromElements(children);
     return ROUTER_FACTORIES[kind](routes, opts);
   }, []);
+  // Warn (once) in dev if children change between renders. The router is
+  // built once on mount so subsequent Route() changes are silently ignored;
+  // surfacing this as a console warning saves users from a confusing
+  // "my new route doesn't appear" debugging session. Remount the
+  // RouterProvider (e.g. via a key prop) to apply new routes.
+  const initialChildren = React.useRef(children);
+  const warned = React.useRef(false);
+  if (
+    !warned.current &&
+    typeof process !== 'undefined' &&
+    process.env &&
+    process.env.NODE_ENV !== 'production' &&
+    initialChildren.current !== children
+  ) {
+    warned.current = true;
+    // eslint-disable-next-line no-console
+    console.warn(
+      'RouterProvider: `router` children changed after mount. The router ' +
+      'is created once on mount and subsequent Route() changes are ignored. ' +
+      'Remount RouterProvider (e.g. with a `key` prop) to apply new routes.'
+    );
+  }
   return React.createElement(ReactRouter.RouterProvider, { router: rrRouter, fallbackElement });
 }

@@ -41,4 +41,11 @@ almost every use, including Shiny apps with server-rendered output
 (`uiOutput`, `renderUI`, `plotOutput`, htmlwidgets) — Shiny output bindings
 re-attach automatically when React Router mounts the new route's element.
 See `vignette("routers", package = "reactRouter")` for details.
+
+\strong{Two flavors.} Pick \code{Link()} for a plain navigation link
+(the common case, mirroring React Router's API one-to-one). Pick
+\code{Link.shinyInput()} only when you also need the click to fire a
+Shiny input on the server — it adds an \code{inputId} that updates with
+the link's \code{to} every time it is clicked, while still navigating.
+If in doubt, use \code{Link()}.
 }

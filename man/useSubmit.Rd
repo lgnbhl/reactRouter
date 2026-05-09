@@ -31,6 +31,10 @@ The submit function has signature \code{submit(target, options?)} and
 triggers a form submission (including calling the route's \code{action})
 without requiring a \code{\link{Form}} element.
 Only works inside a data router.
+
+Because the hook returns a function (not a value), the \code{into} form
+is rarely useful here -- prefer \code{render = JS(...)} so you can call
+the submit function from inside the rendered element.
 }
 \examples{
 \dontrun{

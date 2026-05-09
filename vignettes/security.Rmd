@@ -96,17 +96,20 @@ The same applies to values read from `useSearchParams()` before they go into a U
 
 ## 5. Validate redirect targets
 
-`redirect()` already blocks dangerous URL schemes such as `javascript:` and `data:`:
+`redirect()` blocks dangerous URL schemes such as `javascript:` and `data:`,
+and protocol-relative targets like `//evil.example.com/path` (which the
+browser would otherwise interpret as an absolute URL on another origin):
 
 ```{r}
 redirect("javascript:alert(1)")
 #> Error: redirect(): refusing unsafe URL scheme in `to` = "javascript:alert(1)".
+redirect("//evil.example.com/path")
+#> Error: redirect(): refusing protocol-relative URL in `to` = "//evil.example.com/path". ...
 ```
 
-It does **not**, however, reject protocol-relative targets like
-`//evil.example.com/path`, which the browser interprets as an absolute URL on
-another origin. If `to` ever comes from user input, do not rely on the
-built-in scheme check alone.
+If you genuinely need a cross-origin redirect, spell out the full
+`https://...` URL. And if `to` ever comes from user input, still don't
+rely on the built-in checks alone -- match it against an allowlist.
 
 But if you build a redirect target from user input (for example a `?next=` parameter after a sign-in), it's safer to compare against a list of allowed paths than to try to filter the string yourself:
 

@@ -1,3 +1,9 @@
+test_that("useBlocker() with default shouldBlock = FALSE constructs without error", {
+  expect_no_error(
+    useBlocker(into = shiny::span(), as = "children")
+  )
+})
+
 test_that("useBlocker() renders blocker state", {
   skip_on_cran()
 

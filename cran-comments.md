@@ -25,6 +25,13 @@ The package ships a webpack-built bundle of `react-router-dom` at
 alongside it at `inst/reactRouter/react-router-dom.js.LICENSE.txt` (MIT,
 compatible with the package license).
 
+The buildable source for the bundle lives in `js/` (entry point
+`js/src/index.js`, `webpack.config.js`, `package.json`). React and
+ReactDOM are externalised at build time (see `webpack.config.js`) and
+provided by the host `shiny.react` package, so `react-router-dom` is the
+only third-party JavaScript shipped inside the bundle. The bundle can
+be rebuilt with `cd js && yarn install && yarn build`.
+
 ## Reverse dependencies
 
 There are no reverse dependencies on CRAN.

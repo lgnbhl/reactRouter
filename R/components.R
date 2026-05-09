@@ -131,6 +131,24 @@ Route <- function(
   errorElement = NULL,
   key = randomKey()
 ) {
+  # Mirrors the diagnostic quality of the hook wrappers: surface the most
+  # common mistake (passing an R function instead of a JS() expression) at
+  # call time, rather than as a confusing browser-side error later.
+  if (!is.null(loader) && !inherits(loader, "JS_EVAL")) {
+    stop(
+      "Route(): `loader` must be a JS() expression, e.g. ",
+      "loader = JS(\"({ params }) => fetch(...)\"). ",
+      "For static R data, use jsonlite::toJSON() and wrap with JS(), or use redirect()/dataResponse().",
+      call. = FALSE
+    )
+  }
+  if (!is.null(action) && !inherits(action, "JS_EVAL")) {
+    stop(
+      "Route(): `action` must be a JS() expression, e.g. ",
+      "action = JS(\"async ({ request }) => { ... }\").",
+      call. = FALSE
+    )
+  }
   shiny.react::reactElement(
     module = "react-router-dom",
     name = "Route",
@@ -161,6 +179,13 @@ Route <- function(
 #' (`uiOutput`, `renderUI`, `plotOutput`, htmlwidgets) — Shiny output bindings
 #' re-attach automatically when React Router mounts the new route's element.
 #' See `vignette("routers", package = "reactRouter")` for details.
+#'
+#' \strong{Two flavors.} Pick \code{Link()} for a plain navigation link
+#' (the common case, mirroring React Router's API one-to-one). Pick
+#' \code{Link.shinyInput()} only when you also need the click to fire a
+#' Shiny input on the server — it adds an \code{inputId} that updates with
+#' the link's \code{to} every time it is clicked, while still navigating.
+#' If in doubt, use \code{Link()}.
 #'
 #' @rdname Link
 #' @param ... Props to pass to element.
