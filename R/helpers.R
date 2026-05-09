@@ -85,7 +85,7 @@ replace <- function(to) {
   ))
 }
 
-#' data (loader/action helper)
+#' dataResponse (loader/action helper)
 #'
 #' \url{https://api.reactrouter.com/v7/functions/react-router.data.html}
 #'
@@ -122,7 +122,7 @@ replace <- function(to) {
 #' \dontrun{
 #' Route(
 #'   path = "/profile",
-#'   loader = data(
+#'   loader = dataResponse(
 #'     list(name = "Ada", role = "Engineer"),
 #'     init = list(status = 200)
 #'   ),
@@ -130,16 +130,16 @@ replace <- function(to) {
 #' )
 #' }
 #'
-#' @name data-helper
+#' @name dataResponse
 #' @export
-data <- function(value = NULL, init = NULL) {
+dataResponse <- function(value = NULL, init = NULL) {
   serialize <- function(x) {
     if (inherits(x, "JS_EVAL")) {
       return(as.character(x))
     }
     if (!requireNamespace("jsonlite", quietly = TRUE)) {
       stop(
-        "data(): the 'jsonlite' package is required to serialize R objects. ",
+        "dataResponse(): the 'jsonlite' package is required to serialize R objects. ",
         "Install it, or pass `value`/`init` as JS() expressions.",
         call. = FALSE
       )

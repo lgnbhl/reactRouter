@@ -1,10 +1,10 @@
-# data() — wraps a loader/action payload with HTTP status, statusText
+# dataResponse() — wraps a loader/action payload with HTTP status, statusText
 # and headers, while still exposing the value via useLoaderData() /
 # useActionData(). Useful when you want to attach metadata to the
 # response without changing how the route's element consumes it.
 #
 # Two routes:
-#   /profile  — static loader built with the R helper data()
+#   /profile  — static loader built with the R helper dataResponse()
 #   /custom   — custom loader using window.reactRouterHelpers.data() to
 #               attach a 201 status to a computed payload.
 
@@ -23,7 +23,7 @@ custom_loader <- JS(
 
 Layout <- div(
   style = "max-width: 540px; margin: 0 auto; padding: 20px; font-family: system-ui;",
-  tags$h2("data() Example"),
+  tags$h2("dataResponse() Example"),
   tags$nav(tags$ul(
     tags$li(NavLink(to = "/", "Home")),
     tags$li(NavLink(to = "/profile", "/profile (static R object)")),
@@ -41,7 +41,7 @@ ui <- RouterProvider(
       Route(index = TRUE, element = tags$p("Pick a link above.")),
       Route(
         path = "profile",
-        loader = data(
+        loader = dataResponse(
           list(name = "Ada Lovelace", role = "Engineer", years = 12),
           init = list(status = 200)
         ),
