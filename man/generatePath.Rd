@@ -30,6 +30,15 @@ Optional segments suffixed with \code{?} are dropped when their value is
 missing (\code{NULL} or \code{""}); required segments raise an error.
 Values are URL-encoded with \code{utils::URLencode(reserved = TRUE)} except
 for the splat \code{*}, whose slashes are preserved.
+
+\strong{Note:} this is a pure-R reimplementation of React Router's helper
+(which itself uses the \code{path-to-regexp} library on the JS side). It
+covers the common pattern syntax (\code{:param}, \code{:param?}, \code{*})
+but may diverge in edge cases such as escaping of regex metacharacters
+inside literal segments or non-trailing splats. For loader/action JS code
+that must stay strictly faithful to the JS implementation, call
+\code{window.reactRouterHelpers.generatePath(path, params)} from inside
+your \code{\link{JS}} string.
 }
 \examples{
 generatePath("/users/:id", list(id = 42))

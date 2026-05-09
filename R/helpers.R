@@ -1,8 +1,90 @@
-# Internal: escape an R string so it can be safely embedded inside a
-# double-quoted JavaScript string literal. Backslashes first, then quotes.
-jsString <- function(x) {
+#' JavaScript helpers exposed on \code{window.reactRouterHelpers}
+#'
+#' For convenience, the package exposes a curated set of React Router v7
+#' utility functions on the global \code{window.reactRouterHelpers} so
+#' user-authored \code{\link{JS}} loaders, actions, and render callbacks can
+#' call them without reaching into webpack internals. The same names are
+#' available as on the JS side of React Router itself.
+#'
+#' \strong{Loader/action response helpers}
+#' \itemize{
+#'   \item \code{redirect(to, init?)} -- client-side navigation redirect.
+#'   \item \code{replace(to, init?)} -- redirect that replaces the history entry.
+#'   \item \code{redirectDocument(to)} -- full document reload redirect.
+#'   \item \code{data(value, init?)} -- attach status/headers to a payload.
+#' }
+#'
+#' \strong{Path / URL utilities}
+#' \itemize{
+#'   \item \code{generatePath(path, params)} -- build a URL from a pattern.
+#'   \item \code{matchPath(pattern, pathname)} -- match a pathname.
+#'   \item \code{matchRoutes(routes, location, basename?)} -- match a route
+#'     tree against a location.
+#'   \item \code{resolvePath(to, fromPathname?)} -- resolve a relative path.
+#'   \item \code{parsePath(path)} -- split into \code{pathname/search/hash}.
+#'   \item \code{createPath(parts)} -- inverse of \code{parsePath}.
+#'   \item \code{createSearchParams(init)} -- build a \code{URLSearchParams}.
+#' }
+#'
+#' \strong{Error helpers}
+#' \itemize{
+#'   \item \code{isRouteErrorResponse(error)} -- type guard intended for use
+#'     inside an \code{errorElement} alongside \code{\link{useRouteError}};
+#'     returns \code{true} when the error came from a thrown
+#'     \code{Response} (e.g. \code{throw new Response(..., { status: 404 })}).
+#' }
+#'
+#' These are the JavaScript implementations from \code{react-router-dom}, so
+#' behavior is exactly faithful to upstream -- unlike the pure-R reimplementations
+#' \code{\link{generatePath}} and \code{\link{matchPath}}.
+#'
+#' @examples
+#' \dontrun{
+#' # Conditional redirect inside a custom loader.
+#' Route(
+#'   path = "/admin",
+#'   loader = JS("async () => {
+#'     const ok = await checkAuth();
+#'     if (!ok) return window.reactRouterHelpers.redirect('/login');
+#'     return { ok: true };
+#'   }"),
+#'   element = useLoaderData(tags$pre())
+#' )
+#'
+#' # Branch on whether the route error is a Response.
+#' Route(
+#'   path = "/items/:id",
+#'   loader = JS("async ({ params }) => {
+#'     const r = await fetch('/api/items/' + params.id);
+#'     if (!r.ok) throw new Response('Not found', { status: 404 });
+#'     return r.json();
+#'   }"),
+#'   errorElement = useRouteError(
+#'     render = JS("e => window.reactRouterHelpers.isRouteErrorResponse(e)
+#'                   ? <p>HTTP {e.status}</p>
+#'                   : <p>Unknown error</p>")
+#'   ),
+#'   element = useLoaderData(tags$pre())
+#' )
+#' }
+#'
+#' @name reactRouterHelpers
+#' @keywords internal
+NULL
+
+# Internal: produce a JavaScript string literal (including the surrounding
+# quotes) for an R string. Uses jsonlite when available for full escaping of
+# control characters, unicode line separators, and `</script>` -- falling
+# back to a minimal backslash + quote escape if jsonlite is not installed.
+jsLiteral <- function(x) {
+  if (requireNamespace("jsonlite", quietly = TRUE)) {
+    return(as.character(jsonlite::toJSON(x, auto_unbox = TRUE)))
+  }
   x <- gsub("\\\\", "\\\\\\\\", x)
-  gsub('"', '\\\\"', x)
+  x <- gsub('"', '\\\\"', x)
+  x <- gsub("\n", "\\\\n", x)
+  x <- gsub("\r", "\\\\r", x)
+  paste0('"', x, '"')
 }
 
 #' redirect (loader/action helper)
@@ -46,8 +128,8 @@ redirect <- function(to) {
     )
   }
   shiny.react::JS(sprintf(
-    '() => window.reactRouterHelpers.redirect("%s")',
-    jsString(to)
+    '() => window.reactRouterHelpers.redirect(%s)',
+    jsLiteral(to)
   ))
 }
 
@@ -87,8 +169,8 @@ replaceResponse <- function(to) {
     )
   }
   shiny.react::JS(sprintf(
-    '() => window.reactRouterHelpers.replace("%s")',
-    jsString(to)
+    '() => window.reactRouterHelpers.replace(%s)',
+    jsLiteral(to)
   ))
 }
 
@@ -129,8 +211,8 @@ redirectDocument <- function(to) {
     )
   }
   shiny.react::JS(sprintf(
-    '() => window.reactRouterHelpers.redirectDocument("%s")',
-    jsString(to)
+    '() => window.reactRouterHelpers.redirectDocument(%s)',
+    jsLiteral(to)
   ))
 }
 
@@ -219,6 +301,15 @@ dataResponse <- function(value = NULL, init = NULL) {
 #' Values are URL-encoded with \code{utils::URLencode(reserved = TRUE)} except
 #' for the splat \code{*}, whose slashes are preserved.
 #'
+#' \strong{Note:} this is a pure-R reimplementation of React Router's helper
+#' (which itself uses the \code{path-to-regexp} library on the JS side). It
+#' covers the common pattern syntax (\code{:param}, \code{:param?}, \code{*})
+#' but may diverge in edge cases such as escaping of regex metacharacters
+#' inside literal segments or non-trailing splats. For loader/action JS code
+#' that must stay strictly faithful to the JS implementation, call
+#' \code{window.reactRouterHelpers.generatePath(path, params)} from inside
+#' your \code{\link{JS}} string.
+#'
 #' @param path Character. A path pattern, e.g. \code{"/users/:id"} or
 #'   \code{"/files/*"}.
 #' @param params Named list (or \code{NULL}) of values for the dynamic
@@ -295,6 +386,13 @@ generatePath <- function(path, params = list()) {
 #' Supported pattern syntax: \code{:param}, splat \code{*}, optional segments
 #' \code{:param?}, and an optional \code{end = FALSE} flag for prefix
 #' matching.
+#'
+#' \strong{Note:} this is a pure-R reimplementation of React Router's helper
+#' and may diverge in edge cases (regex metacharacter escaping in literal
+#' segments, non-trailing splats). For strict parity with the JS
+#' implementation inside a loader/action, call
+#' \code{window.reactRouterHelpers.matchPath(pattern, pathname)} from your
+#' \code{\link{JS}} string.
 #'
 #' @param pattern Either a character path pattern (e.g. \code{"/users/:id"})
 #'   or a list with elements \code{path} and (optional) \code{end}, \code{caseSensitive}.

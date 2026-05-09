@@ -11,7 +11,8 @@
 #'   normally does not return; interrupt R to stop the application
 #'   (usually by pressing Ctrl+C or Esc).
 #'
-#' @seealso [shiny.blueprint::runExample()] which this function is an adaptation.
+#' @seealso \code{shiny.blueprint::runExample()}, which this function is
+#'   adapted from.
 #'
 #' @export
 reactRouterExample <- function(example = NULL, ...) {

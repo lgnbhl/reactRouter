@@ -80,24 +80,50 @@ MemoryRouter <- function(...) {
 #' with a UUID key so, in case R shiny is used, shiny can differentiate
 #' each element.
 #'
+#' Additional React Router \code{Route} props can be passed through \code{...}:
+#' \itemize{
+#'   \item \code{path} (Character): path pattern, supports \code{:param},
+#'     optional \code{:param?}, and splat \code{*}.
+#'   \item \code{index} (Boolean): mark this as the index route of its parent.
+#'   \item \code{caseSensitive} (Boolean): match the path case-sensitively.
+#'   \item \code{id} (Character): stable route id, required for use with
+#'     \code{\link{useRouteLoaderData}}.
+#'   \item \code{handle} (Any): arbitrary value exposed via
+#'     \code{\link{useMatches}} for breadcrumbs and similar use cases.
+#'   \item \code{shouldRevalidate} (\code{\link{JS}}): function controlling
+#'     whether the loader re-runs on a given navigation.
+#'   \item \code{lazy} (\code{\link{JS}}): code-splitting hook returning a
+#'     \code{Promise} resolving to a route module.
+#'   \item \code{hasErrorBoundary} (Boolean): explicit error-boundary flag
+#'     (rarely needed when \code{errorElement} is provided).
+#' }
+#'
 #' @rdname Route
-#' @param ... Props to pass to element.
+#' @param ... Additional Route props (see Details).
 #' @param element element wrapped in a `shiny::div()`.
 #' @param key By default uses a UUID key in the `div()` of the `element` arg.
-#' @return A Route component.
 #' @param loader Optional. A \code{\link{JS}} expression evaluating to a
 #'   loader function, e.g. \code{JS("({ params }) => fetch(...)")}. For a
 #'   plain unconditional redirect, use \code{\link{redirect}}. To embed
 #'   static R data, serialize it first with \code{jsonlite::toJSON()} and
 #'   wrap the result in \code{JS()}.
+#' @param action Optional. A \code{\link{JS}} expression evaluating to an
+#'   action function called by \code{\link{Form}} submissions and
+#'   \code{\link{useSubmit}} / \code{\link{useFetcher}} submits.
+#' @param errorElement Optional. Element rendered when the route's
+#'   \code{loader}, \code{action}, or rendering throws.
+#' @return A Route component.
 #' @export
-Route <- function(..., element, loader = NULL, key = randomKey()) {
+Route <- function(..., element, loader = NULL, action = NULL,
+                  errorElement = NULL, key = randomKey()) {
   shiny.react::reactElement(
     module = "react-router-dom",
     name = "Route",
     props = shiny.react::asProps(
       ...,
       loader = loader,
+      action = action,
+      errorElement = errorElement,
       element = shiny::div(
         key = key,
         element

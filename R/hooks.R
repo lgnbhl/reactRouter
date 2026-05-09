@@ -19,7 +19,7 @@ validateTarget <- function(label, into, render) {
   if (!is.null(render) && !inherits(render, "JS_EVAL")) {
     stop(
       sprintf(
-        '%s(): `render` must be a JS() function, e.g. render = JS("v => v.name"). Got %s.',
+        '%s(): `render` must be a JS() function, e.g. render = JS("v => v.name"). Got value of class "%s" -- did you forget to wrap it in JS()?',
         label,
         class(render)[1]
       ),
@@ -664,10 +664,12 @@ useRevalidator <- function(
 #' (user confirmed, navigation in progress).
 #'
 #' @inheritParams hook-wrapper
-#' @param shouldBlock A \code{\link{JS}} function receiving
+#' @param shouldBlock Either \code{FALSE} (the default, disables blocking)
+#'   or a \code{\link{JS}} function receiving
 #'   \code{\{ currentLocation, nextLocation, historyAction \}} and returning
 #'   \code{true} to block navigation or \code{false} to allow it.
-#'   Pass \code{FALSE} to disable blocking entirely (the default).
+#'   \strong{Must be a JS() expression}, not an R function -- R functions
+#'   cannot be invoked from inside React Router's blocker callback.
 #'
 #' @rdname useBlocker
 #' @export

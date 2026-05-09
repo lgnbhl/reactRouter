@@ -8,7 +8,7 @@
 #' @export
 Link.shinyInput <- function(inputId, ..., reloadDocument = FALSE) {
   checkmate::assert_string(inputId)
-  checkmate::assert_logical(reloadDocument)
+  checkmate::assert_flag(reloadDocument)
 
   shiny.react::reactElement(
     module = "@/reactRouter",
@@ -36,7 +36,7 @@ updateLink.shinyInput <- shiny.react::updateReactInput
 #' @export
 NavLink.shinyInput <- function(inputId, ..., reloadDocument = FALSE) {
   checkmate::assert_string(inputId)
-  checkmate::assert_logical(reloadDocument)
+  checkmate::assert_flag(reloadDocument)
 
   shiny.react::reactElement(
     module = "@/reactRouter",

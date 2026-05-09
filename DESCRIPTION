@@ -23,7 +23,7 @@ Imports:
 Suggests:
     jsonlite,
     testthat (>= 3.0.0),
-    chromote (>= 0.1.1.9001),
+    chromote (>= 0.1.1),
     shinytest2,
     dplyr,
     muiMaterial

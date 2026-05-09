@@ -18,4 +18,15 @@ window.reactRouterHelpers = {
   replace: ReactRouterLib.replace,
   redirectDocument: ReactRouterLib.redirectDocument,
   data: ReactRouterLib.data,
+  // Path / URL utilities — exposed so user-authored loader/action JS()
+  // strings can call them without reaching into window.jsmodule.
+  generatePath: ReactRouterLib.generatePath,
+  matchPath: ReactRouterLib.matchPath,
+  matchRoutes: ReactRouterLib.matchRoutes,
+  resolvePath: ReactRouterLib.resolvePath,
+  parsePath: ReactRouterLib.parsePath,
+  createPath: ReactRouterLib.createPath,
+  createSearchParams: ReactRouterLib.createSearchParams,
+  // Type guard for use inside an errorElement's render JS().
+  isRouteErrorResponse: ReactRouterLib.isRouteErrorResponse,
 };

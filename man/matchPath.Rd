@@ -29,6 +29,13 @@ match. Implemented in pure R so it can be used outside a browser context
 Supported pattern syntax: \code{:param}, splat \code{*}, optional segments
 \code{:param?}, and an optional \code{end = FALSE} flag for prefix
 matching.
+
+\strong{Note:} this is a pure-R reimplementation of React Router's helper
+and may diverge in edge cases (regex metacharacter escaping in literal
+segments, non-trailing splats). For strict parity with the JS
+implementation inside a loader/action, call
+\code{window.reactRouterHelpers.matchPath(pattern, pathname)} from your
+\code{\link{JS}} string.
 }
 \examples{
 matchPath("/users/:id", "/users/42")

@@ -30,10 +30,12 @@ used in place of \code{into}/\code{as}. Mirrors the native React Router
 pattern for cases where a single prop is not expressive enough (e.g.
 \code{JS("v => `${v.first} ${v.last}`")}).}
 
-\item{shouldBlock}{A \code{\link{JS}} function receiving
+\item{shouldBlock}{Either \code{FALSE} (the default, disables blocking)
+or a \code{\link{JS}} function receiving
 \code{\{ currentLocation, nextLocation, historyAction \}} and returning
 \code{true} to block navigation or \code{false} to allow it.
-Pass \code{FALSE} to disable blocking entirely (the default).}
+\strong{Must be a JS() expression}, not an R function -- R functions
+cannot be invoked from inside React Router's blocker callback.}
 
 \item{...}{Additional props to pass to the component.}
 }

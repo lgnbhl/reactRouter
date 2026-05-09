@@ -23,5 +23,6 @@ Launch a Shiny example app or list the available examples.
 Use `reactRouter::reactRouterExample("basic")` to run a showcase app.
 }
 \seealso{
-[shiny.blueprint::runExample()] which this function is an adaptation.
+\code{shiny.blueprint::runExample()}, which this function is
+  adapted from.
 }
