@@ -132,7 +132,7 @@ replace <- function(to) {
 #'
 #' @name data-helper
 #' @export
-data <- function(value, init = NULL) {
+data <- function(value = NULL, init = NULL) {
   serialize <- function(x) {
     if (inherits(x, "JS_EVAL")) {
       return(as.character(x))
