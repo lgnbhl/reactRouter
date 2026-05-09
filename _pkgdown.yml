@@ -26,6 +26,8 @@ navbar:
       href: articles/useFetcher.html
     - text: Advanced Hooks
       href: articles/advanced-hooks.html
+    - text: Security considerations
+      href: articles/security.html
   - text: Reference
     href: reference/index.html
   - text: News

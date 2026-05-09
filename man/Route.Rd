@@ -31,7 +31,7 @@ action function called by \code{\link{Form}} submissions and
 \item{errorElement}{Optional. Element rendered when the route's
 \code{loader}, \code{action}, or rendering throws.}
 
-\item{key}{By default uses a UUID key in the `div()` of the `element` arg.}
+\item{key}{By default uses a random key in the `div()` of the `element` arg.}
 }
 \value{
 A Route component.

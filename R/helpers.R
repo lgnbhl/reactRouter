@@ -73,18 +73,27 @@
 NULL
 
 # Internal: produce a JavaScript string literal (including the surrounding
-# quotes) for an R string. Uses jsonlite when available for full escaping of
-# control characters, unicode line separators, and `</script>` -- falling
-# back to a minimal backslash + quote escape if jsonlite is not installed.
+# quotes) for an R string. Delegates to jsonlite for full escaping of control
+# characters, unicode line separators, and `</script>`.
 jsLiteral <- function(x) {
-  if (requireNamespace("jsonlite", quietly = TRUE)) {
-    return(as.character(jsonlite::toJSON(x, auto_unbox = TRUE)))
+  as.character(jsonlite::toJSON(x, auto_unbox = TRUE))
+}
+
+# Internal: reject URL schemes that can execute code when used as a redirect
+# target (javascript:, data:, vbscript:). Allows everything else, including
+# absolute http(s) URLs and root-relative paths.
+assertSafeRedirectTarget <- function(fn, to) {
+  if (!is.character(to) || length(to) != 1 || is.na(to)) {
+    stop(sprintf(
+      "%s(): `to` must be a single, non-NA character string.", fn
+    ), call. = FALSE)
   }
-  x <- gsub("\\\\", "\\\\\\\\", x)
-  x <- gsub('"', '\\\\"', x)
-  x <- gsub("\n", "\\\\n", x)
-  x <- gsub("\r", "\\\\r", x)
-  paste0('"', x, '"')
+  if (grepl("^\\s*(javascript|data|vbscript):", to, ignore.case = TRUE)) {
+    stop(sprintf(
+      "%s(): refusing unsafe URL scheme in `to` = %s. ",
+      fn, deparse(to)
+    ), call. = FALSE)
+  }
 }
 
 #' redirect (loader/action helper)
@@ -95,6 +104,12 @@ jsLiteral <- function(x) {
 #' Pass as the \code{loader} argument of a \code{\link{Route}} to perform
 #' an unconditional redirect -- typically used for guard routes that always
 #' send the user somewhere else.
+#'
+#' \strong{Security:} \code{to} must be a trusted, package-author-controlled
+#' string. \code{javascript:}, \code{data:}, and \code{vbscript:} URL schemes
+#' are rejected. If you build \code{to} from user-supplied input, validate it
+#' yourself before passing it in -- never round-trip untrusted strings through
+#' \code{redirect()} into a navigation.
 #'
 #' For conditional redirects inside a custom loader/action, use the global
 #' \code{window.reactRouterHelpers.redirect(to)} from your own \code{JS()}
@@ -121,12 +136,7 @@ jsLiteral <- function(x) {
 #' @rdname redirect
 #' @export
 redirect <- function(to) {
-  if (!is.character(to) || length(to) != 1 || is.na(to)) {
-    stop(
-      "redirect(): `to` must be a single, non-NA character string.",
-      call. = FALSE
-    )
-  }
+  assertSafeRedirectTarget("redirect", to)
   shiny.react::JS(sprintf(
     '() => window.reactRouterHelpers.redirect(%s)',
     jsLiteral(to)
@@ -162,12 +172,7 @@ redirect <- function(to) {
 #' @rdname replaceResponse
 #' @export
 replaceResponse <- function(to) {
-  if (!is.character(to) || length(to) != 1 || is.na(to)) {
-    stop(
-      "replaceResponse(): `to` must be a single, non-NA character string.",
-      call. = FALSE
-    )
-  }
+  assertSafeRedirectTarget("replaceResponse", to)
   shiny.react::JS(sprintf(
     '() => window.reactRouterHelpers.replace(%s)',
     jsLiteral(to)
@@ -204,12 +209,7 @@ replaceResponse <- function(to) {
 #' @rdname redirectDocument
 #' @export
 redirectDocument <- function(to) {
-  if (!is.character(to) || length(to) != 1 || is.na(to)) {
-    stop(
-      "redirectDocument(): `to` must be a single, non-NA character string.",
-      call. = FALSE
-    )
-  }
+  assertSafeRedirectTarget("redirectDocument", to)
   shiny.react::JS(sprintf(
     '() => window.reactRouterHelpers.redirectDocument(%s)',
     jsLiteral(to)
@@ -267,13 +267,6 @@ dataResponse <- function(value = NULL, init = NULL) {
   serialize <- function(x) {
     if (inherits(x, "JS_EVAL")) {
       return(as.character(x))
-    }
-    if (!requireNamespace("jsonlite", quietly = TRUE)) {
-      stop(
-        "dataResponse(): the 'jsonlite' package is required to serialize R objects. ",
-        "Install it, or pass `value`/`init` as JS() expressions.",
-        call. = FALSE
-      )
     }
     jsonlite::toJSON(x, auto_unbox = TRUE, null = "null", na = "null")
   }

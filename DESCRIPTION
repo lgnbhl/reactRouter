@@ -19,9 +19,9 @@ Imports:
     htmltools,
     shiny,
     shiny.react,
-    checkmate
+    checkmate,
+    jsonlite
 Suggests:
-    jsonlite,
     testthat (>= 3.0.0),
     chromote (>= 0.1.1),
     shinytest2,

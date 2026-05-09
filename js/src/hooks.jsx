@@ -37,6 +37,20 @@ function injectValue({ result, selector, mapArray, render, into, as, rest }) {
   return React.cloneElement(into, { [as]: value, ...rest });
 }
 
+// Allowlist of react-router-dom hook names the R-side wrappers may dispatch
+// to via the generic UseHook. Defense in depth: the R wrappers always pass a
+// hardcoded `hook` string, but pinning the set here prevents any future code
+// path (or user-crafted props) from invoking arbitrary react-router-dom
+// exports through this dispatcher.
+const ALLOWED_HOOKS = new Set([
+  'useLoaderData', 'useActionData', 'useLocation', 'useParams',
+  'useNavigation', 'useNavigationType', 'useNavigate', 'useSubmit',
+  'useRouteLoaderData', 'useRouteError', 'useMatch', 'useMatches',
+  'useHref', 'useResolvedPath', 'useFetchers', 'useRevalidator',
+  'useBlocker', 'useInRouterContext', 'useOutlet', 'useAsyncValue',
+  'useAsyncError',
+]);
+
 // Generic dispatcher for any React Router hook that fits the common shape:
 //   value = ReactRouter[hook](hookArg?); optional dotted-path `selector`;
 //   render it via `render` JS function or by cloning `into` with `[as]=value`.
@@ -49,6 +63,12 @@ export function UseHook({
   hook, hookArg, selector, as, into, render,
   mapArray = false, nullIfFalsy = false, ...rest
 }) {
+  if (!ALLOWED_HOOKS.has(hook)) {
+    throw new Error(
+      `UseHook: hook "${hook}" is not in the allowlist. ` +
+      `This is an internal reactRouter package error — please report it.`
+    );
+  }
   const fn = ReactRouter[hook];
   if (typeof fn !== 'function') {
     throw new Error(

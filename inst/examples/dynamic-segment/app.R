@@ -106,7 +106,7 @@ loader_film <- JS(
   "
   async ({ params }) => {
     // Fetch a single film using the dynamic :id route param (e.g. /films/1)
-    const res = await fetch(`https://swapi.info/api/films/${params.id}`);
+    const res = await fetch(`https://swapi.info/api/films/${encodeURIComponent(params.id)}`);
     // Throw a Response error for useRouteError to catch if the film doesn't exist
     if (!res.ok) throw new Response('Film not found', { status: res.status });
     const data = await res.json();
@@ -144,7 +144,7 @@ loader_people <- JS(
 loader_person <- JS(
   "
   async ({ params }) => {
-    const res = await fetch(`https://swapi.info/api/people/${params.id}`);
+    const res = await fetch(`https://swapi.info/api/people/${encodeURIComponent(params.id)}`);
     if (!res.ok) throw new Response('Character not found', { status: res.status });
     const data = await res.json();
     if (data.homeworld) {

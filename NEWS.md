@@ -1,6 +1,23 @@
 # reactRouter 0.2.0
 
 - CRAN submission.
+- Security: `reactRouterExample()` now validates `example` against the list of
+  bundled examples and rejects anything else, closing a path-traversal vector
+  in user-supplied input.
+- Security: `redirect()`, `replaceResponse()`, and `redirectDocument()` reject
+  `javascript:`, `data:`, and `vbscript:` URL schemes in `to`.
+- Security: the `UseHook` JSX dispatcher now restricts the dispatched hook
+  name to a fixed allowlist, preventing arbitrary lookups against the
+  `react-router-dom` namespace via crafted props.
+- Security: moved `jsonlite` from `Suggests` to `Imports` so the JSON-safe
+  escape path in `JS()` literal generation (control chars, U+2028/U+2029,
+  `</script>`) is always taken; removed the partial fallback.
+- Bumped bundled `react-router-dom` to 7.15.x and rebuilt the JS bundle.
+- New vignette: "Security considerations" — guidance on loaders/actions as
+  client-side code, URL-encoding route params, redirect targets, CSP, and
+  more.
+- The `dynamic-segment` example now wraps `params.id` in `encodeURIComponent`
+  before splicing into a `fetch()` URL, modelling the safe pattern.
 - Updated React Router to v7. The package now wraps `react-router-dom` 7.x.
 - Adopted the v7 data router API: `createBrowserRouter()`, `createHashRouter()`,
   `createMemoryRouter()` paired with `RouterProvider(router = ...)`. This is the

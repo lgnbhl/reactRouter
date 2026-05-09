@@ -17,19 +17,23 @@
 #' @export
 reactRouterExample <- function(example = NULL, ...) {
   examples <- system.file("examples", package = utils::packageName(), mustWork = TRUE)
+  valid <- sub("\\.R$", "", list.files(examples))
   if (is.null(example)) {
-    names <- sub("\\.R$", "", list.files(examples))
     message(
       "Available reactRouter examples:\n",
-      paste0("  - ", names, collapse = "\n"),
+      paste0("  - ", valid, collapse = "\n"),
       "\n\nRun one with reactRouterExample(\"<name>\")."
     )
-    invisible(names)
-  } else {
-    path <- file.path(examples, example)
-    if (!grepl("\\.R$", path) && !file.exists(path)) {
-      path <- paste0(path, ".R")
-    }
-    shiny::runApp(path, ...)
+    return(invisible(valid))
   }
+  if (!is.character(example) || length(example) != 1 || is.na(example)) {
+    stop("reactRouterExample(): `example` must be a single, non-NA character string.", call. = FALSE)
+  }
+  if (!example %in% valid) {
+    stop(sprintf(
+      "reactRouterExample(): unknown example '%s'. Available: %s.",
+      example, paste(valid, collapse = ", ")
+    ), call. = FALSE)
+  }
+  shiny::runApp(file.path(examples, example), ...)
 }

@@ -22,6 +22,12 @@ Pass as the \code{loader} argument of a \code{\link{Route}} to perform
 an unconditional redirect -- typically used for guard routes that always
 send the user somewhere else.
 
+\strong{Security:} \code{to} must be a trusted, package-author-controlled
+string. \code{javascript:}, \code{data:}, and \code{vbscript:} URL schemes
+are rejected. If you build \code{to} from user-supplied input, validate it
+yourself before passing it in -- never round-trip untrusted strings through
+\code{redirect()} into a navigation.
+
 For conditional redirects inside a custom loader/action, use the global
 \code{window.reactRouterHelpers.redirect(to)} from your own \code{JS()}
 string, e.g.

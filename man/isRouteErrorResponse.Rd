@@ -35,4 +35,5 @@ useRouteError(render = JS(paste0(
   "(e) ? <p>HTTP {e.status}</p> : <p>Unknown error</p>"
 )))
 }
+
 }
