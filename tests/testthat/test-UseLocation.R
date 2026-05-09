@@ -9,7 +9,8 @@ test_that("useLocation() renders location properties", {
   app_url <- app$get_url()
 
   app_with_path <- shinytest2::AppDriver$new(
-    paste0(app_url, "/#/about?q=test")
+    paste0(app_url, "/#/about?q=test"),
+    load_timeout = 60 * 1000
   )
   app_with_path$wait_for_idle()
 

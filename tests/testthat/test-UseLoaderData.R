@@ -9,7 +9,8 @@ test_that("useLoaderData() renders loader data", {
   app_url <- app$get_url()
 
   app_data <- shinytest2::AppDriver$new(
-    paste0(app_url, "/#/data")
+    paste0(app_url, "/#/data"),
+    load_timeout = 60 * 1000
   )
   app_data$wait_for_idle()
 

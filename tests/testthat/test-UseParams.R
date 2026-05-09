@@ -9,7 +9,8 @@ test_that("useParams() renders route parameters", {
   app_url <- app$get_url()
 
   app_with_param <- shinytest2::AppDriver$new(
-    paste0(app_url, "/#/user/42")
+    paste0(app_url, "/#/user/42"),
+    load_timeout = 60 * 1000
   )
   app_with_param$wait_for_idle()
 

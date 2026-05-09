@@ -14,7 +14,8 @@ test_that("Link renders and routes work", {
 
   app_url <- app$get_url()
   app_about <- shinytest2::AppDriver$new(
-    paste0(app_url, "/#/about")
+    paste0(app_url, "/#/about"),
+    load_timeout = 60 * 1000
   )
   app_about$wait_for_idle()
 

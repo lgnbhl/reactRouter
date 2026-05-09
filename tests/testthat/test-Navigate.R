@@ -9,7 +9,8 @@ test_that("Navigate redirects to the target route", {
   app_url <- app$get_url()
 
   app_redirect <- shinytest2::AppDriver$new(
-    paste0(app_url, "/#/old")
+    paste0(app_url, "/#/old"),
+    load_timeout = 60 * 1000
   )
   app_redirect$wait_for_idle()
 

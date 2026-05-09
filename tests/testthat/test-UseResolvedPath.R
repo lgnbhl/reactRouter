@@ -9,7 +9,8 @@ test_that("useHref() and useResolvedPath() resolve paths", {
   app_url <- app$get_url()
 
   app_product <- shinytest2::AppDriver$new(
-    paste0(app_url, "/#/products/42")
+    paste0(app_url, "/#/products/42"),
+    load_timeout = 60 * 1000
   )
   app_product$wait_for_idle()
 

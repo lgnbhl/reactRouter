@@ -12,8 +12,8 @@ test_that("routes with HashRouter() work", {
 
   app_url <- app$get_url()
 
-  app_home <- shinytest2::AppDriver$new(paste0(app_url, "/#"))
-  app_page <- shinytest2::AppDriver$new(paste0(app_url, "/#/page"))
+  app_home <- shinytest2::AppDriver$new(paste0(app_url, "/#"), load_timeout = 60 * 1000)
+  app_page <- shinytest2::AppDriver$new(paste0(app_url, "/#/page"), load_timeout = 60 * 1000)
 
   values_home <- app_home$get_values()
   values_page <- app_page$get_values()

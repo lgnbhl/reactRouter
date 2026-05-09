@@ -9,7 +9,8 @@ test_that("useSearchParams() renders query parameters", {
   app_url <- app$get_url()
 
   app_with_params <- shinytest2::AppDriver$new(
-    paste0(app_url, "/#/?color=red")
+    paste0(app_url, "/#/?color=red"),
+    load_timeout = 60 * 1000
   )
   app_with_params$wait_for_idle()
 

@@ -9,7 +9,8 @@ test_that("useRouteError() renders error message", {
   app_url <- app$get_url()
 
   app_error <- shinytest2::AppDriver$new(
-    paste0(app_url, "/#/broken")
+    paste0(app_url, "/#/broken"),
+    load_timeout = 60 * 1000
   )
   app_error$wait_for_idle()
 

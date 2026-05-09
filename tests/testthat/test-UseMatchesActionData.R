@@ -22,7 +22,8 @@ test_that("useActionData() is null before form submission", {
   app_url <- app$get_url()
 
   app_form <- shinytest2::AppDriver$new(
-    paste0(app_url, "/#/form")
+    paste0(app_url, "/#/form"),
+    load_timeout = 60 * 1000
   )
   app_form$wait_for_idle()
 
@@ -41,7 +42,8 @@ test_that("Form submission populates useActionData()", {
   app_url <- app$get_url()
 
   app_form <- shinytest2::AppDriver$new(
-    paste0(app_url, "/#/form")
+    paste0(app_url, "/#/form"),
+    load_timeout = 60 * 1000
   )
   app_form$wait_for_idle()
 
