@@ -106,16 +106,9 @@ htmltools::browsable(ui)
 
 ### Install
 
-For current version 0.2.0 (coming soon on CRAN):
-
-``` r
-remotes::install_github("lgnbhl/reactRouter") # development version
-```
-
-For older version 0.1.1 (older version on CRAN):
-
 ``` r
 install.packages("reactRouter")
+# remotes::install_github("lgnbhl/reactRouter") # development version
 ```
 
 ### Resources
@@ -151,5 +144,9 @@ Learn more about how to use data loaders with these R packages
 
 ### Contribute
 
-Would you like to contribute to the package? Have a look at the current
-[roadmap](https://github.com/users/lgnbhl/projects/2/views/1).
+Found a bug or have a feature request? [Open an
+issue](https://github.com/lgnbhl/reactRouter/issues). Pull requests are
+welcome.
+
+Follow [Felix Luginbuhl](https://linkedin.com/in/FelixLuginbuhl) on
+LinkedIn for updates.
