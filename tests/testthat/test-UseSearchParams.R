@@ -6,18 +6,13 @@ test_that("useSearchParams() renders query parameters", {
   )
   app$wait_for_idle()
 
-  app_url <- app$get_url()
+  app$get_js("window.location.hash = '#/?color=red'")
+  app$wait_for_idle()
 
-  app_with_params <- shinytest2::AppDriver$new(
-    paste0(app_url, "/#/?color=red"),
-    load_timeout = 60 * 1000
-  )
-  app_with_params$wait_for_idle()
-
-  color_text <- app_with_params$get_text("#colorParam")
+  color_text <- app$get_text("#colorParam")
   expect_equal(color_text, "red")
 
-  all_text <- app_with_params$get_text("#allParams")
+  all_text <- app$get_text("#allParams")
   expect_true(grepl('"color"', all_text))
   expect_true(grepl('"red"', all_text))
 })

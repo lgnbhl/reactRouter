@@ -6,18 +6,13 @@ test_that("useParams() renders route parameters", {
   )
   app$wait_for_idle()
 
-  app_url <- app$get_url()
+  app$get_js("window.location.hash = '#/user/42'")
+  app$wait_for_idle()
 
-  app_with_param <- shinytest2::AppDriver$new(
-    paste0(app_url, "/#/user/42"),
-    load_timeout = 60 * 1000
-  )
-  app_with_param$wait_for_idle()
-
-  param_text <- app_with_param$get_text("#paramId")
+  param_text <- app$get_text("#paramId")
   expect_equal(param_text, "42")
 
-  param_json <- app_with_param$get_text("#paramAll")
+  param_json <- app$get_text("#paramAll")
   expect_true(grepl('"id"', param_json))
   expect_true(grepl('"42"', param_json))
 })

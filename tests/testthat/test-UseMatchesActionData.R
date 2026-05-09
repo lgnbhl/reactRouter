@@ -19,15 +19,10 @@ test_that("useActionData() is null before form submission", {
   )
   app$wait_for_idle()
 
-  app_url <- app$get_url()
+  app$get_js("window.location.hash = '#/form'")
+  app$wait_for_idle()
 
-  app_form <- shinytest2::AppDriver$new(
-    paste0(app_url, "/#/form"),
-    load_timeout = 60 * 1000
-  )
-  app_form$wait_for_idle()
-
-  action_text <- app_form$get_text("#actionData")
+  action_text <- app$get_text("#actionData")
   expect_equal(action_text, "")
 })
 
@@ -39,21 +34,16 @@ test_that("Form submission populates useActionData()", {
   )
   app$wait_for_idle()
 
-  app_url <- app$get_url()
+  app$get_js("window.location.hash = '#/form'")
+  app$wait_for_idle()
 
-  app_form <- shinytest2::AppDriver$new(
-    paste0(app_url, "/#/form"),
-    load_timeout = 60 * 1000
-  )
-  app_form$wait_for_idle()
+  app$click(selector = "#submitBtn")
+  app$wait_for_idle()
 
-  app_form$click(selector = "#submitBtn")
-  app_form$wait_for_idle()
-
-  action_text <- app_form$get_text("#actionData")
+  action_text <- app$get_text("#actionData")
   expect_true(grepl('"submitted"', action_text))
   expect_true(grepl('"Bob"', action_text))
 
-  action_field <- app_form$get_text("#actionField")
+  action_field <- app$get_text("#actionField")
   expect_equal(action_field, "Bob")
 })

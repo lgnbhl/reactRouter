@@ -6,23 +6,18 @@ test_that("useHref() and useResolvedPath() resolve paths", {
   )
   app$wait_for_idle()
 
-  app_url <- app$get_url()
+  app$get_js("window.location.hash = '#/products/42'")
+  app$wait_for_idle()
 
-  app_product <- shinytest2::AppDriver$new(
-    paste0(app_url, "/#/products/42"),
-    load_timeout = 60 * 1000
-  )
-  app_product$wait_for_idle()
-
-  href_relative <- app_product$get_text("#hrefRelative")
+  href_relative <- app$get_text("#hrefRelative")
   expect_equal(href_relative, "#/settings")
 
-  href_absolute <- app_product$get_text("#hrefAbsolute")
+  href_absolute <- app$get_text("#hrefAbsolute")
   expect_equal(href_absolute, "#/home")
 
-  resolved_all <- app_product$get_text("#resolvedAll")
+  resolved_all <- app$get_text("#resolvedAll")
   expect_true(grepl('"pathname"', resolved_all))
 
-  resolved_pathname <- app_product$get_text("#resolvedPathname")
+  resolved_pathname <- app$get_text("#resolvedPathname")
   expect_equal(resolved_pathname, "/settings")
 })

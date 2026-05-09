@@ -6,25 +6,20 @@ test_that("useLoaderData() renders loader data", {
   )
   app$wait_for_idle()
 
-  app_url <- app$get_url()
+  app$get_js("window.location.hash = '#/data'")
+  app$wait_for_idle()
 
-  app_data <- shinytest2::AppDriver$new(
-    paste0(app_url, "/#/data"),
-    load_timeout = 60 * 1000
-  )
-  app_data$wait_for_idle()
-
-  loader_all <- app_data$get_text("#loaderAll")
+  loader_all <- app$get_text("#loaderAll")
   expect_true(grepl('"name"', loader_all))
   expect_true(grepl('"Alice"', loader_all))
 
-  loader_name <- app_data$get_text("#loaderName")
+  loader_name <- app$get_text("#loaderName")
   expect_equal(loader_name, "Alice")
 
-  loader_age <- app_data$get_text("#loaderAge")
+  loader_age <- app$get_text("#loaderAge")
   expect_equal(loader_age, "30")
 
   # render = JS(...) path: receives full loader object, composes a string
-  loader_name_render <- app_data$get_text("#loaderNameRender")
+  loader_name_render <- app$get_text("#loaderNameRender")
   expect_equal(loader_name_render, "Alice, age 30")
 })

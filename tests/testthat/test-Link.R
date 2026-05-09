@@ -12,13 +12,9 @@ test_that("Link renders and routes work", {
   home_text <- app$get_text("#homePage")
   expect_true(grepl("home", home_text))
 
-  app_url <- app$get_url()
-  app_about <- shinytest2::AppDriver$new(
-    paste0(app_url, "/#/about"),
-    load_timeout = 60 * 1000
-  )
-  app_about$wait_for_idle()
+  app$get_js("window.location.hash = '#/about'")
+  app$wait_for_idle()
 
-  about_text <- app_about$get_text("#aboutPage")
+  about_text <- app$get_text("#aboutPage")
   expect_true(grepl("about content", about_text))
 })

@@ -6,18 +6,13 @@ test_that("useRouteLoaderData() accesses parent route loader data", {
   )
   app$wait_for_idle()
 
-  app_url <- app$get_url()
+  app$get_js("window.location.hash = '#/child'")
+  app$wait_for_idle()
 
-  app_child <- shinytest2::AppDriver$new(
-    paste0(app_url, "/#/child"),
-    load_timeout = 60 * 1000
-  )
-  app_child$wait_for_idle()
-
-  root_all <- app_child$get_text("#rootDataAll")
+  root_all <- app$get_text("#rootDataAll")
   expect_true(grepl('"title"', root_all))
   expect_true(grepl('"Root Data"', root_all))
 
-  root_title <- app_child$get_text("#rootDataTitle")
+  root_title <- app$get_text("#rootDataTitle")
   expect_equal(root_title, "Root Data")
 })

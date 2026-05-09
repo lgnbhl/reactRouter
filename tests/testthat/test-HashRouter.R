@@ -10,13 +10,13 @@ test_that("routes with HashRouter() work", {
   app <- shinytest2::AppDriver$new(app_dir = testthat::test_path("test-apps", "HashRouter"))
   app$wait_for_idle()
 
-  app_url <- app$get_url()
+  app$get_js("window.location.hash = '#/'")
+  app$wait_for_idle()
+  values_home <- app$get_values()
 
-  app_home <- shinytest2::AppDriver$new(paste0(app_url, "/#"), load_timeout = 60 * 1000)
-  app_page <- shinytest2::AppDriver$new(paste0(app_url, "/#/page"), load_timeout = 60 * 1000)
-
-  values_home <- app_home$get_values()
-  values_page <- app_page$get_values()
+  app$get_js("window.location.hash = '#/page'")
+  app$wait_for_idle()
+  values_page <- app$get_values()
 
   expect_identical(names(values_home$input), c("NavLinkHome", "NavLinkPage"))
   expect_true(names(values_home$output) == "outputHome")
