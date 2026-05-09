@@ -51,5 +51,5 @@ Renders \code{into} when a deferred loader promise resolves, injecting the
 resolved value (or a \code{selector} from it) \code{as} a prop.
 Use inside a \code{\link{Route}} whose \code{loader} returns an object
 containing a promise (written via \code{\link{JS}}). In React Router v7,
-simply return the object directly — no \code{defer()} wrapper is needed.
+simply return the object directly -- no \code{defer()} wrapper is needed.
 }

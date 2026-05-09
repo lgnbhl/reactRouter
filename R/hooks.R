@@ -29,7 +29,7 @@ validateTarget <- function(label, into, render) {
   if (!is.null(render) && !is.null(into)) {
     stop(
       sprintf(
-        '%s(): `render` and `into` are mutually exclusive — provide one or the other, not both.',
+        '%s(): `render` and `into` are mutually exclusive -- provide one or the other, not both.',
         label
       ),
       call. = FALSE
@@ -65,7 +65,7 @@ component <- function(name, module = 'react-router-dom') {
 #' resolved value (or a \code{selector} from it) \code{as} a prop.
 #' Use inside a \code{\link{Route}} whose \code{loader} returns an object
 #' containing a promise (written via \code{\link{JS}}). In React Router v7,
-#' simply return the object directly — no \code{defer()} wrapper is needed.
+#' simply return the object directly -- no \code{defer()} wrapper is needed.
 #'
 #' @inheritParams hook-wrapper
 #' @param resolveKey Character. The key in the loader's return value that holds
@@ -668,7 +668,7 @@ useRevalidator <- function(
 #'
 #' Calls the \code{useBlocker()} hook and injects the blocker's \code{state}
 #' (or another \code{selector} field) \code{as} a prop of the \code{into}
-#' component. Use to intercept navigation — e.g. warn the user about unsaved
+#' component. Use to intercept navigation -- e.g. warn the user about unsaved
 #' changes before they leave a route.
 #'
 #' The blocker \code{state} is one of \code{"unblocked"} (default),
@@ -777,163 +777,6 @@ useSubmit <- function(
   )
 }
 
-#' redirect (loader/action helper)
-#'
-#' \url{https://api.reactrouter.com/v7/functions/react-router.redirect.html}
-#'
-#' Returns a \code{\link{JS}} loader function that redirects to \code{to}.
-#' Pass as the \code{loader} argument of a \code{\link{Route}} to perform
-#' an unconditional redirect — typically used for guard routes that always
-#' send the user somewhere else.
-#'
-#' For conditional redirects inside a custom loader/action, use the global
-#' \code{window.reactRouterHelpers.redirect(to)} from your own \code{JS()}
-#' string, e.g.
-#' \preformatted{
-#'   loader = JS(
-#'     "async () => { if (!authed()) return window.reactRouterHelpers.redirect('/login'); ... }"
-#'   )
-#' }
-#'
-#' The \code{data} and \code{replace} helpers are exposed on the same global
-#' (\code{window.reactRouterHelpers.data}, \code{...replace}).
-#'
-#' @param to Character. Destination path.
-#' @return A \code{\link{JS}} expression suitable for the \code{loader}
-#'   argument of \code{\link{Route}}.
-#'
-#' @examples
-#' \dontrun{
-#' Route(path = "/old", loader = redirect("/new"), element = NULL)
-#' }
-#'
-#' @rdname redirect
-#' @export
-redirect <- function(to) {
-  if (!is.character(to) || length(to) != 1 || is.na(to)) {
-    stop(
-      "redirect(): `to` must be a single, non-NA character string.",
-      call. = FALSE
-    )
-  }
-  escaped <- gsub("\\\\", "\\\\\\\\", to)
-  escaped <- gsub('"', '\\\\"', escaped)
-  shiny.react::JS(sprintf(
-    '() => window.reactRouterHelpers.redirect("%s")',
-    escaped
-  ))
-}
-
-#' replace (loader/action helper)
-#'
-#' \url{https://api.reactrouter.com/v7/functions/react-router.replace.html}
-#'
-#' Returns a \code{\link{JS}} loader function that performs a \emph{replace}
-#' navigation to \code{to} — same as \code{\link{redirect}}, but the new
-#' entry replaces the current one in the history stack instead of pushing
-#' a new one. Use for "alias" routes where the original URL should not
-#' remain in the user's back-history.
-#'
-#' For conditional replacements inside a custom loader/action, call
-#' \code{window.reactRouterHelpers.replace(to)} from your own \code{JS()}
-#' string.
-#'
-#' @param to Character. Destination path.
-#' @return A \code{\link{JS}} expression suitable for the \code{loader}
-#'   argument of \code{\link{Route}}.
-#'
-#' @examples
-#' \dontrun{
-#' Route(path = "/legacy", loader = replace("/new"), element = NULL)
-#' }
-#'
-#' @rdname replace
-#' @export
-replace <- function(to) {
-  if (!is.character(to) || length(to) != 1 || is.na(to)) {
-    stop(
-      "replace(): `to` must be a single, non-NA character string.",
-      call. = FALSE
-    )
-  }
-  escaped <- gsub("\\\\", "\\\\\\\\", to)
-  escaped <- gsub('"', '\\\\"', escaped)
-  shiny.react::JS(sprintf(
-    '() => window.reactRouterHelpers.replace("%s")',
-    escaped
-  ))
-}
-
-#' data (loader/action helper)
-#'
-#' \url{https://api.reactrouter.com/v7/functions/react-router.data.html}
-#'
-#' Returns a \code{\link{JS}} loader function that resolves to a React Router
-#' \code{data()} response — a thin wrapper that lets you attach an HTTP
-#' \code{status}, \code{statusText}, and/or \code{headers} alongside the
-#' loader/action payload while still exposing \code{value} via
-#' \code{\link{useLoaderData}} / \code{\link{useActionData}}.
-#'
-#' Use the R helper for static loaders that always return the same value plus
-#' status. For values computed inside a custom loader/action, call
-#' \code{window.reactRouterHelpers.data(value, init)} directly in your
-#' \code{JS()} string, e.g.
-#' \preformatted{
-#'   loader = JS("async () => {
-#'     const rows = await fetchRows();
-#'     return window.reactRouterHelpers.data(
-#'       \{ rows \}, \{ status: 200 \}
-#'     );
-#'   }")
-#' }
-#'
-#' @param value The payload to expose via \code{useLoaderData()} /
-#'   \code{useActionData()}. Either an R object (list, vector, data.frame —
-#'   serialized to JSON), or a \code{\link{JS}} expression for a JavaScript
-#'   value.
-#' @param init Optional. Either a list with \code{status} (integer),
-#'   \code{statusText} (character) and/or \code{headers} (named list), or a
-#'   \code{\link{JS}} expression evaluating to such an object.
-#' @return A \code{\link{JS}} expression suitable for the \code{loader} or
-#'   \code{action} argument of \code{\link{Route}}.
-#'
-#' @examples
-#' \dontrun{
-#' Route(
-#'   path = "/profile",
-#'   loader = data(
-#'     list(name = "Ada", role = "Engineer"),
-#'     init = list(status = 200)
-#'   ),
-#'   element = useLoaderData(tags$pre())
-#' )
-#' }
-#'
-#' @rdname data
-#' @export
-data <- function(value, init = NULL) {
-  serialize <- function(x) {
-    if (inherits(x, "JS_EVAL")) {
-      return(as.character(x))
-    }
-    if (!requireNamespace("jsonlite", quietly = TRUE)) {
-      stop(
-        "data(): the 'jsonlite' package is required to serialize R objects. ",
-        "Install it, or pass `value`/`init` as JS() expressions.",
-        call. = FALSE
-      )
-    }
-    jsonlite::toJSON(x, auto_unbox = TRUE, null = "null", na = "null")
-  }
-  valueJS <- serialize(value)
-  initStr <- if (!is.null(init)) paste0(", ", serialize(init)) else ""
-  shiny.react::JS(sprintf(
-    "() => window.reactRouterHelpers.data(%s%s)",
-    valueJS,
-    initStr
-  ))
-}
-
 #' useAsyncValue
 #'
 #' \url{https://api.reactrouter.com/v7/functions/react-router.useAsyncValue.html}
@@ -941,7 +784,7 @@ data <- function(value, init = NULL) {
 #' Calls the \code{useAsyncValue()} hook and injects the resolved value (or a
 #' \code{selector} from it) \code{as} a prop of the \code{into} component.
 #' Must be rendered inside an \code{\link{Await}} that has been called in
-#' \emph{children mode} (no \code{into} / \code{render} on \code{Await}) — the
+#' \emph{children mode} (no \code{into} / \code{render} on \code{Await}) -- the
 #' hook reads the value resolved by the closest \code{<Await>} ancestor.
 #'
 #' @inheritParams hook-wrapper
@@ -1031,7 +874,7 @@ useRoutes <- function(..., routes = NULL) {
 #'
 #' Calls the \code{useInRouterContext()} hook and injects the boolean result
 #' \code{as} a prop of the \code{into} component. Useful inside reusable
-#' components that may be rendered with or without a surrounding router —
+#' components that may be rendered with or without a surrounding router --
 #' guard router-only logic with this check before calling other hooks.
 #'
 #' @inheritParams hook-wrapper
@@ -1059,7 +902,7 @@ useInRouterContext <- function(
 #'
 #' Calls the \code{useOutlet()} hook and injects the matched child route's
 #' element \code{as} a prop of the \code{into} component (or passes it to
-#' \code{render}). Returns \code{NULL} when no child route matches — useful for
+#' \code{render}). Returns \code{NULL} when no child route matches -- useful for
 #' rendering a fallback inside a layout when the user is on the parent route.
 #'
 #' Differs from the \code{\link{Outlet}} component in that it returns the

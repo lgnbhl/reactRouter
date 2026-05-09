@@ -19,7 +19,7 @@ A \code{\link{JS}} expression suitable for the \code{loader}
 \details{
 Returns a \code{\link{JS}} loader function that redirects to \code{to}.
 Pass as the \code{loader} argument of a \code{\link{Route}} to perform
-an unconditional redirect — typically used for guard routes that always
+an unconditional redirect -- typically used for guard routes that always
 send the user somewhere else.
 
 For conditional redirects inside a custom loader/action, use the global

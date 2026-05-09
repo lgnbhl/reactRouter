@@ -27,6 +27,6 @@ pattern for cases where a single prop is not expressive enough (e.g.
 \details{
 Calls the \code{useInRouterContext()} hook and injects the boolean result
 \code{as} a prop of the \code{into} component. Useful inside reusable
-components that may be rendered with or without a surrounding router —
+components that may be rendered with or without a surrounding router --
 guard router-only logic with this check before calling other hooks.
 }

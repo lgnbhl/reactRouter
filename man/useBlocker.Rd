@@ -43,7 +43,7 @@ Pass \code{FALSE} to disable blocking entirely (the default).}
 \details{
 Calls the \code{useBlocker()} hook and injects the blocker's \code{state}
 (or another \code{selector} field) \code{as} a prop of the \code{into}
-component. Use to intercept navigation — e.g. warn the user about unsaved
+component. Use to intercept navigation -- e.g. warn the user about unsaved
 changes before they leave a route.
 
 The blocker \code{state} is one of \code{"unblocked"} (default),

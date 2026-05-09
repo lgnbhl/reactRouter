@@ -30,7 +30,7 @@ pattern for cases where a single prop is not expressive enough (e.g.
 \details{
 Calls the \code{useOutlet()} hook and injects the matched child route's
 element \code{as} a prop of the \code{into} component (or passes it to
-\code{render}). Returns \code{NULL} when no child route matches — useful for
+\code{render}). Returns \code{NULL} when no child route matches -- useful for
 rendering a fallback inside a layout when the user is on the parent route.
 
 Differs from the \code{\link{Outlet}} component in that it returns the

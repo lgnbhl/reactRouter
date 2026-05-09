@@ -38,6 +38,6 @@ pattern for cases where a single prop is not expressive enough (e.g.
 Calls the \code{useAsyncValue()} hook and injects the resolved value (or a
 \code{selector} from it) \code{as} a prop of the \code{into} component.
 Must be rendered inside an \code{\link{Await}} that has been called in
-\emph{children mode} (no \code{into} / \code{render} on \code{Await}) — the
+\emph{children mode} (no \code{into} / \code{render} on \code{Await}) -- the
 hook reads the value resolved by the closest \code{<Await>} ancestor.
 }

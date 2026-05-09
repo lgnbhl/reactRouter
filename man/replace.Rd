@@ -18,7 +18,7 @@ A \code{\link{JS}} expression suitable for the \code{loader}
 }
 \details{
 Returns a \code{\link{JS}} loader function that performs a \emph{replace}
-navigation to \code{to} — same as \code{\link{redirect}}, but the new
+navigation to \code{to} -- same as \code{\link{redirect}}, but the new
 entry replaces the current one in the history stack instead of pushing
 a new one. Use for "alias" routes where the original URL should not
 remain in the user's back-history.
