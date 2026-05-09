@@ -15,7 +15,7 @@ test_that("useActionData() is null before form submission", {
   skip_on_cran()
 
   app <- shinytest2::AppDriver$new(
-    app_dir = testthat::test_path("test-apps", "useMatchesActionData")
+    app_dir = testthat::test_path("test-apps", "UseMatchesActionData")
   )
   app$wait_for_idle()
 
@@ -30,7 +30,7 @@ test_that("Form submission populates useActionData()", {
   skip_on_cran()
 
   app <- shinytest2::AppDriver$new(
-    app_dir = testthat::test_path("test-apps", "useMatchesActionData")
+    app_dir = testthat::test_path("test-apps", "UseMatchesActionData")
   )
   app$wait_for_idle()
 
