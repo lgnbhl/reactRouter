@@ -1,6 +1,6 @@
 # shouldRevalidate Example
 # Demonstrates: shouldRevalidate on a Route loader
-# https://reactrouter.com/6.30.3/route/should-revalidate
+# https://api.reactrouter.com/v7/types/react-router.ShouldRevalidateFunction.html
 #
 # By default, React Router re-runs ALL loaders on every navigation.
 # shouldRevalidate lets you skip re-runs when the data won't have changed,

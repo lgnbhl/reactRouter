@@ -14,7 +14,7 @@
 ^data-raw$
 ^vignettes$
 ^inst/examples/shiny\.fluent$
-^inst/examples/dynamic-segment$
+^inst/examples/star-wars-explorer$
 ^renovate.json
 ^reinstall.sh$
 ^cran-comments\.md$

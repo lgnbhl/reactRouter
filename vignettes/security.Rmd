@@ -103,6 +103,11 @@ redirect("javascript:alert(1)")
 #> Error: redirect(): refusing unsafe URL scheme in `to` = "javascript:alert(1)".
 ```
 
+It does **not**, however, reject protocol-relative targets like
+`//evil.example.com/path`, which the browser interprets as an absolute URL on
+another origin. If `to` ever comes from user input, do not rely on the
+built-in scheme check alone.
+
 But if you build a redirect target from user input (for example a `?next=` parameter after a sign-in), it's safer to compare against a list of allowed paths than to try to filter the string yourself:
 
 ```{r}
@@ -131,7 +136,10 @@ Content-Security-Policy:
   frame-ancestors 'none';
 ```
 
-`'unsafe-inline'` for scripts is currently needed by Shiny itself; `reactRouter` does not require it.
+`'unsafe-inline'` for scripts is currently needed by **Shiny** itself (its
+client uses inline scripts to bootstrap the session); `reactRouter` does not
+require it. If a future Shiny release tightens this, the policy above can
+drop `'unsafe-inline'`.
 
 ## Reporting an issue
 

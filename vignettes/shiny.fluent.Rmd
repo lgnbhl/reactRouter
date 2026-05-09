@@ -16,6 +16,13 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
+> **Note.** This tutorial uses the legacy component-based router
+> (`HashRouter()` + `Routes()`) for compatibility with `rhino`'s `box` module
+> loading. For new projects, prefer the data router API
+> (`RouterProvider()` + `createHashRouter()`) shown in
+> `vignette("routers", package = "reactRouter")`, which unlocks `loader`,
+> `action`, `errorElement`, and the full hook surface.
+
 This tutorial demonstrates how to build a dynamic Shiny application using `reactRouter` for routing and `shiny.fluent` for modern UI components, all within the `rhino` framework. We'll use [Dota 2](https://www.opendota.com/) API data as an example of routing multiple pages.
 
 Initially, ensure you have the necessary rhino package installed. You can do this by running the following command in your R console:

@@ -16,7 +16,7 @@
 - New vignette: "Security considerations" — guidance on loaders/actions as
   client-side code, URL-encoding route params, redirect targets, CSP, and
   more.
-- The `dynamic-segment` example now wraps `params.id` in `encodeURIComponent`
+- The `star-wars-explorer` example wraps `params.id` in `encodeURIComponent`
   before splicing into a `fetch()` URL, modelling the safe pattern.
 - Updated React Router to v7. The package now wraps `react-router-dom` 7.x.
 - Adopted the v7 data router API: `createBrowserRouter()`, `createHashRouter()`,

@@ -1,4 +1,4 @@
-# Minimal example using createHashRouter() and createRoutesFromElements()
+# Minimal example using createHashRouter() with RouterProvider().
 # This uses the data router API instead of the component-based <HashRouter> + <Routes>.
 # Demonstrates the `loader` argument with useLoaderData() to fetch and display data.
 

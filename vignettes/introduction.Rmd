@@ -14,6 +14,10 @@ knitr::opts_chunk$set(
 )
 ```
 
+For an overview of which router to choose (`createHashRouter()` vs.
+`createMemoryRouter()` vs. `createBrowserRouter()`) and when to set
+`reloadDocument = TRUE`, see `vignette("routers", package = "reactRouter")`.
+
 ### Install
 
 ``` r
@@ -328,68 +332,41 @@ RouterProvider(
 
 ### Dynamic segments
 
-A minimal example using dynamic segments, i.e. using `Route(to = ":id/*")`.
-
-To allow R Shiny to update URL hashs, you have to add `reloadDocument = TRUE` (by default FALSE) in `NavLink()`.
+A minimal example using dynamic segments (`Route(path = ":id")`). The route
+parameter is read with `useParams()` — no full page reload needed and no
+dependency on `session$clientData$url_hash`:
 
 ```r
-library(shiny)
 library(reactRouter)
 library(htmltools)
 
-ui <- RouterProvider(
+RouterProvider(
   router = createHashRouter(
     Route(
       path = "/",
       element = div(
-        Link(
-          to = "/",
-          h3("reactRouter with dynamic routes", class = "m-3"),
-          style = "text-decoration: none; color: black"
-        ),
+        h3("reactRouter with dynamic routes"),
+        NavLink(to = "/project/1", "Project 1"), " | ",
+        NavLink(to = "/project/2", "Project 2"),
+        tags$hr(),
         Outlet()
       ),
+      Route(index = TRUE, element = p("Select a project.")),
       Route(
-        index = TRUE,
+        path = "project/:id",
         element = div(
-          NavLink(
-            to = "project/1/overview",
-            # if default FALSE session$clientData$url_hash not visible
-            reloadDocument = TRUE,
-            "Project 1"
-          ),
-          tags$br(),
-          NavLink(
-            to = "project/2/overview",
-            # if default FALSE session$clientData$url_hash not visible
-            reloadDocument = TRUE,
-            "Project 2"
-          )
+          h4("Project: ", useParams(tags$strong(), selector = "id"))
         )
-      ),
-      Route(
-        path = "project/:id/overview",
-        element = uiOutput("uiOverview")
-      ),
-      Route(
-        path = "project/:id/analysis",
-        element = uiOutput("uiAnalysis")
       )
     )
   )
 )
-
-server <- function(input, output, session) {
-  output$uiOverview <- renderUI({
-    session$clientData$url_hash
-  })
-  output$uiAnalysis <- renderUI({
-    session$clientData$url_hash
-  })
-}
-
-shinyApp(ui, server)
 ```
+
+If your dynamic page renders **server-rendered** Shiny output (`uiOutput()`,
+`renderUI()`, `plotOutput()`), set `reloadDocument = TRUE` on the relevant
+links so the Shiny session re-initialises with the new URL hash. See
+`vignette("routers", package = "reactRouter")` for the full reference.
 
 ### Alternatives
 
@@ -398,6 +375,6 @@ shinyApp(ui, server)
 
 ### More information
 
-**reactRouter** implements React Router [v.6.30.0](https://reactrouter.com/6.30.0).
+**reactRouter** wraps [React Router v7](https://reactrouter.com/) and exposes the data router API to R users.
 
-More info about how to use React Router can be found in the [official website](https://reactrouter.com/6.30.0).
+More info about how to use React Router can be found in the [official website](https://reactrouter.com/).

@@ -53,7 +53,7 @@ Header <- div(
   tags$p(
     paste0(
       'This example demonstrates some of the core features of React Router
-        including reactRouter::createHashRouter(), reactRouter::createRoutesFromElements(),
+        including reactRouter::createHashRouter(), reactRouter::RouterProvider(),
         nested reactRouter::Route(), reactRouter::Outlet(),
         reactRouter::Link(), and using a "*" route (aka "splat route")
         to render a "not found" page when someone visits an unrecognized URL.'
