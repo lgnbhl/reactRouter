@@ -177,63 +177,40 @@ In short: if the route should be visible in the URL (bookmarks, deep links, back
 
 Use `HashRouter()` or `MemoryRouter()` only if you have a specific reason to stay with the component API (e.g. migrating an existing app incrementally).
 
-```r
-# Legacy: component API — still works, but RouterProvider() is preferred
-library(shiny)
-library(reactRouter)
-
-ui <- HashRouter(
-  NavLink(to = "/",      reloadDocument = TRUE, "Home"), br(),
-  NavLink(to = "/other", reloadDocument = TRUE, "Other"),
-  Routes(
-    Route(path = "/",      element = uiOutput("uiHome")),
-    Route(path = "/other", element = uiOutput("uiOther"))
-  )
-)
-
-server <- function(input, output, session) {
-  url_hash <- reactive(session$clientData$url_hash)
-
-  output$uiHome  <- renderUI({ p("Home — hash: ",  url_hash()) })
-  output$uiOther <- renderUI({ p("Other — hash: ", url_hash()) })
-}
-
-shinyApp(ui, server)
-```
-
 ---
 
 ## Understanding `reloadDocument`
 
-`Link()` and `NavLink()` accept a `reloadDocument` prop that controls how navigation works. The default is `FALSE`, matching React Router's own default.
+`Link()` and `NavLink()` accept a `reloadDocument` prop. The default is `FALSE`, matching React Router's own default, and that default is correct for almost every use of this package — including Shiny apps with server-rendered output.
 
-### `reloadDocument = FALSE` (default)
+### `reloadDocument = FALSE` (default, recommended)
 
-React Router handles navigation **entirely on the client side** — it swaps the displayed route component without reloading the page. This is the correct behavior for:
+React Router intercepts the click and updates the route **entirely on the client side**, without reloading the page. This is the right behavior for:
 
-- **Static sites and Quarto documents** — there is no server to re-initialize. Client-side navigation provides smooth, instant route switching.
-- **`createMemoryRouter()` and `MemoryRouter()`** — a full page reload would reset the in-memory routing state back to `/`, breaking navigation entirely.
-- **Data router loaders and actions** — `loader` and `action` functions only execute during client-side navigations. A full page reload bypasses React Router and loaders will not run.
+- **Static sites and Quarto documents** — there is no server to re-initialize.
+- **`createMemoryRouter()` / `MemoryRouter()`** — a full page reload would reset the in-memory routing state back to `/`.
+- **Data router `loader` / `action`** — these only run during client-side navigations; a full reload bypasses them.
+- **Shiny apps with `uiOutput`, `renderUI`, `plotOutput`, or htmlwidgets.** Shiny output bindings re-attach automatically when React Router mounts the new route's element, and reactives that depend on the URL — `useLocation()`, `useParams()`, `useSearchParams()`, or Shiny's own reactive `session$clientData$url_hash` — update without any reload. The bundled `shiny.fluent` example (`reactRouterExample("shiny.fluent")`) navigates between routes containing live `echarts4rOutput()` and `uiOutput()` and uses the default `reloadDocument = FALSE` throughout.
 
-### `reloadDocument = TRUE`
+A full reload would actually be *worse* for Shiny: it tears down the session, drops shared reactives (e.g. a `hero_selected` reactive used across routes), and re-runs every initialization step on every click.
 
-Clicking a link triggers a **full page reload**, as if the user clicked a regular `<a href>`. This is necessary in **Shiny apps with server-rendered content** because:
+### `reloadDocument = TRUE` (rare)
 
-- Shiny's server needs to re-initialize to read the new URL hash and render the correct `uiOutput()`/`renderUI()` content.
-- Without a reload, server-rendered UI will not update properly since the Shiny session was started with the old route.
+Setting `reloadDocument = TRUE` skips React Router's client-side navigation and lets the browser handle the `<a>` click natively. What this actually does depends on the router:
 
-Set `reloadDocument = TRUE` whenever your routes contain server-rendered output (`uiOutput`, `plotOutput`, etc.):
+| Router | Rendered href | Effect of `reloadDocument = TRUE` |
+|---|---|---|
+| `createHashRouter()` / `HashRouter()` | `#/path` | Effectively a no-op — browsers don't reload on hash-only changes. The URL hash updates and React Router still picks it up via `hashchange`. |
+| `createMemoryRouter()` / `MemoryRouter()` | (none — no real `<a href>`) | No effect; memory routers don't use real URLs. |
+| `createBrowserRouter()` | `/path` | Triggers a full HTTP request to `/path`. Requires the server to serve the app on every route, which Shiny does not do by default — the request will 404. |
 
-```r
-NavLink(to = "/about", reloadDocument = TRUE, "About")
-Link(to = "/",         reloadDocument = TRUE, "Home")
-```
+In practice this means `reloadDocument = TRUE` is rarely the right choice in this package. Leave it at the default.
 
 ### Quick reference
 
-| Context | `reloadDocument` | Why |
-|---|---|---|
-| Static site / Quarto / R Markdown | `FALSE` (default) | No server; client-side navigation is smooth |
-| `createMemoryRouter()` / `MemoryRouter()` | `FALSE` (default) | Reload resets in-memory state to `/` |
-| Data router with `loader`/`action` | `FALSE` (default) | Loaders only run on client-side navigations |
-| Shiny app with `uiOutput`/`renderUI` | `TRUE` | Server must re-initialize to render new content |
+| Context | `reloadDocument` |
+|---|---|
+| Static site / Quarto / R Markdown | `FALSE` (default) |
+| `createMemoryRouter()` / `MemoryRouter()` | `FALSE` (default) |
+| Data router with `loader` / `action` | `FALSE` (default) |
+| Shiny app with `uiOutput` / `renderUI` / `plotOutput` | `FALSE` (default) |

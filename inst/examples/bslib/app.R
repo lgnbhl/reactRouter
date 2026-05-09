@@ -9,7 +9,6 @@ Layout <- bslib::page_navbar(
     reactRouter::NavLink(
       "Home",
       to = "/",
-      #reloadDocument = TRUE, # MANDATORY WITH R SHINY
       style = JS(
         '({isActive}) => { return isActive ? {color: "red", textDecoration: "none"} : {}; }'
       )
@@ -19,7 +18,6 @@ Layout <- bslib::page_navbar(
     reactRouter::NavLink(
       "Analysis",
       to = "/analysis",
-      #reloadDocument = TRUE, # MANDATORY WITH R SHINY
       style = JS(
         '({isActive}) => { return isActive ? {color: "red", textDecoration: "none"} : {}; }'
       )

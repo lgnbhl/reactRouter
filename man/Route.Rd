@@ -16,7 +16,14 @@ Route(
 \arguments{
 \item{...}{Additional Route props (see Details).}
 
-\item{element}{element wrapped in a `shiny::div()`.}
+\item{element}{The element to render when the route matches. Wrapped on
+the JS side in a no-DOM \code{Keyed} component so React remounts the
+subtree on every route change -- this is required for Shiny output
+bindings (e.g. \code{textOutput()}) to reinitialise correctly when two
+routes render the same component shape with different namespaces.
+Unlike the previous \code{<div>} wrapper, \code{Keyed} adds no DOM node,
+so layouts like MUI \code{Grid} that require typed direct children keep
+working.}
 
 \item{loader}{Optional. A \code{\link{JS}} expression evaluating to a
 loader function, e.g. \code{JS("({ params }) => fetch(...)")}. For a
@@ -31,7 +38,9 @@ action function called by \code{\link{Form}} submissions and
 \item{errorElement}{Optional. Element rendered when the route's
 \code{loader}, \code{action}, or rendering throws.}
 
-\item{key}{By default uses a random key in the `div()` of the `element` arg.}
+\item{key}{Stable React key used by the \code{Keyed} wrapper. Defaults to
+a random alphanumeric string; pass an explicit value if you want to
+keep state across navigations to the same route.}
 }
 \value{
 A Route component.

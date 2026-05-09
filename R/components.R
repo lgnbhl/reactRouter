@@ -100,8 +100,17 @@ MemoryRouter <- function(...) {
 #'
 #' @rdname Route
 #' @param ... Additional Route props (see Details).
-#' @param element element wrapped in a `shiny::div()`.
-#' @param key By default uses a random key in the `div()` of the `element` arg.
+#' @param element The element to render when the route matches. Wrapped on
+#'   the JS side in a no-DOM \code{Keyed} component so React remounts the
+#'   subtree on every route change -- this is required for Shiny output
+#'   bindings (e.g. \code{textOutput()}) to reinitialise correctly when two
+#'   routes render the same component shape with different namespaces.
+#'   Unlike the previous \code{<div>} wrapper, \code{Keyed} adds no DOM node,
+#'   so layouts like MUI \code{Grid} that require typed direct children keep
+#'   working.
+#' @param key Stable React key used by the \code{Keyed} wrapper. Defaults to
+#'   a random alphanumeric string; pass an explicit value if you want to
+#'   keep state across navigations to the same route.
 #' @param loader Optional. A \code{\link{JS}} expression evaluating to a
 #'   loader function, e.g. \code{JS("({ params }) => fetch(...)")}. For a
 #'   plain unconditional redirect, use \code{\link{redirect}}. To embed
@@ -130,9 +139,11 @@ Route <- function(
       loader = loader,
       action = action,
       errorElement = errorElement,
-      element = shiny::div(
-        key = key,
-        element
+      element = shiny.react::reactElement(
+        module = "@/reactRouter",
+        name = "Keyed",
+        props = shiny.react::asProps(key = key, element),
+        deps = reactRouterDependency()
       )
     ),
     deps = reactRouterDependency()
@@ -143,16 +154,19 @@ Route <- function(
 #'
 #' \url{https://api.reactrouter.com/v7/variables/react-router.Link.html}
 #'
-#' The `reloadDocument` prop controls whether clicking the link triggers a full
-#' page reload (`TRUE`) or client-side navigation (`FALSE`). The default is
-#' `FALSE`, matching React Router's own default. Set `reloadDocument = TRUE` in
-#' Shiny apps that use server-rendered UI (`uiOutput`/`renderUI`) so that
-#' Shiny can re-initialize and read the new URL hash.
+#' The `reloadDocument` prop controls whether clicking the link uses React
+#' Router's client-side navigation (`FALSE`, the default) or skips it and lets
+#' the browser handle the click natively (`TRUE`). The default is correct for
+#' almost every use, including Shiny apps with server-rendered output
+#' (`uiOutput`, `renderUI`, `plotOutput`, htmlwidgets) — Shiny output bindings
+#' re-attach automatically when React Router mounts the new route's element.
+#' See `vignette("routers", package = "reactRouter")` for details.
 #'
 #' @rdname Link
 #' @param ... Props to pass to element.
-#' @param reloadDocument Boolean. Default `FALSE`. Set to `TRUE` for Shiny apps
-#'   with server-rendered content.
+#' @param reloadDocument Boolean. Default `FALSE`. When `TRUE`, the click is
+#'   handled natively by the browser instead of by React Router's client-side
+#'   navigation. Rarely needed — leave at the default in most cases.
 #' @return A Link component.
 #' @export
 Link <- function(..., reloadDocument = FALSE) {
@@ -179,16 +193,19 @@ Navigate <- component('Navigate')
 #'
 #' \url{https://api.reactrouter.com/v7/variables/react-router.NavLink.html}
 #'
-#' The `reloadDocument` prop controls whether clicking the link triggers a full
-#' page reload (`TRUE`) or client-side navigation (`FALSE`). The default is
-#' `FALSE`, matching React Router's own default. Set `reloadDocument = TRUE` in
-#' Shiny apps that use server-rendered UI (`uiOutput`/`renderUI`) so that
-#' Shiny can re-initialize and read the new URL hash.
+#' The `reloadDocument` prop controls whether clicking the link uses React
+#' Router's client-side navigation (`FALSE`, the default) or skips it and lets
+#' the browser handle the click natively (`TRUE`). The default is correct for
+#' almost every use, including Shiny apps with server-rendered output
+#' (`uiOutput`, `renderUI`, `plotOutput`, htmlwidgets) — Shiny output bindings
+#' re-attach automatically when React Router mounts the new route's element.
+#' See `vignette("routers", package = "reactRouter")` for details.
 #'
 #' @rdname NavLink
 #' @param ... Props to pass to element.
-#' @param reloadDocument Boolean. Default `FALSE`. Set to `TRUE` for Shiny apps
-#'   with server-rendered content.
+#' @param reloadDocument Boolean. Default `FALSE`. When `TRUE`, the click is
+#'   handled natively by the browser instead of by React Router's client-side
+#'   navigation. Rarely needed — leave at the default in most cases.
 #' @return A NavLink component.
 #' @export
 NavLink <- function(..., reloadDocument = FALSE) {

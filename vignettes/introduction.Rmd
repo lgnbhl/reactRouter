@@ -15,8 +15,8 @@ knitr::opts_chunk$set(
 ```
 
 For an overview of which router to choose (`createHashRouter()` vs.
-`createMemoryRouter()` vs. `createBrowserRouter()`) and when to set
-`reloadDocument = TRUE`, see `vignette("routers", package = "reactRouter")`.
+`createMemoryRouter()` vs. `createBrowserRouter()`) and the role of the
+`reloadDocument` prop, see `vignette("routers", package = "reactRouter")`.
 
 ### Install
 
@@ -363,10 +363,10 @@ RouterProvider(
 )
 ```
 
-If your dynamic page renders **server-rendered** Shiny output (`uiOutput()`,
-`renderUI()`, `plotOutput()`), set `reloadDocument = TRUE` on the relevant
-links so the Shiny session re-initialises with the new URL hash. See
-`vignette("routers", package = "reactRouter")` for the full reference.
+Server-rendered Shiny output (`uiOutput()`, `renderUI()`, `plotOutput()`,
+htmlwidgets) works correctly with the default `reloadDocument = FALSE` — Shiny
+output bindings re-attach when React Router mounts the new route's element.
+See `vignette("routers", package = "reactRouter")` for the full reference.
 
 ### Alternatives
 

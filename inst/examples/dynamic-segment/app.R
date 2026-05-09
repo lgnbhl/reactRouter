@@ -1,7 +1,7 @@
 # Minimal dynamic-segment example.
 # Demonstrates: createHashRouter() with a `:id` route param, useParams(),
-#               NavLink, Outlet. No server-rendered Shiny output, so default
-#               `reloadDocument = FALSE` works without any reload.
+#               NavLink, Outlet. Uses the default `reloadDocument = FALSE`
+#               (the recommended setting — see vignette("routers")).
 # For a richer dynamic-segment app with loaders, errorElements, charts, and
 # data grids, see reactRouterExample("star-wars-explorer").
 

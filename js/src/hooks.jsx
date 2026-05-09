@@ -1,6 +1,17 @@
 import React from 'react';
 import * as ReactRouter from 'react-router-dom';
 
+// No-DOM wrapper used by R-side Route() to attach a React `key` to the
+// route's `element` without introducing a wrapping <div>. The key forces
+// React to unmount/remount the subtree on every route change so Shiny
+// output bindings (textOutput, plotOutput, ...) reinitialise against the
+// new namespace — the original reason a keyed <div> was used. Renders
+// children as-is so layouts like MUI Grid that require typed direct
+// children keep working.
+export function Keyed({ children }) {
+  return children == null ? null : children;
+}
+
 // Resolve a dotted path like "summary.title" into nested object access.
 function getPath(obj, path) {
   if (!path || obj == null) return obj;
