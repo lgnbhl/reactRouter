@@ -58,8 +58,8 @@ const ALLOWED_HOOKS = new Set([
   'useNavigation', 'useNavigationType', 'useNavigate', 'useSubmit',
   'useRouteLoaderData', 'useRouteError', 'useMatch', 'useMatches',
   'useHref', 'useResolvedPath', 'useFetchers', 'useRevalidator',
-  'useBlocker', 'useInRouterContext', 'useOutlet', 'useAsyncValue',
-  'useAsyncError',
+  'useBlocker', 'useInRouterContext', 'useOutlet', 'useOutletContext',
+  'useAsyncValue', 'useAsyncError',
 ]);
 
 // Generic dispatcher for any React Router hook that fits the common shape:
