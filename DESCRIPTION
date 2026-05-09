@@ -21,6 +21,7 @@ Imports:
     shiny.react,
     checkmate
 Suggests:
+    jsonlite,
     testthat (>= 3.0.0),
     chromote (>= 0.1.1.9001),
     shinytest2,

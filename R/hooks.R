@@ -87,7 +87,13 @@ Await <- function(
   fallback = NULL,
   ...
 ) {
-  validateTarget("Await", into, render)
+  # Children-only mode: when neither `into` nor `render` is given, the
+  # children passed via `...` are rendered directly inside <Await> so they
+  # can call `useAsyncValue()` / `useAsyncError()` against the same promise.
+  hasChildren <- length(list(...)) > 0
+  if (!(is.null(into) && is.null(render) && hasChildren)) {
+    validateTarget("Await", into, render)
+  }
   tag <- shiny.react::reactElement(
     module = "@/reactRouter",
     name = "Await",
@@ -816,6 +822,178 @@ redirect <- function(to) {
     '() => window.reactRouterHelpers.redirect("%s")',
     escaped
   ))
+}
+
+#' replace (loader/action helper)
+#'
+#' \url{https://api.reactrouter.com/v7/functions/react-router.replace.html}
+#'
+#' Returns a \code{\link{JS}} loader function that performs a \emph{replace}
+#' navigation to \code{to} — same as \code{\link{redirect}}, but the new
+#' entry replaces the current one in the history stack instead of pushing
+#' a new one. Use for "alias" routes where the original URL should not
+#' remain in the user's back-history.
+#'
+#' For conditional replacements inside a custom loader/action, call
+#' \code{window.reactRouterHelpers.replace(to)} from your own \code{JS()}
+#' string.
+#'
+#' @param to Character. Destination path.
+#' @return A \code{\link{JS}} expression suitable for the \code{loader}
+#'   argument of \code{\link{Route}}.
+#'
+#' @examples
+#' \dontrun{
+#' Route(path = "/legacy", loader = replace("/new"), element = NULL)
+#' }
+#'
+#' @rdname replace
+#' @export
+replace <- function(to) {
+  if (!is.character(to) || length(to) != 1 || is.na(to)) {
+    stop(
+      "replace(): `to` must be a single, non-NA character string.",
+      call. = FALSE
+    )
+  }
+  escaped <- gsub("\\\\", "\\\\\\\\", to)
+  escaped <- gsub('"', '\\\\"', escaped)
+  shiny.react::JS(sprintf(
+    '() => window.reactRouterHelpers.replace("%s")',
+    escaped
+  ))
+}
+
+#' data (loader/action helper)
+#'
+#' \url{https://api.reactrouter.com/v7/functions/react-router.data.html}
+#'
+#' Returns a \code{\link{JS}} loader function that resolves to a React Router
+#' \code{data()} response — a thin wrapper that lets you attach an HTTP
+#' \code{status}, \code{statusText}, and/or \code{headers} alongside the
+#' loader/action payload while still exposing \code{value} via
+#' \code{\link{useLoaderData}} / \code{\link{useActionData}}.
+#'
+#' Use the R helper for static loaders that always return the same value plus
+#' status. For values computed inside a custom loader/action, call
+#' \code{window.reactRouterHelpers.data(value, init)} directly in your
+#' \code{JS()} string, e.g.
+#' \preformatted{
+#'   loader = JS("async () => {
+#'     const rows = await fetchRows();
+#'     return window.reactRouterHelpers.data(
+#'       \{ rows \}, \{ status: 200 \}
+#'     );
+#'   }")
+#' }
+#'
+#' @param value The payload to expose via \code{useLoaderData()} /
+#'   \code{useActionData()}. Either an R object (list, vector, data.frame —
+#'   serialized to JSON), or a \code{\link{JS}} expression for a JavaScript
+#'   value.
+#' @param init Optional. Either a list with \code{status} (integer),
+#'   \code{statusText} (character) and/or \code{headers} (named list), or a
+#'   \code{\link{JS}} expression evaluating to such an object.
+#' @return A \code{\link{JS}} expression suitable for the \code{loader} or
+#'   \code{action} argument of \code{\link{Route}}.
+#'
+#' @examples
+#' \dontrun{
+#' Route(
+#'   path = "/profile",
+#'   loader = data(
+#'     list(name = "Ada", role = "Engineer"),
+#'     init = list(status = 200)
+#'   ),
+#'   element = useLoaderData(tags$pre())
+#' )
+#' }
+#'
+#' @rdname data
+#' @export
+data <- function(value, init = NULL) {
+  serialize <- function(x) {
+    if (inherits(x, "JS_EVAL")) {
+      return(as.character(x))
+    }
+    if (!requireNamespace("jsonlite", quietly = TRUE)) {
+      stop(
+        "data(): the 'jsonlite' package is required to serialize R objects. ",
+        "Install it, or pass `value`/`init` as JS() expressions.",
+        call. = FALSE
+      )
+    }
+    jsonlite::toJSON(x, auto_unbox = TRUE, null = "null", na = "null")
+  }
+  valueJS <- serialize(value)
+  initStr <- if (!is.null(init)) paste0(", ", serialize(init)) else ""
+  shiny.react::JS(sprintf(
+    "() => window.reactRouterHelpers.data(%s%s)",
+    valueJS,
+    initStr
+  ))
+}
+
+#' useAsyncValue
+#'
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useAsyncValue.html}
+#'
+#' Calls the \code{useAsyncValue()} hook and injects the resolved value (or a
+#' \code{selector} from it) \code{as} a prop of the \code{into} component.
+#' Must be rendered inside an \code{\link{Await}} that has been called in
+#' \emph{children mode} (no \code{into} / \code{render} on \code{Await}) — the
+#' hook reads the value resolved by the closest \code{<Await>} ancestor.
+#'
+#' @inheritParams hook-wrapper
+#'
+#' @rdname useAsyncValue
+#' @export
+useAsyncValue <- function(
+  into = NULL,
+  as = "children",
+  selector = NULL,
+  render = NULL,
+  ...
+) {
+  useHookElement(
+    hook = "useAsyncValue",
+    into = into,
+    as = as,
+    selector = selector,
+    render = render,
+    ...
+  )
+}
+
+#' useAsyncError
+#'
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useAsyncError.html}
+#'
+#' Calls the \code{useAsyncError()} hook and injects the rejection reason
+#' (or a \code{selector} from it) \code{as} a prop of the \code{into}
+#' component. Must be rendered inside the \code{errorElement} of an
+#' \code{\link{Await}} so the hook can pick up the rejected promise's error.
+#'
+#' @inheritParams hook-wrapper
+#'
+#' @rdname useAsyncError
+#' @export
+useAsyncError <- function(
+  into = NULL,
+  as = "children",
+  selector = NULL,
+  render = NULL,
+  ...
+) {
+  useHookElement(
+    hook = "useAsyncError",
+    nullIfFalsy = TRUE,
+    into = into,
+    as = as,
+    selector = selector,
+    render = render,
+    ...
+  )
 }
 
 #' useRoutes

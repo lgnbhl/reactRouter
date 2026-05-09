@@ -109,6 +109,16 @@ export function UseRoutes({ routes, children }) {
   return ReactRouter.useRoutes(resolved);
 }
 
+// Not routed through UseHook: takes (action, opts) — two positional args, and
+// `action` is optional (falls back to the closest route's pathname when omitted).
+export function useFormAction({ action, relative, as, into, render, ...rest }) {
+  const opts = relative ? { relative } : undefined;
+  const result = opts
+    ? ReactRouter.useFormAction(action, opts)
+    : ReactRouter.useFormAction(action);
+  return injectValue({ result, render, into, as, rest });
+}
+
 // Not routed through UseHook: takes (to, opts) — two positional args.
 export function useViewTransitionState({ to, relative, as, into, render, ...rest }) {
   const opts = relative ? { relative } : undefined;
@@ -144,7 +154,7 @@ export function useLinkClickHandler({
 // `resolveKey` inside that data, (3) builds a <ReactRouter.Await> with a
 // function-as-child, and (4) wraps the result in <Suspense> with a fallback.
 // None of that fits the generic dispatcher's shape.
-export function Await({ resolveKey, errorElement, fallback, as = 'children', into, selector, render, ...rest }) {
+export function Await({ resolveKey, errorElement, fallback, as = 'children', into, selector, render, children, ...rest }) {
   const data = ReactRouter.useLoaderData();
   if (!data || !(resolveKey in data)) {
     throw new Error(
@@ -153,10 +163,18 @@ export function Await({ resolveKey, errorElement, fallback, as = 'children', int
       `holding a promise, e.g. () => ({ ${resolveKey}: fetch(...) }).`
     );
   }
+  // When `into`/`render` are provided, use the function-as-child pattern to
+  // pump the resolved value into the requested target. Otherwise, render any
+  // `children` directly inside <Await> — that mode lets descendant components
+  // call `useAsyncValue()` / `useAsyncError()` against the same promise.
+  const useFnAsChild = into || render;
+  const awaitChildren = useFnAsChild
+    ? (value) => injectValue({ result: value, selector, render, into, as, rest })
+    : children;
   const awaitEl = React.createElement(
     ReactRouter.Await,
     { resolve: data[resolveKey], errorElement },
-    (value) => injectValue({ result: value, selector, render, into, as, rest })
+    awaitChildren
   );
   return React.createElement(
     React.Suspense,
