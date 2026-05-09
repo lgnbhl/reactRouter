@@ -38,4 +38,18 @@ Values are always returned as character vectors so that repeated keys
 (e.g. \code{"?tag=a&tag=b"}) are preserved. When injected as
 \code{"children"}, vectors are joined with \code{", "}; for custom
 formatting, use \code{render}.
+
+\strong{Reading vs. writing.} The upstream JS hook returns a tuple
+\code{[searchParams, setSearchParams]}. This wrapper splits the two paths:
+\itemize{
+  \item \code{into} / \code{as} — \emph{read-only}. Receives the parsed
+    params (or one \code{param}) and ignores the setter.
+  \item \code{render} — receives both as \code{(params, setSearchParams)},
+    so use this form when you need to update the URL programmatically:
+    \preformatted{
+  useSearchParams(render = JS(
+    "(p, set) => <button onClick={() => set({tag:'b'})}>Filter</button>"
+  ))
+    }
+}
 }

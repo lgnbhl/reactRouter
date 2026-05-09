@@ -25,6 +25,11 @@
   mask `base::data()`.
 - BREAKING CHANGE: `replace()` was renamed to `replaceResponse()` so it does
   not mask `base::replace()`.
+- Naming rule for loader/action helpers: upstream React Router names are
+  preserved as-is, except where they would mask a base R function — in which
+  case the helper takes a `*Response` suffix (`dataResponse`,
+  `replaceResponse`). `redirect` and `redirectDocument` keep their original
+  names because they do not collide.
 - Internal: `randomKey()` no longer perturbs the user's RNG state.
 - Internal: removed an unused `useFormAction` JS export and de-duplicated the
   R hook-element helpers.

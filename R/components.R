@@ -101,7 +101,7 @@ MemoryRouter <- function(...) {
 #' @rdname Route
 #' @param ... Additional Route props (see Details).
 #' @param element element wrapped in a `shiny::div()`.
-#' @param key By default uses a UUID key in the `div()` of the `element` arg.
+#' @param key By default uses a random key in the `div()` of the `element` arg.
 #' @param loader Optional. A \code{\link{JS}} expression evaluating to a
 #'   loader function, e.g. \code{JS("({ params }) => fetch(...)")}. For a
 #'   plain unconditional redirect, use \code{\link{redirect}}. To embed
@@ -114,8 +114,14 @@ MemoryRouter <- function(...) {
 #'   \code{loader}, \code{action}, or rendering throws.
 #' @return A Route component.
 #' @export
-Route <- function(..., element, loader = NULL, action = NULL,
-                  errorElement = NULL, key = randomKey()) {
+Route <- function(
+  ...,
+  element,
+  loader = NULL,
+  action = NULL,
+  errorElement = NULL,
+  key = randomKey()
+) {
   shiny.react::reactElement(
     module = "react-router-dom",
     name = "Route",

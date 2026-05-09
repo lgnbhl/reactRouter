@@ -286,6 +286,41 @@ dataResponse <- function(value = NULL, init = NULL) {
   ))
 }
 
+#' isRouteErrorResponse
+#'
+#' \url{https://api.reactrouter.com/v7/functions/react-router.isRouteErrorResponse.html}
+#'
+#' Returns a \code{\link{JS}} reference to the \code{isRouteErrorResponse}
+#' type guard. Use it inside an \code{errorElement} render callback to branch
+#' on whether the error came from a thrown \code{Response}
+#' (e.g. \code{throw new Response(..., \{ status: 404 \})}) or from arbitrary
+#' code. Pair with \code{\link{useRouteError}}.
+#'
+#' Calling \code{isRouteErrorResponse()} from R returns a \code{\link{JS}}
+#' expression that evaluates, in the browser, to the upstream
+#' \code{isRouteErrorResponse} function. Interpolate it inside the
+#' \code{render} string of \code{useRouteError()} as shown below.
+#'
+#' For convenience, the same function is also reachable inside any user-authored
+#' \code{\link{JS}} string as \code{window.reactRouterHelpers.isRouteErrorResponse}.
+#'
+#' @return A \code{\link{JS}} expression evaluating to the
+#'   \code{isRouteErrorResponse} function reference.
+#'
+#' @examples
+#' \dontrun{
+#' useRouteError(render = JS(paste0(
+#'   "e => ", isRouteErrorResponse(),
+#'   "(e) ? <p>HTTP {e.status}</p> : <p>Unknown error</p>"
+#' )))
+#' }
+#'
+#' @rdname isRouteErrorResponse
+#' @export
+isRouteErrorResponse <- function() {
+  shiny.react::JS("window.reactRouterHelpers.isRouteErrorResponse")
+}
+
 #' generatePath
 #'
 #' \url{https://api.reactrouter.com/v7/functions/react-router.generatePath.html}
