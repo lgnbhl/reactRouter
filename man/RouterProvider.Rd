@@ -24,4 +24,10 @@ Renders a data router. Mirrors the React Router v7 composition pattern:
 pass a router built with \code{\link{createHashRouter}},
 \code{\link{createBrowserRouter}}, or \code{\link{createMemoryRouter}} to
 the \code{router} argument.
+
+The underlying router is created once on mount and is not rebuilt when
+\code{Route()} children change at runtime — React Router data routers own
+their own navigation state and must be stable. To swap the route tree
+dynamically (e.g. based on Shiny inputs), remount \code{RouterProvider}
+itself, for instance by toggling its parent via \code{shiny::renderUI}.
 }

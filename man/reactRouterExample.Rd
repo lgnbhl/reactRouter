@@ -7,13 +7,16 @@
 reactRouterExample(example = NULL, ...)
 }
 \arguments{
-\item{example}{The name of the example to run, or `NULL` to retrieve the list of examples.}
+\item{example}{The name of the example to run, or `NULL` to print and
+invisibly return the list of available examples.}
 
 \item{...}{Additional arguments to pass to `shiny::runApp()`.}
 }
 \value{
-This function normally does not return;
-interrupt R to stop the application (usually by pressing Ctrl+C or Esc).
+When `example` is `NULL`, invisibly returns a character vector of
+  example names (also printed via `message()`). Otherwise this function
+  normally does not return; interrupt R to stop the application
+  (usually by pressing Ctrl+C or Esc).
 }
 \description{
 Launch a Shiny example app or list the available examples.

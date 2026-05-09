@@ -85,12 +85,13 @@ MemoryRouter <- function(...) {
 #' @param element element wrapped in a `shiny::div()`.
 #' @param key By default uses a UUID key in the `div()` of the `element` arg.
 #' @return A Route component.
-#' @param loader Optional. Can be:
-#'   - A data.frame or list: serialized as a static JS loader
-#'   - An R function: called at build time (no params available)
-#'   - A JS() expression: passed through as-is
+#' @param loader Optional. A \code{\link{JS}} expression evaluating to a
+#'   loader function, e.g. \code{JS("({ params }) => fetch(...)")}. For a
+#'   plain unconditional redirect, use \code{\link{redirect}}. To embed
+#'   static R data, serialize it first with \code{jsonlite::toJSON()} and
+#'   wrap the result in \code{JS()}.
 #' @export
-Route <- function(..., element, loader = NULL, key = uuid::UUIDgenerate()) {
+Route <- function(..., element, loader = NULL, key = randomKey()) {
   shiny.react::reactElement(
     module = "react-router-dom",
     name = "Route",
@@ -123,15 +124,6 @@ Route <- function(..., element, loader = NULL, key = uuid::UUIDgenerate()) {
 #' @return A Link component.
 #' @export
 Link <- function(..., reloadDocument = FALSE) {
-  # Check if the user did NOT provide the argument
-  if (missing(reloadDocument)) {
-    lifecycle::deprecate_warn(
-      when = "0.2.0",
-      what = "Link(reloadDocument = 'default is now FALSE')",
-      details = "The default of `reloadDocument` was TRUE in version 0.1.1. It is now FALSE."
-    )
-  }
-
   shiny.react::reactElement(
     module = "react-router-dom",
     name = "Link",
@@ -168,15 +160,6 @@ Navigate <- component('Navigate')
 #' @return A NavLink component.
 #' @export
 NavLink <- function(..., reloadDocument = FALSE) {
-  # Check if the user did NOT provide the argument
-  if (missing(reloadDocument)) {
-    lifecycle::deprecate_warn(
-      when = "0.2.0",
-      what = "NavLink(reloadDocument = 'default is now FALSE')",
-      details = "The default of `reloadDocument` was TRUE in version 0.1.1. It is now FALSE."
-    )
-  }
-
   shiny.react::reactElement(
     module = "react-router-dom",
     name = "NavLink",

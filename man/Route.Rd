@@ -4,17 +4,18 @@
 \alias{Route}
 \title{Route}
 \usage{
-Route(..., element, loader = NULL, key = uuid::UUIDgenerate())
+Route(..., element, loader = NULL, key = randomKey())
 }
 \arguments{
 \item{...}{Props to pass to element.}
 
 \item{element}{element wrapped in a `shiny::div()`.}
 
-\item{loader}{Optional. Can be:
-- A data.frame or list: serialized as a static JS loader
-- An R function: called at build time (no params available)
-- A JS() expression: passed through as-is}
+\item{loader}{Optional. A \code{\link{JS}} expression evaluating to a
+loader function, e.g. \code{JS("({ params }) => fetch(...)")}. For a
+plain unconditional redirect, use \code{\link{redirect}}. To embed
+static R data, serialize it first with \code{jsonlite::toJSON()} and
+wrap the result in \code{JS()}.}
 
 \item{key}{By default uses a UUID key in the `div()` of the `element` arg.}
 }

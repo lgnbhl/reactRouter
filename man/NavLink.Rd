@@ -19,7 +19,7 @@ updateNavLink.shinyInput(
 \arguments{
 \item{...}{Props to pass to element.}
 
-\item{reloadDocument}{Boolean. Default TRUE. Let browser handle the transition normally}
+\item{reloadDocument}{Boolean. Default FALSE Let browser handle the transition normally}
 
 \item{inputId}{ID of the component.}
 
