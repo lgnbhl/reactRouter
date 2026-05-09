@@ -109,16 +109,6 @@ export function UseRoutes({ routes, children }) {
   return ReactRouter.useRoutes(resolved);
 }
 
-// Not routed through UseHook: takes (action, opts) — two positional args, and
-// `action` is optional (falls back to the closest route's pathname when omitted).
-export function useFormAction({ action, relative, as, into, render, ...rest }) {
-  const opts = relative ? { relative } : undefined;
-  const result = opts
-    ? ReactRouter.useFormAction(action, opts)
-    : ReactRouter.useFormAction(action);
-  return injectValue({ result, render, into, as, rest });
-}
-
 // Not routed through UseHook: takes (to, opts) — two positional args.
 export function useViewTransitionState({ to, relative, as, into, render, ...rest }) {
   const opts = relative ? { relative } : undefined;

@@ -46,15 +46,19 @@ validateTarget <- function(label, into, render) {
   }
 }
 
-component <- function(name, module = 'react-router-dom') {
-  function(...) {
-    shiny.react::reactElement(
-      module = module,
-      name = name,
-      props = shiny.react::asProps(...),
-      deps = reactRouterDependency()
-    )
-  }
+# Internal: build a reactElement from the package's "@/reactRouter" JSX
+# module and tag it with the `reactRouter` S3 class so `print.reactRouter`
+# picks it up. Used by every hook wrapper that doesn't go through the
+# generic `UseHook` dispatcher.
+customHookElement <- function(name, ...) {
+  tag <- shiny.react::reactElement(
+    module = "@/reactRouter",
+    name = name,
+    props = shiny.react::asProps(...),
+    deps = reactRouterDependency()
+  )
+  class(tag) <- c("reactRouter", class(tag))
+  tag
 }
 
 #' Await
@@ -87,30 +91,32 @@ Await <- function(
   fallback = NULL,
   ...
 ) {
-  # Children-only mode: when neither `into` nor `render` is given, the
-  # children passed via `...` are rendered directly inside <Await> so they
-  # can call `useAsyncValue()` / `useAsyncError()` against the same promise.
+  # Await has two shapes:
+  #
+  #   1. Target mode  — `into` or `render` is given. The resolved value is
+  #      injected like any other hook (delegates to validateTarget).
+  #   2. Children mode — neither `into` nor `render`, but children are
+  #      passed via `...`. Those children are rendered directly inside
+  #      <Await> so descendants can call useAsyncValue() / useAsyncError()
+  #      against the same promise (matches React Router's native pattern).
+  #
+  # Only target mode runs the validator — children mode legitimately omits
+  # both `into` and `render`.
   hasChildren <- length(list(...)) > 0
   if (!(is.null(into) && is.null(render) && hasChildren)) {
     validateTarget("Await", into, render)
   }
-  tag <- shiny.react::reactElement(
-    module = "@/reactRouter",
-    name = "Await",
-    props = shiny.react::asProps(
-      as = as,
-      into = into,
-      resolveKey = resolveKey,
-      selector = selector,
-      render = render,
-      errorElement = errorElement,
-      fallback = fallback,
-      ...
-    ),
-    deps = reactRouterDependency()
+  customHookElement(
+    "Await",
+    as = as,
+    into = into,
+    resolveKey = resolveKey,
+    selector = selector,
+    render = render,
+    errorElement = errorElement,
+    fallback = fallback,
+    ...
   )
-  class(tag) <- c("reactRouter", class(tag))
-  tag
 }
 
 # Internal: build a React element that dispatches through the generic
@@ -124,21 +130,15 @@ useHookElement <- function(
   nullIfFalsy = FALSE
 ) {
   validateTarget(hook, into, render)
-  tag <- shiny.react::reactElement(
-    module = "@/reactRouter",
-    name = "UseHook",
-    props = shiny.react::asProps(
-      hook = hook,
-      mapArray = mapArray,
-      nullIfFalsy = nullIfFalsy,
-      into = into,
-      render = render,
-      ...
-    ),
-    deps = reactRouterDependency()
+  customHookElement(
+    "UseHook",
+    hook = hook,
+    mapArray = mapArray,
+    nullIfFalsy = nullIfFalsy,
+    into = into,
+    render = render,
+    ...
   )
-  class(tag) <- c("reactRouter", class(tag))
-  tag
 }
 
 #' useLoaderData
@@ -487,20 +487,14 @@ useSearchParams <- function(
   ...
 ) {
   validateTarget("useSearchParams", into, render)
-  tag <- shiny.react::reactElement(
-    module = "@/reactRouter",
-    name = "useSearchParams",
-    props = shiny.react::asProps(
-      as = as,
-      into = into,
-      param = param,
-      render = render,
-      ...
-    ),
-    deps = reactRouterDependency()
+  customHookElement(
+    "useSearchParams",
+    as = as,
+    into = into,
+    param = param,
+    render = render,
+    ...
   )
-  class(tag) <- c("reactRouter", class(tag))
-  tag
 }
 
 #' useHref
@@ -583,21 +577,15 @@ useFetcher <- function(
   ...
 ) {
   validateTarget("useFetcher", into, render)
-  tag <- shiny.react::reactElement(
-    module = "@/reactRouter",
-    name = "useFetcher",
-    props = shiny.react::asProps(
-      as = as,
-      into = into,
-      selector = selector,
-      render = render,
-      fetcherKey = fetcherKey,
-      ...
-    ),
-    deps = reactRouterDependency()
+  customHookElement(
+    "useFetcher",
+    as = as,
+    into = into,
+    selector = selector,
+    render = render,
+    fetcherKey = fetcherKey,
+    ...
   )
-  class(tag) <- c("reactRouter", class(tag))
-  tag
 }
 
 
@@ -858,14 +846,7 @@ useAsyncError <- function(
 #' @rdname useRoutes
 #' @export
 useRoutes <- function(..., routes = NULL) {
-  tag <- shiny.react::reactElement(
-    module = "@/reactRouter",
-    name = "UseRoutes",
-    props = shiny.react::asProps(..., routes = routes),
-    deps = reactRouterDependency()
-  )
-  class(tag) <- c("reactRouter", class(tag))
-  tag
+  customHookElement("UseRoutes", ..., routes = routes)
 }
 
 #' useInRouterContext
@@ -970,21 +951,15 @@ useViewTransitionState <- function(
   ...
 ) {
   validateTarget("useViewTransitionState", into, render)
-  tag <- shiny.react::reactElement(
-    module = "@/reactRouter",
-    name = "useViewTransitionState",
-    props = shiny.react::asProps(
-      as = as,
-      into = into,
-      render = render,
-      to = to,
-      relative = relative,
-      ...
-    ),
-    deps = reactRouterDependency()
+  customHookElement(
+    "useViewTransitionState",
+    as = as,
+    into = into,
+    render = render,
+    to = to,
+    relative = relative,
+    ...
   )
-  class(tag) <- c("reactRouter", class(tag))
-  tag
 }
 
 #' useLinkClickHandler
@@ -1032,25 +1007,19 @@ useLinkClickHandler <- function(
   ...
 ) {
   validateTarget("useLinkClickHandler", into, render)
-  tag <- shiny.react::reactElement(
-    module = "@/reactRouter",
-    name = "useLinkClickHandler",
-    props = shiny.react::asProps(
-      as = as,
-      into = into,
-      render = render,
-      to = to,
-      replace = replace,
-      state = state,
-      target = target,
-      preventScrollReset = preventScrollReset,
-      relative = relative,
-      ...
-    ),
-    deps = reactRouterDependency()
+  customHookElement(
+    "useLinkClickHandler",
+    as = as,
+    into = into,
+    render = render,
+    to = to,
+    replace = replace,
+    state = state,
+    target = target,
+    preventScrollReset = preventScrollReset,
+    relative = relative,
+    ...
   )
-  class(tag) <- c("reactRouter", class(tag))
-  tag
 }
 
 #' useOutletContext

@@ -4,7 +4,6 @@
 #' @param ... Props to pass to element.
 #' @param inputId ID of the component.
 #' @param reloadDocument Boolean. Default FALSE. Let browser handle the transition normally
-#' @param session Object passed as the `session` argument to Shiny server.
 #' @export
 Link.shinyInput <- function(inputId, ..., reloadDocument = FALSE) {
   checkmate::assert_string(inputId)
@@ -32,7 +31,6 @@ updateLink.shinyInput <- shiny.react::updateReactInput
 #' @param ... Props to pass to element.
 #' @param inputId ID of the component.
 #' @param reloadDocument Boolean. Default FALSE Let browser handle the transition normally
-#' @param session Object passed as the `session` argument to Shiny server.
 #' @export
 NavLink.shinyInput <- function(inputId, ..., reloadDocument = FALSE) {
   checkmate::assert_string(inputId)

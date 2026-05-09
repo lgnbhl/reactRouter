@@ -22,8 +22,6 @@ updateLink.shinyInput(
 \item{reloadDocument}{Boolean. Default FALSE. Let browser handle the transition normally}
 
 \item{inputId}{ID of the component.}
-
-\item{session}{Object passed as the `session` argument to Shiny server.}
 }
 \value{
 A Link component.

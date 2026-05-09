@@ -31,8 +31,9 @@ string, e.g.
   )
 }
 
-The \code{data} and \code{replace} helpers are exposed on the same global
-(\code{window.reactRouterHelpers.data}, \code{...replace}).
+The \code{data}, \code{replace}, and \code{redirectDocument} helpers are
+exposed on the same global (\code{window.reactRouterHelpers.data},
+\code{...replace}, \code{...redirectDocument}).
 }
 \examples{
 \dontrun{

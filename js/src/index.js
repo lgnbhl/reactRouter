@@ -16,5 +16,6 @@ window.jsmodule = {
 window.reactRouterHelpers = {
   redirect: ReactRouterLib.redirect,
   replace: ReactRouterLib.replace,
+  redirectDocument: ReactRouterLib.redirectDocument,
   data: ReactRouterLib.data,
 };
