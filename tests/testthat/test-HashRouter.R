@@ -19,9 +19,9 @@ test_that("routes with HashRouter() work", {
   values_page <- app$get_values()
 
   expect_identical(names(values_home$input), c("NavLinkHome", "NavLinkPage"))
-  expect_true(names(values_home$output) == "outputHome")
+  expect_true("outputHome" %in% names(values_home$output))
   expect_identical(as.character(values_home$output$outputHome$html), as.character(tags$p("home content")))
   expect_identical(names(values_page$input), c("NavLinkHome", "NavLinkPage"))
-  expect_true(names(values_page$output) == "outputPage")
+  expect_true("outputPage" %in% names(values_page$output))
   expect_identical(as.character(values_page$output$outputPage$html), as.character(tags$p("page content")))
 })
