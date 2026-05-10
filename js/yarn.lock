@@ -566,7 +566,7 @@ pkg-dir@^4.2.0:
   dependencies:
     find-up "^4.0.0"
 
-react-router-dom@^7.15.0:
+react-router-dom@7.15.0:
   version "7.15.0"
   resolved "https://registry.yarnpkg.com/react-router-dom/-/react-router-dom-7.15.0.tgz#a4b95c4402d896c2ad437014aff9076b94673063"
   integrity sha512-VcrVg64Fo8nwBvDscajG8gRTLIuTC6N50nb22l2HOOV4PTOHgoGp8mUjy9wLiHYoYTSYI36tUnXZgasSRFZorQ==
