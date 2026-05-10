@@ -14,9 +14,7 @@ deferred data via `Await`, and the full set of v7 navigation hooks.
 
 ## R CMD check results
 
-0 errors | 0 warnings | 1 note
-
-* New maintainer note may apply on first submission of this version.
+0 errors | 0 warnings | 0 note
 
 ## Bundled JavaScript
 
