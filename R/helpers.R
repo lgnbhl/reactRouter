@@ -105,31 +105,43 @@ jsLiteral <- function(x) {
 # absolute http(s) URLs and root-relative paths.
 assertSafeRedirectTarget <- function(fn, to) {
   if (!is.character(to) || length(to) != 1 || is.na(to)) {
-    stop(sprintf(
-      "%s(): `to` must be a single, non-NA character string.", fn
-    ), call. = FALSE)
+    stop(
+      sprintf(
+        "%s(): `to` must be a single, non-NA character string.",
+        fn
+      ),
+      call. = FALSE
+    )
   }
   if (grepl("^\\s*(javascript|data|vbscript):", to, ignore.case = TRUE)) {
-    stop(sprintf(
-      "%s(): refusing unsafe URL scheme in `to` = %s. ",
-      fn, deparse(to)
-    ), call. = FALSE)
+    stop(
+      sprintf(
+        "%s(): refusing unsafe URL scheme in `to` = %s. ",
+        fn,
+        deparse(to)
+      ),
+      call. = FALSE
+    )
   }
   # Protocol-relative URLs (//host/...) inherit the page's scheme and send
   # the user off-origin. Safe by default: reject. Callers wanting a
   # cross-origin absolute URL can spell out the full https:// form.
   if (grepl("^\\s*//", to)) {
-    stop(sprintf(
-      "%s(): refusing protocol-relative URL in `to` = %s. ",
-      fn, deparse(to)
-    ), "Use a full https:// URL if you really want a cross-origin redirect.",
-    call. = FALSE)
+    stop(
+      sprintf(
+        "%s(): refusing protocol-relative URL in `to` = %s. ",
+        fn,
+        deparse(to)
+      ),
+      "Use a full https:// URL if you really want a cross-origin redirect.",
+      call. = FALSE
+    )
   }
 }
 
 #' redirect (loader/action helper)
 #'
-#' \url{https://api.reactrouter.com/v7/functions/react-router.redirect.html}
+#' \url{https://reactrouter.com/api/utils/redirect}
 #'
 #' Returns a \code{\link{JS}} loader function that redirects to \code{to}.
 #' Pass as the \code{loader} argument of a \code{\link{Route}} to perform
@@ -172,13 +184,14 @@ redirect <- function(to) {
   assertSafeRedirectTarget("redirect", to)
   shiny.react::JS(sprintf(
     '() => %s.redirect(%s)',
-    HELPERS_JS, jsLiteral(to)
+    HELPERS_JS,
+    jsLiteral(to)
   ))
 }
 
 #' replaceResponse (loader/action helper)
 #'
-#' \url{https://api.reactrouter.com/v7/functions/react-router.replace.html}
+#' \url{https://reactrouter.com/api/utils/replace}
 #'
 #' Returns a \code{\link{JS}} loader function that performs a \emph{replace}
 #' navigation to \code{to} -- same as \code{\link{redirect}}, but the new
@@ -208,13 +221,14 @@ replaceResponse <- function(to) {
   assertSafeRedirectTarget("replaceResponse", to)
   shiny.react::JS(sprintf(
     '() => %s.replace(%s)',
-    HELPERS_JS, jsLiteral(to)
+    HELPERS_JS,
+    jsLiteral(to)
   ))
 }
 
 #' redirectDocument (loader/action helper)
 #'
-#' \url{https://api.reactrouter.com/v7/functions/react-router.redirectDocument.html}
+#' \url{https://reactrouter.com/api/utils/redirectDocument}
 #'
 #' Returns a \code{\link{JS}} loader function that performs a \emph{document}
 #' redirect to \code{to} -- a full page reload, as opposed to the client-side
@@ -245,7 +259,8 @@ redirectDocument <- function(to) {
   assertSafeRedirectTarget("redirectDocument", to)
   shiny.react::JS(sprintf(
     '() => %s.redirectDocument(%s)',
-    HELPERS_JS, jsLiteral(to)
+    HELPERS_JS,
+    jsLiteral(to)
   ))
 }
 
@@ -317,15 +332,22 @@ dataResponse <- function(value, init = NULL) {
     allowed <- c("status", "statusText", "headers")
     bad <- setdiff(names(init), allowed)
     if (length(bad)) {
-      stop(sprintf(
-        "dataResponse(): unknown `init` field(s): %s. Allowed: %s.",
-        paste(bad, collapse = ", "),
-        paste(allowed, collapse = ", ")
-      ), call. = FALSE)
+      stop(
+        sprintf(
+          "dataResponse(): unknown `init` field(s): %s. Allowed: %s.",
+          paste(bad, collapse = ", "),
+          paste(allowed, collapse = ", ")
+        ),
+        call. = FALSE
+      )
     }
     if (!is.null(init$status)) {
-      checkmate::assert_int(init$status, lower = 100, upper = 599,
-                            .var.name = "init$status")
+      checkmate::assert_int(
+        init$status,
+        lower = 100,
+        upper = 599,
+        .var.name = "init$status"
+      )
     }
     if (!is.null(init$statusText)) {
       checkmate::assert_string(init$statusText, .var.name = "init$statusText")
@@ -333,8 +355,11 @@ dataResponse <- function(value, init = NULL) {
     if (!is.null(init$headers)) {
       # Headers can be a named list/character vector; both serialize to a
       # plain JS object that the Headers constructor accepts.
-      if (!(is.list(init$headers) || is.character(init$headers)) ||
-          is.null(names(init$headers)) || any(!nzchar(names(init$headers)))) {
+      if (
+        !(is.list(init$headers) || is.character(init$headers)) ||
+          is.null(names(init$headers)) ||
+          any(!nzchar(names(init$headers)))
+      ) {
         stop(
           "dataResponse(): `init$headers` must be a fully named list or ",
           "character vector (e.g. list(`Content-Type` = \"application/json\")).",
@@ -388,4 +413,3 @@ dataResponse <- function(value, init = NULL) {
 isRouteErrorResponse <- function() {
   shiny.react::JS(paste0(HELPERS_JS, ".isRouteErrorResponse"))
 }
-

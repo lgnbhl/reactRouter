@@ -14,7 +14,7 @@ A \code{\link{JS}} expression suitable for the \code{loader}
   argument of \code{\link{Route}}.
 }
 \description{
-\url{https://api.reactrouter.com/v7/functions/react-router.redirectDocument.html}
+\url{https://reactrouter.com/api/utils/redirectDocument}
 }
 \details{
 Returns a \code{\link{JS}} loader function that performs a \emph{document}

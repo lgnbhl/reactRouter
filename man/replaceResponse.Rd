@@ -14,7 +14,7 @@ A \code{\link{JS}} expression suitable for the \code{loader}
   argument of \code{\link{Route}}.
 }
 \description{
-\url{https://api.reactrouter.com/v7/functions/react-router.replace.html}
+\url{https://reactrouter.com/api/utils/replace}
 }
 \details{
 Returns a \code{\link{JS}} loader function that performs a \emph{replace}
