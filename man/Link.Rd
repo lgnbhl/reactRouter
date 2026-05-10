@@ -34,6 +34,16 @@ A Link component.
 \url{https://api.reactrouter.com/v7/variables/react-router.Link.html}
 
 \url{https://api.reactrouter.com/v7/variables/react-router.Link.html}
+
+\strong{Repeat clicks.} The Shiny input value is the link's \code{to}
+string. Clicking the same link twice publishes the same value, and Shiny
+suppresses identical-value updates by default — your
+\code{observeEvent(input$myLink, ...)} will fire only on the first click.
+If you need to react to every click (e.g. logging, refreshing a panel),
+bind to a counter or use \code{shiny::observeEvent(..., ignoreNULL = FALSE,
+priority = "event")} alongside an explicit click counter, or wrap the
+click target in a regular \code{shiny::actionButton()} that triggers the
+navigation programmatically.
 }
 \details{
 The `reloadDocument` prop controls whether clicking the link uses React

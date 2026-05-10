@@ -310,6 +310,39 @@ dataResponse <- function(value, init = NULL) {
     }
     jsonlite::toJSON(x, auto_unbox = TRUE, null = "null", na = "null")
   }
+  # Surface common shape mistakes in `init` at call site, rather than as a
+  # confusing browser-side error from React Router's data() helper.
+  if (!is.null(init) && !inherits(init, "JS_EVAL")) {
+    checkmate::assert_list(init, names = "named", .var.name = "init")
+    allowed <- c("status", "statusText", "headers")
+    bad <- setdiff(names(init), allowed)
+    if (length(bad)) {
+      stop(sprintf(
+        "dataResponse(): unknown `init` field(s): %s. Allowed: %s.",
+        paste(bad, collapse = ", "),
+        paste(allowed, collapse = ", ")
+      ), call. = FALSE)
+    }
+    if (!is.null(init$status)) {
+      checkmate::assert_int(init$status, lower = 100, upper = 599,
+                            .var.name = "init$status")
+    }
+    if (!is.null(init$statusText)) {
+      checkmate::assert_string(init$statusText, .var.name = "init$statusText")
+    }
+    if (!is.null(init$headers)) {
+      # Headers can be a named list/character vector; both serialize to a
+      # plain JS object that the Headers constructor accepts.
+      if (!(is.list(init$headers) || is.character(init$headers)) ||
+          is.null(names(init$headers)) || any(!nzchar(names(init$headers)))) {
+        stop(
+          "dataResponse(): `init$headers` must be a fully named list or ",
+          "character vector (e.g. list(`Content-Type` = \"application/json\")).",
+          call. = FALSE
+        )
+      }
+    }
+  }
   valueJS <- serialize(value)
   initStr <- if (!is.null(init)) paste0(", ", serialize(init)) else ""
   shiny.react::JS(sprintf(

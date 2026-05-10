@@ -190,6 +190,15 @@ RouterProvider(
 
 Use `HashRouter()` or `MemoryRouter()` only if you have a specific reason to stay with the component API (e.g. migrating an existing app incrementally).
 
+### Legacy router caveat: re-rendering parent UI remounts route elements
+
+`Route()` attaches a fresh random React `key` to its `element` on every R-side call. The data router (`createHashRouter()` / `RouterProvider()`) builds the route tree once on mount and is unaffected. The component-API routers (`HashRouter()` / `MemoryRouter()` + `Routes()` + `Route()`) are different: if the host UI is re-rendered — typically via `shiny::renderUI()` / `shiny::uiOutput()` — `Route()` is re-evaluated, every route element gets a new key, and React unmounts and remounts the matched element on every parent render even when the URL has not changed. Any client-side state inside the route element (form input, scroll position, third-party widget state) is reset.
+
+Workarounds:
+
+- **Preferred:** switch to `RouterProvider(router = createHashRouter(...))`. The data router builds the route tree once and is immune.
+- If you must keep the legacy component API, render the router at the top level of your `ui` (not inside `renderUI`) so it is built once.
+
 ---
 
 ## Understanding `reloadDocument`

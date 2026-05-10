@@ -7,7 +7,7 @@
 useFetcher(
   into = NULL,
   as = "children",
-  selector = NULL,
+  selector = "state",
   render = NULL,
   fetcherKey = NULL,
   ...
@@ -44,4 +44,13 @@ Calls the \code{useFetcher()} hook and injects the result (or a
 Use to fetch data or submit forms without causing a navigation.
 The fetcher object has \code{state} (\code{"idle"}/\code{"loading"}/\code{"submitting"}) and
 \code{data} (the response from a loader or action).
+
+
+\code{selector} defaults to \code{"state"} so the default \code{into}/
+\code{children} display shows a readable string (\code{"idle"} /
+\code{"loading"} / \code{"submitting"}). The full fetcher object contains
+methods (\code{submit}, \code{load}, \code{Form}) that would be silently
+dropped by JSON serialization if the whole object were rendered as
+children. To call those methods, use the \code{render = JS(...)} form,
+which receives the full fetcher: \code{render = JS("f => <button onClick={() => f.load('/data')}>Reload</button>")}.
 }

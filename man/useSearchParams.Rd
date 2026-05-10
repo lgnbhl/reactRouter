@@ -15,9 +15,16 @@ data into (by default \code{"children"} for text display, \code{"rows"} for
 a data grid, \code{"value"} for an input).}
 
 \item{param}{Character. Name of a single query parameter to extract.
-Returns a character vector of all values for that key (length 0 if
-absent, length 1+ otherwise). When \code{NULL}, returns a named list
-mapping each key to its vector of values.}
+  Returns a character vector of all values for that key (length 0 if
+  absent, length 1+ otherwise). When \code{NULL}, returns a named list
+  mapping each key to its vector of values.
+
+  \strong{Empty vs. missing.} A missing key produces a length-0 vector,
+  which renders as an empty string when injected with the default
+  \code{as = "children"}. If you need to distinguish "absent" from
+  "present-but-empty" (e.g. show a placeholder), use the \code{render}
+  form and branch on \code{Array.isArray(v) && v.length === 0}, e.g.
+  \code{render = JS("v => v.length ? v.join(', ') : <em>none</em>")}.}
 
 \item{render}{Optional \code{\link{JS}} function \code{(value) => ReactNode}
 used in place of \code{into}/\code{as}. Mirrors the native React Router

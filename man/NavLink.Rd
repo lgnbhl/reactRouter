@@ -34,6 +34,11 @@ A NavLink component.
 \url{https://api.reactrouter.com/v7/variables/react-router.NavLink.html}
 
 \url{https://api.reactrouter.com/v7/variables/react-router.NavLink.html}
+
+\strong{Repeat clicks.} The Shiny input value is the link's \code{to}
+string; clicking the same link twice publishes the same value and Shiny
+suppresses identical-value updates by default. See
+\code{\link{Link.shinyInput}} for the workaround.
 }
 \details{
 The `reloadDocument` prop controls whether clicking the link uses React

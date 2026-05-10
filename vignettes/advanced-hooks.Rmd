@@ -27,6 +27,25 @@ basic data loading and navigation:
 Both hooks require a data router: `RouterProvider()` with
 `createHashRouter()`, `createBrowserRouter()`, or `createMemoryRouter()`.
 
+## Why "hooks" are components in this package
+
+In React, a hook like `useLocation()` is a function call inside another
+component. In R, you don't write components — you compose Shiny tag trees.
+**reactRouter** therefore bridges every hook through a tiny JSX component
+on the JavaScript side: the R-level `useLocation()` returns a React element
+that, when rendered, calls `useLocation()` for you and either injects the
+value into the component you supplied (`into` + `as`) or hands it to a
+JavaScript `render` function.
+
+The practical consequence is that **every hook call must produce some UI**:
+either a target component that receives the value, or a `render = JS(...)`
+function that returns a React node. There is no "call the hook just to
+trigger a side effect" form, because the hook only runs when its element
+is mounted in the React tree. If you need to react to a hook value from
+the Shiny server, mount a `Link.shinyInput()` / `NavLink.shinyInput()` or
+read `session$clientData$url_hash` instead of trying to drive an
+`observeEvent()` from `useLocation()` directly.
+
 ## Two ways to inject hook values
 
 Every hook wrapper in **reactRouter** offers two mutually exclusive ways to

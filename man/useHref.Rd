@@ -8,18 +8,15 @@ useHref(into = NULL, as = "children", to, render = NULL, ...)
 }
 \arguments{
 \item{into}{A component (HTML tag or \pkg{shiny.react}-based element)
-that will receive the hook data as the specified prop.}
+that will receive the hook value as the specified prop.}
 
 \item{as}{Character. The name of the component's prop to inject the hook
-data into (by default \code{"children"} for text display, \code{"rows"} for
-a data grid, \code{"value"} for an input).}
+value into. Defaults to \code{"children"}.}
 
 \item{to}{Character. The path to resolve.}
 
 \item{render}{Optional \code{\link{JS}} function \code{(value) => ReactNode}
-used in place of \code{into}/\code{as}. Mirrors the native React Router
-pattern for cases where a single prop is not expressive enough (e.g.
-\code{JS("v => `${v.first} ${v.last}`")}).}
+used in place of \code{into}/\code{as}.}
 
 \item{...}{Additional props to pass to the component.}
 }

@@ -94,13 +94,21 @@ function routeSignature(children) {
       parts.push('_');
       return;
     }
-    const { path, index, id, children: kids } = child.props || {};
+    const { path, index, id, loader, action, element, errorElement, children: kids } = child.props || {};
+    // Presence markers (not values): the warning is meant to fire when the
+    // *shape* of the tree changes, e.g. adding a loader to an existing route
+    // or swapping element out entirely. Comparing values would re-fire on
+    // every parent render because R-side reactElement() identity is fresh.
     parts.push(
       [
         typeof child.type === 'string' ? child.type : (child.type && child.type.name) || '?',
         path || '',
         index ? '#' : '',
         id || '',
+        loader ? 'L' : '',
+        action ? 'A' : '',
+        element != null ? 'E' : '',
+        errorElement != null ? 'X' : '',
         kids ? `[${routeSignature(kids)}]` : '',
       ].join(':')
     );

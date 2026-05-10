@@ -15,20 +15,71 @@
 #' @keywords internal
 NULL
 
+#' Documentation template for hook wrappers whose value has no internal
+#' structure to walk (scalars, booleans, or functions). Identical to
+#' \code{hook-wrapper} except that \code{selector} is intentionally
+#' omitted -- it would have nothing to walk.
+#'
+#' @param into A component (HTML tag or \pkg{shiny.react}-based element)
+#'   that will receive the hook value as the specified prop.
+#' @param as Character. The name of the component's prop to inject the hook
+#'   value into. Defaults to \code{"children"}.
+#' @param render Optional \code{\link{JS}} function \code{(value) => ReactNode}
+#'   used in place of \code{into}/\code{as}.
+#' @param ... Additional props to pass to the component.
+#' @name hook-wrapper-noselector
+#' @keywords internal
+NULL
+
 # For hooks whose value is a function (useNavigate, useSubmit,
 # useLinkClickHandler): rendering a function as React `children` triggers
 # "functions are not valid as a React child". Catch the common mistake at
-# call time with a message that points to render/onClick instead.
-validateFunctionTarget <- function(label, into, render, as) {
+# call time with a message that points the user at the right escape hatch.
+#
+# `onClickSafe` controls whether `as = "onClick"` is suggested. It is only
+# safe for `useLinkClickHandler`, whose returned function takes a single
+# MouseEvent argument and is therefore a drop-in onClick handler. For
+# `useNavigate(to, options?)` and `useSubmit(target, options?)` the function
+# expects positional args other than a MouseEvent — wiring the click event
+# straight to it would call `navigate(MouseEvent)` and try to navigate to
+# the event object. For those hooks we recommend `render = JS(...)` only.
+validateFunctionTarget <- function(label, into, render, as, onClickSafe = FALSE) {
   validateTarget(label, into, render)
   if (!is.null(into) && identical(as, "children")) {
+    if (onClickSafe) {
+      stop(
+        sprintf(
+          '%s(): the hook returns a function, so it cannot be injected as `children`. ',
+          label
+        ),
+        'Either pass `render = JS("fn => <a onClick={fn}>...</a>")`, ',
+        'or set `as = "onClick"` (and pass a click target via `into`).',
+        call. = FALSE
+      )
+    }
     stop(
       sprintf(
-        '%s(): the hook returns a function, so it cannot be injected as `children`. ',
+        '%s(): the hook returns a function (signature unlike a click handler), ',
         label
       ),
-      'Either pass `render = JS("fn => <button onClick={() => fn(...)}>...</button>")`, ',
-      'or set `as = "onClick"` (and pass a click target via `into`).',
+      'so it cannot be injected as `children` and must not be wired directly to ',
+      '`as = "onClick"` (the click event would be passed as the function\'s ',
+      'first argument). Use `render = JS("fn => <button onClick={() => fn(...)}>...</button>")` ',
+      'so you can call the function with the right arguments.',
+      call. = FALSE
+    )
+  }
+  # Even when `as` is set explicitly, "onClick" is unsafe for these hooks:
+  # the click event would be passed as the function's first positional arg.
+  if (!onClickSafe && !is.null(into) && identical(as, "onClick")) {
+    stop(
+      sprintf(
+        '%s(): wiring the hook function directly to `as = "onClick"` is unsafe ',
+        label
+      ),
+      'because the click event would be passed as the first argument (the hook ',
+      'expects e.g. `(to, options)`, not a MouseEvent). Use ',
+      '`render = JS("fn => <button onClick={() => fn(...)}>...</button>")` instead.',
       call. = FALSE
     )
   }
@@ -412,7 +463,7 @@ useRouteError <- function(
 #' \code{as} a prop of the \code{into} component.
 #' Returns one of \code{"POP"}, \code{"PUSH"}, or \code{"REPLACE"}.
 #'
-#' @inheritParams hook-wrapper
+#' @inheritParams hook-wrapper-noselector
 #'
 #' @rdname useNavigationType
 #' @export
@@ -534,6 +585,13 @@ useMatches <- function(
 #'   absent, length 1+ otherwise). When \code{NULL}, returns a named list
 #'   mapping each key to its vector of values.
 #'
+#'   \strong{Empty vs. missing.} A missing key produces a length-0 vector,
+#'   which renders as an empty string when injected with the default
+#'   \code{as = "children"}. If you need to distinguish "absent" from
+#'   "present-but-empty" (e.g. show a placeholder), use the \code{render}
+#'   form and branch on \code{Array.isArray(v) && v.length === 0}, e.g.
+#'   \code{render = JS("v => v.length ? v.join(', ') : <em>none</em>")}.
+#'
 #' @rdname useSearchParams
 #' @export
 useSearchParams <- function(
@@ -561,7 +619,7 @@ useSearchParams <- function(
 #' Calls the \code{useHref()} hook and injects the resolved href string
 #' \code{as} a prop of the \code{into} component.
 #'
-#' @inheritParams hook-wrapper
+#' @inheritParams hook-wrapper-noselector
 #' @param to Character. The path to resolve.
 #'
 #' @rdname useHref
@@ -629,12 +687,21 @@ useResolvedPath <- function(
 #' @param fetcherKey Character. Optional key to share a fetcher across
 #'   components (e.g. \code{"my-fetcher"}).
 #'
+#' @details
+#' \code{selector} defaults to \code{"state"} so the default \code{into}/
+#' \code{children} display shows a readable string (\code{"idle"} /
+#' \code{"loading"} / \code{"submitting"}). The full fetcher object contains
+#' methods (\code{submit}, \code{load}, \code{Form}) that would be silently
+#' dropped by JSON serialization if the whole object were rendered as
+#' children. To call those methods, use the \code{render = JS(...)} form,
+#' which receives the full fetcher: \code{render = JS("f => <button onClick={() => f.load('/data')}>Reload</button>")}.
+#'
 #' @rdname useFetcher
 #' @export
 useFetcher <- function(
   into = NULL,
   as = "children",
-  selector = NULL,
+  selector = "state",
   render = NULL,
   fetcherKey = NULL,
   ...
@@ -777,7 +844,7 @@ useBlocker <- function(
 #'   ))
 #' }
 #'
-#' @inheritParams hook-wrapper
+#' @inheritParams hook-wrapper-noselector
 #'
 #' @rdname useNavigate
 #' @export
@@ -812,7 +879,7 @@ useNavigate <- function(
 #' is rarely useful here -- prefer \code{render = JS(...)} so you can call
 #' the submit function from inside the rendered element.
 #'
-#' @inheritParams hook-wrapper
+#' @inheritParams hook-wrapper-noselector
 #'
 #' @examples
 #' \dontrun{
@@ -934,7 +1001,7 @@ useRoutes <- function(..., routes = NULL) {
 #' components that may be rendered with or without a surrounding router --
 #' guard router-only logic with this check before calling other hooks.
 #'
-#' @inheritParams hook-wrapper
+#' @inheritParams hook-wrapper-noselector
 #'
 #' @rdname useInRouterContext
 #' @export
@@ -965,7 +1032,7 @@ useInRouterContext <- function(
 #' Differs from the \code{\link{Outlet}} component in that it returns the
 #' element as a value, so you can branch on whether a child route is matched.
 #'
-#' @inheritParams hook-wrapper
+#' @inheritParams hook-wrapper-noselector
 #' @param context Optional value to expose to descendants via
 #'   \code{\link{useOutletContext}}.
 #'
@@ -1011,7 +1078,7 @@ useOutlet <- function(
 #' Pair with the \code{viewTransition} prop on \code{\link{Link}}/\code{\link{NavLink}}
 #' to drive transition-aware styling.
 #'
-#' @inheritParams hook-wrapper
+#' @inheritParams hook-wrapper-noselector
 #' @param to Character. The destination path being transitioned to.
 #' @param relative Optional character. Either \code{"route"} (default) or
 #'   \code{"path"}.
@@ -1060,7 +1127,7 @@ useViewTransitionState <- function(
 #'   )
 #' }
 #'
-#' @inheritParams hook-wrapper
+#' @inheritParams hook-wrapper-noselector
 #' @param to Character. Destination path.
 #' @param replace Optional boolean. Replace the current entry in the history
 #'   stack instead of pushing a new one.
@@ -1088,7 +1155,7 @@ useLinkClickHandler <- function(
   if (missing(to)) {
     stop('useLinkClickHandler(): `to` is required (the destination path).', call. = FALSE)
   }
-  validateFunctionTarget("useLinkClickHandler", into, render, as)
+  validateFunctionTarget("useLinkClickHandler", into, render, as, onClickSafe = TRUE)
   customHookElement(
     "useLinkClickHandler",
     as = as,
