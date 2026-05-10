@@ -110,7 +110,13 @@ MemoryRouter <- function(...) {
 #'   working.
 #' @param key Stable React key used by the \code{Keyed} wrapper. Defaults to
 #'   a random alphanumeric string; pass an explicit value if you want to
-#'   keep state across navigations to the same route.
+#'   keep state across navigations to the same route. \strong{Note:} this
+#'   key only affects remounting of the route's \code{element} on
+#'   navigation -- it does \emph{not} force \code{\link{RouterProvider}} to
+#'   rebuild the route tree. The data router is created once on mount and
+#'   subsequent \code{Route()} edits are ignored; to apply a new route
+#'   tree at runtime, give \code{RouterProvider} itself a changing
+#'   \code{key} (e.g. via \code{shiny::renderUI}).
 #' @param loader Optional. A \code{\link{JS}} expression evaluating to a
 #'   loader function, e.g. \code{JS("({ params }) => fetch(...)")}. For a
 #'   plain unconditional redirect, use \code{\link{redirect}}. To embed
@@ -195,13 +201,17 @@ Route <- function(
 #' @return A Link component.
 #' @export
 Link <- function(..., reloadDocument = FALSE) {
+  # Only forward reloadDocument when the caller actually supplied it, so
+  # we don't override any future change to React Router's own default.
+  props <- if (missing(reloadDocument)) {
+    shiny.react::asProps(...)
+  } else {
+    shiny.react::asProps(..., reloadDocument = reloadDocument)
+  }
   shiny.react::reactElement(
     module = "react-router-dom",
     name = "Link",
-    props = shiny.react::asProps(
-      ...,
-      reloadDocument = reloadDocument
-    ),
+    props = props,
     deps = reactRouterDependency()
   )
 }
@@ -234,13 +244,15 @@ Navigate <- component('Navigate')
 #' @return A NavLink component.
 #' @export
 NavLink <- function(..., reloadDocument = FALSE) {
+  props <- if (missing(reloadDocument)) {
+    shiny.react::asProps(...)
+  } else {
+    shiny.react::asProps(..., reloadDocument = reloadDocument)
+  }
   shiny.react::reactElement(
     module = "react-router-dom",
     name = "NavLink",
-    props = shiny.react::asProps(
-      ...,
-      reloadDocument = reloadDocument
-    ),
+    props = props,
     deps = reactRouterDependency()
   )
 }

@@ -4,7 +4,9 @@
 #' @param ... Props to pass to element.
 #' @param inputId ID of the component.
 #' @param reloadDocument Boolean. Default FALSE. Let browser handle the transition normally
-#' @param session The Shiny session object. Defaults to the current reactive domain.
+#' @param session For \code{updateLink.shinyInput()} / \code{updateNavLink.shinyInput()}
+#'   only: the Shiny session object. Defaults to the current reactive domain.
+#'   Not used by \code{Link.shinyInput()} / \code{NavLink.shinyInput()} themselves.
 #' @export
 Link.shinyInput <- function(inputId, ..., reloadDocument = FALSE) {
   checkmate::assert_string(inputId)
@@ -32,7 +34,9 @@ updateLink.shinyInput <- shiny.react::updateReactInput
 #' @param ... Props to pass to element.
 #' @param inputId ID of the component.
 #' @param reloadDocument Boolean. Default FALSE Let browser handle the transition normally
-#' @param session The Shiny session object. Defaults to the current reactive domain.
+#' @param session For \code{updateLink.shinyInput()} / \code{updateNavLink.shinyInput()}
+#'   only: the Shiny session object. Defaults to the current reactive domain.
+#'   Not used by \code{Link.shinyInput()} / \code{NavLink.shinyInput()} themselves.
 #' @export
 NavLink.shinyInput <- function(inputId, ..., reloadDocument = FALSE) {
   checkmate::assert_string(inputId)

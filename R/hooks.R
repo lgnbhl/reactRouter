@@ -15,6 +15,25 @@
 #' @keywords internal
 NULL
 
+# For hooks whose value is a function (useNavigate, useSubmit,
+# useLinkClickHandler): rendering a function as React `children` triggers
+# "functions are not valid as a React child". Catch the common mistake at
+# call time with a message that points to render/onClick instead.
+validateFunctionTarget <- function(label, into, render, as) {
+  validateTarget(label, into, render)
+  if (!is.null(into) && identical(as, "children")) {
+    stop(
+      sprintf(
+        '%s(): the hook returns a function, so it cannot be injected as `children`. ',
+        label
+      ),
+      'Either pass `render = JS("fn => <button onClick={() => fn(...)}>...</button>")`, ',
+      'or set `as = "onClick"` (and pass a click target via `into`).',
+      call. = FALSE
+    )
+  }
+}
+
 validateTarget <- function(label, into, render) {
   if (!is.null(render) && !inherits(render, "JS_EVAL")) {
     stop(
@@ -91,6 +110,9 @@ Await <- function(
   fallback = NULL,
   ...
 ) {
+  if (missing(resolveKey)) {
+    stop('Await(): `resolveKey` is required (the key in the loader\'s return value that holds the promise).', call. = FALSE)
+  }
   # Await has two shapes:
   #
   #   1. Target mode  — `into` or `render` is given. The resolved value is
@@ -102,7 +124,19 @@ Await <- function(
   #
   # Only target mode runs the validator — children mode legitimately omits
   # both `into` and `render`.
-  hasChildren <- length(list(...)) > 0
+  dots <- list(...)
+  # Children are unnamed dots; named dots are extra props (forwarded but
+  # not treated as children). asProps follows the same convention.
+  dotNames <- names(dots)
+  hasChildren <- if (is.null(dotNames)) length(dots) > 0 else any(!nzchar(dotNames))
+  if (hasChildren && (!is.null(into) || !is.null(render))) {
+    stop(
+      "Await(): pass either `into`/`render` (target mode) or children ",
+      "(children mode for descendant useAsyncValue()/useAsyncError()), ",
+      "not both -- with `into`/`render` set, the children would be ignored.",
+      call. = FALSE
+    )
+  }
   if (!(is.null(into) && is.null(render) && hasChildren)) {
     validateTarget("Await", into, render)
   }
@@ -326,6 +360,9 @@ useRouteLoaderData <- function(
   routeId,
   ...
 ) {
+  if (missing(routeId)) {
+    stop('useRouteLoaderData(): `routeId` is required (the `id` of the Route to read loader data from).', call. = FALSE)
+  }
   useHookElement(
     hook = "useRouteLoaderData",
     hookArg = routeId,
@@ -419,6 +456,9 @@ useMatch <- function(
   pattern,
   ...
 ) {
+  if (missing(pattern)) {
+    stop('useMatch(): `pattern` is required (a path pattern such as "/products/:id").', call. = FALSE)
+  }
   useHookElement(
     hook = "useMatch",
     hookArg = pattern,
@@ -527,6 +567,9 @@ useSearchParams <- function(
 #' @rdname useHref
 #' @export
 useHref <- function(into = NULL, as = "children", to, render = NULL, ...) {
+  if (missing(to)) {
+    stop('useHref(): `to` is required (the path to resolve).', call. = FALSE)
+  }
   useHookElement(
     hook = "useHref",
     hookArg = to,
@@ -558,6 +601,9 @@ useResolvedPath <- function(
   to,
   ...
 ) {
+  if (missing(to)) {
+    stop('useResolvedPath(): `to` is required (the path to resolve).', call. = FALSE)
+  }
   useHookElement(
     hook = "useResolvedPath",
     hookArg = to,
@@ -741,6 +787,7 @@ useNavigate <- function(
   render = NULL,
   ...
 ) {
+  validateFunctionTarget("useNavigate", into, render, as)
   useHookElement(
     hook = "useNavigate",
     into = into,
@@ -784,6 +831,7 @@ useSubmit <- function(
   render = NULL,
   ...
 ) {
+  validateFunctionTarget("useSubmit", into, render, as)
   useHookElement(
     hook = "useSubmit",
     into = into,
@@ -978,6 +1026,9 @@ useViewTransitionState <- function(
   relative = NULL,
   ...
 ) {
+  if (missing(to)) {
+    stop('useViewTransitionState(): `to` is required (the destination path being transitioned to).', call. = FALSE)
+  }
   validateTarget("useViewTransitionState", into, render)
   customHookElement(
     "useViewTransitionState",
@@ -1034,7 +1085,10 @@ useLinkClickHandler <- function(
   relative = NULL,
   ...
 ) {
-  validateTarget("useLinkClickHandler", into, render)
+  if (missing(to)) {
+    stop('useLinkClickHandler(): `to` is required (the destination path).', call. = FALSE)
+  }
+  validateFunctionTarget("useLinkClickHandler", into, render, as)
   customHookElement(
     "useLinkClickHandler",
     as = as,

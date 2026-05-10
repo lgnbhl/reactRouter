@@ -40,7 +40,13 @@ action function called by \code{\link{Form}} submissions and
 
 \item{key}{Stable React key used by the \code{Keyed} wrapper. Defaults to
 a random alphanumeric string; pass an explicit value if you want to
-keep state across navigations to the same route.}
+keep state across navigations to the same route. \strong{Note:} this
+key only affects remounting of the route's \code{element} on
+navigation -- it does \emph{not} force \code{\link{RouterProvider}} to
+rebuild the route tree. The data router is created once on mount and
+subsequent \code{Route()} edits are ignored; to apply a new route
+tree at runtime, give \code{RouterProvider} itself a changing
+\code{key} (e.g. via \code{shiny::renderUI}).}
 }
 \value{
 A Route component.

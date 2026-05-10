@@ -164,6 +164,19 @@ In short: if the route should be visible in the URL (bookmarks, deep links, back
 
 `createBrowserRouter()` only works correctly in a full web application deployment (e.g. React served by Node.js, Express, or Nginx with URL rewriting). That scenario is outside the scope of this R package.
 
+If you nevertheless decide to use `createBrowserRouter()` and your Shiny app is mounted under a sub-path (e.g. on Posit Connect at `/content/abc/` or behind a reverse proxy), set `basename` so the router knows where the app starts. Otherwise every route 404s because the router compares the full path (`/content/abc/about`) against patterns rooted at `/`.
+
+```r
+RouterProvider(
+  router = createBrowserRouter(
+    Route(path = "/", element = ...),
+    basename = "/content/abc"   # match your deployment prefix
+  )
+)
+```
+
+`createHashRouter()` and `createMemoryRouter()` do not need `basename` — neither uses the URL path.
+
 ---
 
 ## Legacy: `HashRouter()` and `MemoryRouter()` — component API

@@ -23,7 +23,9 @@ updateLink.shinyInput(
 
 \item{inputId}{ID of the component.}
 
-\item{session}{The Shiny session object. Defaults to the current reactive domain.}
+\item{session}{For \code{updateLink.shinyInput()} / \code{updateNavLink.shinyInput()}
+only: the Shiny session object. Defaults to the current reactive domain.
+Not used by \code{Link.shinyInput()} / \code{NavLink.shinyInput()} themselves.}
 }
 \value{
 A Link component.
