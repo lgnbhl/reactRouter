@@ -28,18 +28,20 @@ are rejected. If you build \code{to} from user-supplied input, validate it
 yourself before passing it in -- never round-trip untrusted strings through
 \code{redirect()} into a navigation.
 
-For conditional redirects inside a custom loader/action, use the global
-\code{window.reactRouterHelpers.redirect(to)} from your own \code{JS()}
-string, e.g.
+For conditional redirects inside a custom loader/action, call
+\code{window.jsmodule['@/reactRouter'].helpers.redirect(to)} from your own
+\code{JS()} string, e.g.
 \preformatted{
   loader = JS(
-    "async () => { if (!authed()) return window.reactRouterHelpers.redirect('/login'); ... }"
+    "async () => {
+       const { redirect } = window.jsmodule['@/reactRouter'].helpers;
+       if (!authed()) return redirect('/login'); ...
+     }"
   )
 }
 
 The \code{data}, \code{replace}, and \code{redirectDocument} helpers are
-exposed on the same global (\code{window.reactRouterHelpers.data},
-\code{...replace}, \code{...redirectDocument}).
+exposed on the same namespace.
 }
 \examples{
 \dontrun{

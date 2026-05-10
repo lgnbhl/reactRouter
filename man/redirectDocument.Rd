@@ -24,8 +24,8 @@ URL outside the router's control (e.g. a server-rendered page) so the
 browser fully unloads the SPA.
 
 For conditional document redirects inside a custom loader/action, call
-\code{window.reactRouterHelpers.redirectDocument(to)} from your own
-\code{JS()} string.
+\code{window.jsmodule['@/reactRouter'].helpers.redirectDocument(to)} from
+your own \code{JS()} string.
 }
 \examples{
 \dontrun{

@@ -55,19 +55,21 @@ export function RouterProvider({ router, fallbackElement }) {
     const routes = ReactRouter.createRoutesFromElements(children);
     return ROUTER_FACTORIES[kind](routes, opts);
   }, []);
-  // Warn (once) in dev if children change between renders. The router is
-  // built once on mount so subsequent Route() changes are silently ignored;
-  // surfacing this as a console warning saves users from a confusing
-  // "my new route doesn't appear" debugging session. Remount the
-  // RouterProvider (e.g. via a key prop) to apply new routes.
-  const initialChildren = React.useRef(children);
+  // Warn (once) in dev if the *shape* of the route tree changes between
+  // renders. Identity comparison would false-positive on every parent
+  // re-render (Shiny re-renders frequently and `children` is a fresh array
+  // each time even when its contents are unchanged); a structural signature
+  // over the top-level Route props (path / index / id) only fires when the
+  // user actually edits the route tree. Mirrors the original intent: catch
+  // "I added a Route and it didn't appear" without crying wolf.
+  const initialSig = React.useRef(routeSignature(children));
   const warned = React.useRef(false);
   if (
     !warned.current &&
     typeof process !== 'undefined' &&
     process.env &&
     process.env.NODE_ENV !== 'production' &&
-    initialChildren.current !== children
+    initialSig.current !== routeSignature(children)
   ) {
     warned.current = true;
     // eslint-disable-next-line no-console
@@ -78,4 +80,30 @@ export function RouterProvider({ router, fallbackElement }) {
     );
   }
   return React.createElement(ReactRouter.RouterProvider, { router: rrRouter, fallbackElement });
+}
+
+// Stable signature of a Route tree, used by the dev-only "children changed"
+// warning. Only inspects the props that affect routing (path/index/id) and
+// recurses into nested Route children. Children that aren't Route elements
+// are summarised by their tag name only — their internal contents change on
+// every render and shouldn't trip the warning.
+function routeSignature(children) {
+  const parts = [];
+  React.Children.forEach(children, (child) => {
+    if (!React.isValidElement(child)) {
+      parts.push('_');
+      return;
+    }
+    const { path, index, id, children: kids } = child.props || {};
+    parts.push(
+      [
+        typeof child.type === 'string' ? child.type : (child.type && child.type.name) || '?',
+        path || '',
+        index ? '#' : '',
+        id || '',
+        kids ? `[${routeSignature(kids)}]` : '',
+      ].join(':')
+    );
+  });
+  return parts.join('|');
 }

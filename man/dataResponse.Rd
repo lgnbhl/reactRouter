@@ -32,14 +32,13 @@ loader/action payload while still exposing \code{value} via
 
 Use the R helper for static loaders that always return the same value plus
 status. For values computed inside a custom loader/action, call
-\code{window.reactRouterHelpers.data(value, init)} directly in your
-\code{JS()} string, e.g.
+\code{window.jsmodule['@/reactRouter'].helpers.data(value, init)} directly
+in your \code{JS()} string, e.g.
 \preformatted{
   loader = JS("async () => {
+    const { data } = window.jsmodule['@/reactRouter'].helpers;
     const rows = await fetchRows();
-    return window.reactRouterHelpers.data(
-      \{ rows \}, \{ status: 200 \}
-    );
+    return data(\{ rows \}, \{ status: 200 \});
   }")
 }
 }

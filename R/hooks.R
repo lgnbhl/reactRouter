@@ -382,6 +382,9 @@ useRouteError <- function(
 useNavigationType <- function(
   into = NULL,
   as = "children",
+  # No `selector` arg: the upstream hook returns a scalar string, so there
+  # is nothing to walk. If `selector` is ever added, also drop `mapArray =
+  # FALSE` semantics from injectValue's path for this hook.
   render = NULL,
   ...
 ) {

@@ -1,10 +1,21 @@
-#' JavaScript helpers exposed on \code{window.reactRouterHelpers}
+#' JavaScript helpers exposed on \code{window.jsmodule['@/reactRouter'].helpers}
 #'
 #' For convenience, the package exposes a curated set of React Router v7
-#' utility functions on the global \code{window.reactRouterHelpers} so
-#' user-authored \code{\link{JS}} loaders, actions, and render callbacks can
-#' call them without reaching into webpack internals. The same names are
+#' utility functions under \code{window.jsmodule['@/reactRouter'].helpers}
+#' so user-authored \code{\link{JS}} loaders, actions, and render callbacks
+#' can call them without reaching into webpack internals. The same names are
 #' available as on the JS side of React Router itself.
+#'
+#' Scoped under the \pkg{shiny.react} \code{jsmodule} registry rather than
+#' \code{window} so the package never adds a top-level global to the host
+#' page. A short alias is the only ergonomic cost:
+#' \preformatted{
+#'   loader = JS("async () => {
+#'     const { redirect } = window.jsmodule['@/reactRouter'].helpers;
+#'     if (!await ok()) return redirect('/login');
+#'     return { ok: true };
+#'   }")
+#' }
 #'
 #' \strong{Loader/action response helpers}
 #' \itemize{
@@ -26,6 +37,10 @@
 #'   \item \code{createSearchParams(init)} -- build a \code{URLSearchParams}.
 #' }
 #'
+#' These run in the browser only (inside \code{\link{JS}} loader/action code).
+#' For R-side construction of a \code{Link()} \code{to} value from data, use
+#' base R: \code{paste0("/users/", utils::URLencode(id, reserved = TRUE))}.
+#'
 #' \strong{Error helpers}
 #' \itemize{
 #'   \item \code{isRouteErrorResponse(error)} -- type guard intended for use
@@ -34,9 +49,7 @@
 #'     \code{Response} (e.g. \code{throw new Response(..., { status: 404 })}).
 #' }
 #'
-#' These are the JavaScript implementations from \code{react-router-dom}, so
-#' behavior is exactly faithful to upstream -- unlike the pure-R reimplementations
-#' \code{\link{generatePath}} and \code{\link{matchPath}}.
+#' These are the JavaScript implementations from \code{react-router-dom}.
 #'
 #' @examples
 #' \dontrun{
@@ -44,8 +57,9 @@
 #' Route(
 #'   path = "/admin",
 #'   loader = JS("async () => {
+#'     const { redirect } = window.jsmodule['@/reactRouter'].helpers;
 #'     const ok = await checkAuth();
-#'     if (!ok) return window.reactRouterHelpers.redirect('/login');
+#'     if (!ok) return redirect('/login');
 #'     return { ok: true };
 #'   }"),
 #'   element = useLoaderData(tags$pre())
@@ -60,9 +74,10 @@
 #'     return r.json();
 #'   }"),
 #'   errorElement = useRouteError(
-#'     render = JS("e => window.reactRouterHelpers.isRouteErrorResponse(e)
-#'                   ? <p>HTTP {e.status}</p>
-#'                   : <p>Unknown error</p>")
+#'     render = JS(
+#'       "e => window.jsmodule['@/reactRouter'].helpers.isRouteErrorResponse(e)" +
+#'       " ? <p>HTTP {e.status}</p> : <p>Unknown error</p>"
+#'     )
 #'   ),
 #'   element = useLoaderData(tags$pre())
 #' )
@@ -71,6 +86,12 @@
 #' @name reactRouterHelpers
 #' @keywords internal
 NULL
+
+# Internal: JS expression that resolves to the package's helpers namespace.
+# All R-side `redirect()`, `replaceResponse()`, etc. emit JS strings that
+# look up helpers through this path so the package never adds anything to
+# the global `window` object — see ?reactRouterHelpers.
+HELPERS_JS <- "window.jsmodule['@/reactRouter'].helpers"
 
 # Internal: produce a JavaScript string literal (including the surrounding
 # quotes) for an R string. Delegates to jsonlite for full escaping of control
@@ -121,18 +142,20 @@ assertSafeRedirectTarget <- function(fn, to) {
 #' yourself before passing it in -- never round-trip untrusted strings through
 #' \code{redirect()} into a navigation.
 #'
-#' For conditional redirects inside a custom loader/action, use the global
-#' \code{window.reactRouterHelpers.redirect(to)} from your own \code{JS()}
-#' string, e.g.
+#' For conditional redirects inside a custom loader/action, call
+#' \code{window.jsmodule['@/reactRouter'].helpers.redirect(to)} from your own
+#' \code{JS()} string, e.g.
 #' \preformatted{
 #'   loader = JS(
-#'     "async () => { if (!authed()) return window.reactRouterHelpers.redirect('/login'); ... }"
+#'     "async () => {
+#'        const { redirect } = window.jsmodule['@/reactRouter'].helpers;
+#'        if (!authed()) return redirect('/login'); ...
+#'      }"
 #'   )
 #' }
 #'
 #' The \code{data}, \code{replace}, and \code{redirectDocument} helpers are
-#' exposed on the same global (\code{window.reactRouterHelpers.data},
-#' \code{...replace}, \code{...redirectDocument}).
+#' exposed on the same namespace.
 #'
 #' @param to Character. Destination path.
 #' @return A \code{\link{JS}} expression suitable for the \code{loader}
@@ -148,8 +171,8 @@ assertSafeRedirectTarget <- function(fn, to) {
 redirect <- function(to) {
   assertSafeRedirectTarget("redirect", to)
   shiny.react::JS(sprintf(
-    '() => window.reactRouterHelpers.redirect(%s)',
-    jsLiteral(to)
+    '() => %s.redirect(%s)',
+    HELPERS_JS, jsLiteral(to)
   ))
 }
 
@@ -167,8 +190,8 @@ redirect <- function(to) {
 #' This mirrors the \code{dataResponse()} naming for the same reason.
 #'
 #' For conditional replacements inside a custom loader/action, call
-#' \code{window.reactRouterHelpers.replace(to)} from your own \code{JS()}
-#' string.
+#' \code{window.jsmodule['@/reactRouter'].helpers.replace(to)} from your own
+#' \code{JS()} string.
 #'
 #' @param to Character. Destination path.
 #' @return A \code{\link{JS}} expression suitable for the \code{loader}
@@ -184,8 +207,8 @@ redirect <- function(to) {
 replaceResponse <- function(to) {
   assertSafeRedirectTarget("replaceResponse", to)
   shiny.react::JS(sprintf(
-    '() => window.reactRouterHelpers.replace(%s)',
-    jsLiteral(to)
+    '() => %s.replace(%s)',
+    HELPERS_JS, jsLiteral(to)
   ))
 }
 
@@ -200,8 +223,8 @@ replaceResponse <- function(to) {
 #' browser fully unloads the SPA.
 #'
 #' For conditional document redirects inside a custom loader/action, call
-#' \code{window.reactRouterHelpers.redirectDocument(to)} from your own
-#' \code{JS()} string.
+#' \code{window.jsmodule['@/reactRouter'].helpers.redirectDocument(to)} from
+#' your own \code{JS()} string.
 #'
 #' @param to Character. Destination path or absolute URL.
 #' @return A \code{\link{JS}} expression suitable for the \code{loader}
@@ -221,8 +244,8 @@ replaceResponse <- function(to) {
 redirectDocument <- function(to) {
   assertSafeRedirectTarget("redirectDocument", to)
   shiny.react::JS(sprintf(
-    '() => window.reactRouterHelpers.redirectDocument(%s)',
-    jsLiteral(to)
+    '() => %s.redirectDocument(%s)',
+    HELPERS_JS, jsLiteral(to)
   ))
 }
 
@@ -238,14 +261,13 @@ redirectDocument <- function(to) {
 #'
 #' Use the R helper for static loaders that always return the same value plus
 #' status. For values computed inside a custom loader/action, call
-#' \code{window.reactRouterHelpers.data(value, init)} directly in your
-#' \code{JS()} string, e.g.
+#' \code{window.jsmodule['@/reactRouter'].helpers.data(value, init)} directly
+#' in your \code{JS()} string, e.g.
 #' \preformatted{
 #'   loader = JS("async () => {
+#'     const { data } = window.jsmodule['@/reactRouter'].helpers;
 #'     const rows = await fetchRows();
-#'     return window.reactRouterHelpers.data(
-#'       \{ rows \}, \{ status: 200 \}
-#'     );
+#'     return data(\{ rows \}, \{ status: 200 \});
 #'   }")
 #' }
 #'
@@ -291,7 +313,8 @@ dataResponse <- function(value, init = NULL) {
   valueJS <- serialize(value)
   initStr <- if (!is.null(init)) paste0(", ", serialize(init)) else ""
   shiny.react::JS(sprintf(
-    "() => window.reactRouterHelpers.data(%s%s)",
+    "() => %s.data(%s%s)",
+    HELPERS_JS,
     valueJS,
     initStr
   ))
@@ -312,8 +335,9 @@ dataResponse <- function(value, init = NULL) {
 #' \code{isRouteErrorResponse} function. Interpolate it inside the
 #' \code{render} string of \code{useRouteError()} as shown below.
 #'
-#' For convenience, the same function is also reachable inside any user-authored
-#' \code{\link{JS}} string as \code{window.reactRouterHelpers.isRouteErrorResponse}.
+#' For convenience, the same function is also reachable inside any
+#' user-authored \code{\link{JS}} string as
+#' \code{window.jsmodule['@/reactRouter'].helpers.isRouteErrorResponse}.
 #'
 #' @return A \code{\link{JS}} expression evaluating to the
 #'   \code{isRouteErrorResponse} function reference.
@@ -329,223 +353,6 @@ dataResponse <- function(value, init = NULL) {
 #' @rdname isRouteErrorResponse
 #' @export
 isRouteErrorResponse <- function() {
-  shiny.react::JS("window.reactRouterHelpers.isRouteErrorResponse")
+  shiny.react::JS(paste0(HELPERS_JS, ".isRouteErrorResponse"))
 }
 
-#' generatePath
-#'
-#' \url{https://api.reactrouter.com/v7/functions/react-router.generatePath.html}
-#'
-#' Builds a concrete pathname by substituting dynamic \code{:param} segments
-#' (and the splat \code{*}) in \code{path} with values from \code{params}.
-#' Mirrors React Router's helper but is implemented in R so the returned
-#' string can be passed directly to \code{\link{Link}}, \code{\link{NavLink}},
-#' or any other component's \code{to} prop.
-#'
-#' Optional segments suffixed with \code{?} are dropped when their value is
-#' missing (\code{NULL} or \code{""}); required segments raise an error.
-#' Values are URL-encoded with \code{utils::URLencode(reserved = TRUE)} except
-#' for the splat \code{*}, whose slashes are preserved.
-#'
-#' \strong{Note:} this is a pure-R reimplementation of React Router's helper
-#' (which itself uses the \code{path-to-regexp} library on the JS side). It
-#' covers the common pattern syntax (\code{:param}, \code{:param?}, \code{*})
-#' but may diverge in edge cases such as escaping of regex metacharacters
-#' inside literal segments or non-trailing splats. For loader/action JS code
-#' that must stay strictly faithful to the JS implementation, call
-#' \code{window.reactRouterHelpers.generatePath(path, params)} from inside
-#' your \code{\link{JS}} string.
-#'
-#' @param path Character. A path pattern, e.g. \code{"/users/:id"} or
-#'   \code{"/files/*"}.
-#' @param params Named list (or \code{NULL}) of values for the dynamic
-#'   segments. The splat is named \code{"*"}.
-#' @return Character scalar, the resolved pathname.
-#'
-#' @examples
-#' generatePath("/users/:id", list(id = 42))
-#' generatePath("/users/:id/posts/:postId", list(id = 1, postId = "abc"))
-#' generatePath("/files/*", list(`*` = "a/b/c.txt"))
-#' generatePath("/posts/:slug?", list())  # optional segment dropped
-#'
-#' @rdname generatePath
-#' @export
-generatePath <- function(path, params = list()) {
-  if (!is.character(path) || length(path) != 1 || is.na(path)) {
-    stop("generatePath(): `path` must be a single, non-NA character string.", call. = FALSE)
-  }
-  if (is.null(params)) params <- list()
-  if (!is.list(params)) {
-    stop("generatePath(): `params` must be a named list.", call. = FALSE)
-  }
-
-  encodeSegment <- function(v) utils::URLencode(as.character(v), reserved = TRUE)
-
-  # Splat (`*`) — preserves slashes inside the value, unlike :params.
-  # `URLencode(reserved = FALSE)` keeps `/` (correct for a splat) but also
-  # leaves `?` and `#` raw, which would be mis-parsed downstream as the
-  # query/fragment delimiter. Percent-encode them explicitly.
-  if (grepl("\\*", path)) {
-    splat <- params[["*"]]
-    if (is.null(splat)) splat <- ""
-    encoded <- utils::URLencode(as.character(splat), reserved = FALSE)
-    encoded <- gsub("?", "%3F", encoded, fixed = TRUE)
-    encoded <- gsub("#", "%23", encoded, fixed = TRUE)
-    path <- gsub("\\*", encoded, path, fixed = FALSE)
-  }
-
-  # Iterate over :param[?] segments. We re-scan after each replacement so
-  # patterns that share a prefix (e.g. :id and :idType) don't collide.
-  pattern <- ":([A-Za-z_][A-Za-z0-9_]*)(\\??)"
-  repeat {
-    m <- regmatches(path, regexpr(pattern, path))
-    if (length(m) == 0) break
-    name <- sub(pattern, "\\1", m)
-    optional <- endsWith(m, "?")
-    val <- params[[name]]
-    if (is.null(val) || identical(val, "")) {
-      if (!optional) {
-        stop(sprintf(
-          "generatePath(): missing value for required segment ':%s' in path '%s'.",
-          name, path
-        ), call. = FALSE)
-      }
-      replacement <- ""
-    } else {
-      replacement <- encodeSegment(val)
-    }
-    path <- sub(pattern, replacement, path)
-  }
-
-  # Collapse `//` introduced by dropped optional segments, but keep a leading
-  # slash and any protocol-style `://` intact.
-  path <- gsub("([^:])//+", "\\1/", path)
-  # Trim trailing slash unless the whole path is "/".
-  if (nchar(path) > 1) path <- sub("/+$", "", path)
-  path
-}
-
-#' matchPath
-#'
-#' \url{https://api.reactrouter.com/v7/functions/react-router.matchPath.html}
-#'
-#' Tests whether \code{pathname} matches \code{pattern} and, if it does,
-#' returns a list with the captured \code{params}, the matched
-#' \code{pathname}, and a \code{pathnameBase}. Returns \code{NULL} on no
-#' match. Implemented in pure R so it can be used outside a browser context
-#' (e.g. to drive Shiny logic from a known URL).
-#'
-#' Supported pattern syntax: \code{:param}, splat \code{*}, optional segments
-#' \code{:param?}, and an optional \code{end = FALSE} flag for prefix
-#' matching.
-#'
-#' \strong{Note:} this is a pure-R reimplementation of React Router's helper
-#' and may diverge in edge cases (regex metacharacter escaping in literal
-#' segments, non-trailing splats). For strict parity with the JS
-#' implementation inside a loader/action, call
-#' \code{window.reactRouterHelpers.matchPath(pattern, pathname)} from your
-#' \code{\link{JS}} string.
-#'
-#' @param pattern Either a character path pattern (e.g. \code{"/users/:id"})
-#'   or a list with elements \code{path} and (optional) \code{end}, \code{caseSensitive}.
-#' @param pathname Character. The pathname to test.
-#' @return A list with \code{params}, \code{pathname}, \code{pathnameBase},
-#'   and \code{pattern}, or \code{NULL} if no match.
-#'
-#' @examples
-#' matchPath("/users/:id", "/users/42")
-#' matchPath("/users/:id", "/about")  # NULL
-#' matchPath(list(path = "/users", end = FALSE), "/users/42/edit")
-#'
-#' @rdname matchPath
-#' @export
-matchPath <- function(pattern, pathname) {
-  if (is.character(pattern)) {
-    spec <- list(path = pattern, end = TRUE, caseSensitive = FALSE)
-  } else if (is.list(pattern) && !is.null(pattern$path)) {
-    spec <- list(
-      path = pattern$path,
-      end = if (is.null(pattern$end)) TRUE else isTRUE(pattern$end),
-      caseSensitive = isTRUE(pattern$caseSensitive)
-    )
-  } else {
-    stop("matchPath(): `pattern` must be a string or a list with a `path` element.", call. = FALSE)
-  }
-  if (!is.character(pathname) || length(pathname) != 1 || is.na(pathname)) {
-    stop("matchPath(): `pathname` must be a single, non-NA character string.", call. = FALSE)
-  }
-
-  # Parse `:param[?]` and `*` placeholders into a regex with named groups.
-  # Strategy: substitute placeholders to NUL-delimited sentinels first,
-  # then escape regex specials (including `?` — see issue #N), then
-  # substitute the sentinels for the actual regex fragments. Doing it in
-  # this order means a literal `?` or `*` in a path segment is treated as
-  # a literal character rather than as a regex meta.
-  paramNames <- character()
-  hasSplat <- FALSE
-  rx <- spec$path
-  OPT_TOKEN <- "\001OPT\001"
-  REQ_TOKEN <- "\001REQ\001"
-  SPLAT_TOKEN <- "\001SPLAT\001"
-
-  # :param? -> optional sentinel.
-  repeat {
-    m <- regmatches(rx, regexpr("/:([A-Za-z_][A-Za-z0-9_]*)\\?", rx))
-    if (length(m) == 0) break
-    name <- sub("/:([A-Za-z_][A-Za-z0-9_]*)\\?", "\\1", m)
-    paramNames <- c(paramNames, name)
-    rx <- sub("/:([A-Za-z_][A-Za-z0-9_]*)\\?", OPT_TOKEN, rx)
-  }
-  # :param -> required sentinel.
-  repeat {
-    m <- regmatches(rx, regexpr(":([A-Za-z_][A-Za-z0-9_]*)", rx))
-    if (length(m) == 0) break
-    name <- sub(":([A-Za-z_][A-Za-z0-9_]*)", "\\1", m)
-    paramNames <- c(paramNames, name)
-    rx <- sub(":([A-Za-z_][A-Za-z0-9_]*)", REQ_TOKEN, rx)
-  }
-  # `*` splat -> sentinel.
-  if (grepl("\\*", rx)) {
-    hasSplat <- TRUE
-    rx <- sub("\\*", SPLAT_TOKEN, rx)
-  }
-  # Now escape regex specials in the remaining literal text.
-  rx <- gsub("([.+?(){}\\[\\]\\\\^$|])", "\\\\\\1", rx, perl = TRUE)
-  # Substitute sentinels for their regex fragments.
-  rx <- gsub(OPT_TOKEN, "(?:/([^/]+))?", rx, fixed = TRUE)
-  rx <- gsub(REQ_TOKEN, "([^/]+)", rx, fixed = TRUE)
-  rx <- gsub(SPLAT_TOKEN, "(.*)", rx, fixed = TRUE)
-
-  rx <- if (spec$end) paste0("^", rx, "/?$") else paste0("^", rx, "(?:/|$)")
-  m <- regexec(rx, pathname, perl = TRUE, ignore.case = !spec$caseSensitive)
-  hits <- regmatches(pathname, m)[[1]]
-  if (length(hits) == 0) return(NULL)
-
-  params <- list()
-  if (length(paramNames) > 0) {
-    vals <- hits[seq_len(length(paramNames)) + 1]
-    vals <- ifelse(vals == "", NA_character_, vals)
-    names(vals) <- paramNames
-    params <- as.list(vals)
-  }
-  if (hasSplat) {
-    params[["*"]] <- hits[length(hits)]
-  }
-
-  matchedPath <- hits[1]
-  pathnameBase <- if (hasSplat) {
-    sub(paste0("/?", utils::URLencode(params[["*"]] %||% "", reserved = TRUE), "$"), "", matchedPath)
-  } else {
-    matchedPath
-  }
-
-  list(
-    params = params,
-    pathname = matchedPath,
-    pathnameBase = if (nzchar(pathnameBase)) pathnameBase else "/",
-    pattern = spec
-  )
-}
-
-# Internal: tiny null-coalescing helper (used only by matchPath).
-`%||%` <- function(a, b) if (is.null(a)) b else a

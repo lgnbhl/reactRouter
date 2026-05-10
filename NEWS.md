@@ -15,10 +15,6 @@
   browser-side error.
 - `dataResponse()`: `value` is now a required argument (the previous
   `value = NULL` default rarely produced what users wanted).
-- `matchPath()` now escapes a literal `?` in path patterns so that
-  `?`-containing literal segments no longer silently match the wrong thing.
-- `generatePath()` now percent-encodes `?` and `#` inside splat values so
-  the resulting URL is not mis-parsed downstream.
 - `RouterProvider` (JS): logs a one-shot dev-mode `console.warn` when the
   `router`'s children change between renders. The router is created once
   on mount and subsequent `Route()` changes are silently ignored;
@@ -33,6 +29,24 @@
   escape path in `JS()` literal generation (control chars, U+2028/U+2029,
   `</script>`) is always taken; removed the partial fallback.
 - Bumped bundled `react-router-dom` to 7.15.x and rebuilt the JS bundle.
+- Internal: webpack now relies on `mode: 'production'` to set
+  `process.env.NODE_ENV` (the explicit `DefinePlugin` was redundant and the
+  previous `process.env = {}` form leaked the `RouterProvider`
+  "children changed after mount" dev warning into production builds).
+- `RouterProvider` (JS): the dev-mode "children changed after mount" warning
+  now compares a structural signature of the route tree (path / index / id)
+  rather than identity, so it no longer false-positives on every parent
+  re-render.
+- `Await` Suspense fallback: the default "Loading…" span now carries
+  `role="status"` and `aria-live="polite"` so screen readers announce the
+  loading state.
+- `useNavigationType()`: documented the intentional absence of a `selector`
+  argument (the upstream hook returns a scalar string).
+- New `js/README.md` documents the bundle layout, build command, and
+  conventions.
+- Tests: added pure-R coverage for `redirect()` / `replaceResponse()` /
+  `redirectDocument()` rejection paths (unsafe schemes, protocol-relative
+  URLs, NA / multi-element `to`) and for `dataResponse(value = NULL)`.
 - New vignette: "Security considerations" — guidance on loaders/actions as
   client-side code, URL-encoding route params, redirect targets, CSP, and
   more.
@@ -53,7 +67,6 @@
 - New loader/action helpers: `redirect()`, `replaceResponse()`,
   `redirectDocument()`, `dataResponse()`. The same helpers are exposed on
   `window.reactRouterHelpers` for use inside custom JS loaders.
-- New URL utilities (pure R): `generatePath()` and `matchPath()`.
 - BREAKING CHANGE: `RouterProvider` now takes a `router` argument built with
   `create*Router()` instead of route children.
 - BREAKING CHANGE: `reloadDocument` defaults to `FALSE` (mirroring React

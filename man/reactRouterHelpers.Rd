@@ -2,15 +2,26 @@
 % Please edit documentation in R/helpers.R
 \name{reactRouterHelpers}
 \alias{reactRouterHelpers}
-\title{JavaScript helpers exposed on \code{window.reactRouterHelpers}}
+\title{JavaScript helpers exposed on \code{window.jsmodule['@/reactRouter'].helpers}}
 \description{
 For convenience, the package exposes a curated set of React Router v7
-utility functions on the global \code{window.reactRouterHelpers} so
-user-authored \code{\link{JS}} loaders, actions, and render callbacks can
-call them without reaching into webpack internals. The same names are
+utility functions under \code{window.jsmodule['@/reactRouter'].helpers}
+so user-authored \code{\link{JS}} loaders, actions, and render callbacks
+can call them without reaching into webpack internals. The same names are
 available as on the JS side of React Router itself.
 }
 \details{
+Scoped under the \pkg{shiny.react} \code{jsmodule} registry rather than
+\code{window} so the package never adds a top-level global to the host
+page. A short alias is the only ergonomic cost:
+\preformatted{
+  loader = JS("async () => {
+    const { redirect } = window.jsmodule['@/reactRouter'].helpers;
+    if (!await ok()) return redirect('/login');
+    return { ok: true };
+  }")
+}
+
 \strong{Loader/action response helpers}
 \itemize{
   \item \code{redirect(to, init?)} -- client-side navigation redirect.
@@ -31,6 +42,10 @@ available as on the JS side of React Router itself.
   \item \code{createSearchParams(init)} -- build a \code{URLSearchParams}.
 }
 
+These run in the browser only (inside \code{\link{JS}} loader/action code).
+For R-side construction of a \code{Link()} \code{to} value from data, use
+base R: \code{paste0("/users/", utils::URLencode(id, reserved = TRUE))}.
+
 \strong{Error helpers}
 \itemize{
   \item \code{isRouteErrorResponse(error)} -- type guard intended for use
@@ -39,9 +54,7 @@ available as on the JS side of React Router itself.
     \code{Response} (e.g. \code{throw new Response(..., { status: 404 })}).
 }
 
-These are the JavaScript implementations from \code{react-router-dom}, so
-behavior is exactly faithful to upstream -- unlike the pure-R reimplementations
-\code{\link{generatePath}} and \code{\link{matchPath}}.
+These are the JavaScript implementations from \code{react-router-dom}.
 }
 \examples{
 \dontrun{
@@ -49,8 +62,9 @@ behavior is exactly faithful to upstream -- unlike the pure-R reimplementations
 Route(
   path = "/admin",
   loader = JS("async () => {
+    const { redirect } = window.jsmodule['@/reactRouter'].helpers;
     const ok = await checkAuth();
-    if (!ok) return window.reactRouterHelpers.redirect('/login');
+    if (!ok) return redirect('/login');
     return { ok: true };
   }"),
   element = useLoaderData(tags$pre())
@@ -65,9 +79,10 @@ Route(
     return r.json();
   }"),
   errorElement = useRouteError(
-    render = JS("e => window.reactRouterHelpers.isRouteErrorResponse(e)
-                  ? <p>HTTP {e.status}</p>
-                  : <p>Unknown error</p>")
+    render = JS(
+      "e => window.jsmodule['@/reactRouter'].helpers.isRouteErrorResponse(e)" +
+      " ? <p>HTTP {e.status}</p> : <p>Unknown error</p>"
+    )
   ),
   element = useLoaderData(tags$pre())
 )

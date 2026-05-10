@@ -3,7 +3,7 @@
 # always send the user elsewhere.
 #
 # For conditional redirects inside a custom loader/action, call the
-# global `window.reactRouterHelpers.redirect(to)` from your own JS()
+# global `window.jsmodule['@/reactRouter'].helpers.redirect(to)` from your own JS()
 # string — see the "conditional" route below.
 
 library(reactRouter)
@@ -14,7 +14,7 @@ library(htmltools)
 coin_flip_loader <- JS(
   "() => {
      if (Math.random() < 0.5) {
-       return window.reactRouterHelpers.redirect('/target');
+       return window.jsmodule['@/reactRouter'].helpers.redirect('/target');
      }
      return { message: 'You got lucky — no redirect this time.' };
    }"
@@ -45,7 +45,7 @@ ui <- RouterProvider(
         loader = redirect("/target"),
         element = NULL
       ),
-      # Conditional redirect using window.reactRouterHelpers.redirect
+      # Conditional redirect using window.jsmodule['@/reactRouter'].helpers.redirect
       Route(
         path = "maybe",
         loader = coin_flip_loader,

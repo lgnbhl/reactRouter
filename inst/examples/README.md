@@ -44,7 +44,6 @@ router and `vignette("introduction", package = "reactRouter")` for a tour.
 | [`useOutlet`](useOutlet/) / [`useOutletContext`](useOutletContext/) | Outlet inspection and parent → child context |
 | [`useLinkClickHandler`](useLinkClickHandler/) | Custom link components |
 | [`useViewTransitionState`](useViewTransitionState/) | View transitions |
-| [`generatePath`](generatePath/) / [`matchPath`](matchPath/) | Pure-R URL utilities |
 | [`useRoutes`](useRoutes/) | Routes-as-data (legacy `Routes()` API) |
 | [`useInRouterContext`](useInRouterContext/) | Detect whether you are inside a router |
 | [`ScrollRestoration`](ScrollRestoration/) | Restore scroll position on navigation |

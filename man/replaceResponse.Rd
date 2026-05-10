@@ -27,8 +27,8 @@ Renamed from \code{replace()} to avoid masking \code{base::replace}.
 This mirrors the \code{dataResponse()} naming for the same reason.
 
 For conditional replacements inside a custom loader/action, call
-\code{window.reactRouterHelpers.replace(to)} from your own \code{JS()}
-string.
+\code{window.jsmodule['@/reactRouter'].helpers.replace(to)} from your own
+\code{JS()} string.
 }
 \examples{
 \dontrun{

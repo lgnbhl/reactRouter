@@ -5,7 +5,7 @@
 #
 # Two routes:
 #   /profile  — static loader built with the R helper dataResponse()
-#   /custom   — custom loader using window.reactRouterHelpers.data() to
+#   /custom   — custom loader using window.jsmodule['@/reactRouter'].helpers.data() to
 #               attach a 201 status to a computed payload.
 
 library(reactRouter)
@@ -14,7 +14,7 @@ library(htmltools)
 custom_loader <- JS(
   "() => {
      const payload = { greeting: 'hello', generatedAt: new Date().toISOString() };
-     return window.reactRouterHelpers.data(payload, {
+     return window.jsmodule['@/reactRouter'].helpers.data(payload, {
        status: 201,
        headers: { 'X-Built-With': 'reactRouter R' }
      });

@@ -50,9 +50,11 @@ function injectValue({ result, selector, mapArray, render, into, as, rest }) {
 
 // Allowlist of react-router-dom hook names the R-side wrappers may dispatch
 // to via the generic UseHook. Defense in depth: the R wrappers always pass a
-// hardcoded `hook` string, but pinning the set here prevents any future code
-// path (or user-crafted props) from invoking arbitrary react-router-dom
-// exports through this dispatcher.
+// hardcoded `hook` string today, but pinning the set here prevents any
+// future code path (or user-crafted props slipping through asProps) from
+// invoking arbitrary react-router-dom exports through this dispatcher.
+// Intentional — do NOT replace with `ReactRouter[hook]` "for simplicity";
+// the closed allowlist is the safety property.
 const ALLOWED_HOOKS = new Set([
   'useLoaderData', 'useActionData', 'useLocation', 'useParams',
   'useNavigation', 'useNavigationType', 'useNavigate', 'useSubmit',
@@ -199,7 +201,14 @@ export function Await({ resolveKey, errorElement, fallback, as = 'children', int
   );
   return React.createElement(
     React.Suspense,
-    { fallback: fallback || React.createElement('span', null, 'Loading…') },
+    {
+      fallback: fallback || React.createElement(
+        'span',
+        // role/aria-live so screen readers announce the loading state.
+        { role: 'status', 'aria-live': 'polite' },
+        'Loading…'
+      ),
+    },
     awaitEl
   );
 }

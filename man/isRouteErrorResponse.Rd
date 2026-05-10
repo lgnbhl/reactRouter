@@ -25,8 +25,9 @@ expression that evaluates, in the browser, to the upstream
 \code{isRouteErrorResponse} function. Interpolate it inside the
 \code{render} string of \code{useRouteError()} as shown below.
 
-For convenience, the same function is also reachable inside any user-authored
-\code{\link{JS}} string as \code{window.reactRouterHelpers.isRouteErrorResponse}.
+For convenience, the same function is also reachable inside any
+user-authored \code{\link{JS}} string as
+\code{window.jsmodule['@/reactRouter'].helpers.isRouteErrorResponse}.
 }
 \examples{
 \dontrun{
