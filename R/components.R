@@ -108,15 +108,18 @@ MemoryRouter <- function(...) {
 #'   Unlike the previous \code{<div>} wrapper, \code{Keyed} adds no DOM node,
 #'   so layouts like MUI \code{Grid} that require typed direct children keep
 #'   working.
-#' @param key Stable React key used by the \code{Keyed} wrapper. Defaults to
-#'   a random alphanumeric string; pass an explicit value if you want to
-#'   keep state across navigations to the same route. \strong{Note:} this
-#'   key only affects remounting of the route's \code{element} on
-#'   navigation -- it does \emph{not} force \code{\link{RouterProvider}} to
-#'   rebuild the route tree. The data router is created once on mount and
-#'   subsequent \code{Route()} edits are ignored; to apply a new route
-#'   tree at runtime, give \code{RouterProvider} itself a changing
-#'   \code{key} (e.g. via \code{shiny::renderUI}).
+#' @param key Stable React key for the route's \code{element}. Defaults to
+#'   a random alphanumeric string per \code{Route()} call, so each route's
+#'   element has a distinct identity from its siblings -- this is what
+#'   causes React to unmount the previous route's subtree (and reinitialise
+#'   its Shiny output bindings) when navigating between routes that render
+#'   the same component shape. You almost never need to pass this
+#'   explicitly. \strong{Note:} this key only affects identity of the
+#'   route's \code{element}; it does \emph{not} rebuild the
+#'   \code{\link{RouterProvider}} data router. The route tree is created
+#'   once on mount and subsequent \code{Route()} edits are ignored; to
+#'   apply a new route tree at runtime, give \code{RouterProvider} itself
+#'   a changing \code{key} (e.g. via \code{shiny::renderUI}).
 #' @param loader Optional. A \code{\link{JS}} expression evaluating to a
 #'   loader function, e.g. \code{JS("({ params }) => fetch(...)")}. For a
 #'   plain unconditional redirect, use \code{\link{redirect}}. To embed
