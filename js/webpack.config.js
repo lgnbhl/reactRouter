@@ -11,7 +11,7 @@ const config = {
     path: path.join(__dirname, '..', 'inst', 'reactRouter'),
     filename: 'react-router-dom.js',
   },
-  resolve: { extensions: ['.js', '.jsx', '.ts', '.tsx'] },
+  resolve: { extensions: ['.js', '.ts'] },
   externals: {
     react: 'jsmodule["react"]',
     'react-dom': 'jsmodule["react-dom"]',
