@@ -26,19 +26,35 @@ test_that("function-returning hooks accept render = JS(...)", {
   expect_no_error(useLinkClickHandler(to = "/x", render = JS("h => h")))
 })
 
-test_that("function-returning hooks accept into with explicit non-children as", {
-  expect_no_error(
-    useNavigate(into = htmltools::tags$button("Go"), as = "onClick")
+test_that("useNavigate/useSubmit reject as = 'onClick' (unsafe signature)", {
+  expect_error(
+    useNavigate(into = htmltools::tags$button("Go"), as = "onClick"),
+    'unsafe',
+    fixed = TRUE
   )
-  expect_no_error(
-    useSubmit(into = htmltools::tags$button("Save"), as = "onClick")
+  expect_error(
+    useSubmit(into = htmltools::tags$button("Save"), as = "onClick"),
+    'unsafe',
+    fixed = TRUE
   )
+})
+
+test_that("useLinkClickHandler accepts as = 'onClick' (MouseEvent signature)", {
   expect_no_error(
     useLinkClickHandler(
       to = "/x",
       into = htmltools::tags$span("link"),
       as = "onClick"
     )
+  )
+})
+
+test_that("function-returning hooks accept other explicit non-children as", {
+  expect_no_error(
+    useNavigate(into = htmltools::tags$button("Go"), as = "onMouseEnter")
+  )
+  expect_no_error(
+    useSubmit(into = htmltools::tags$button("Save"), as = "onMouseEnter")
   )
 })
 
