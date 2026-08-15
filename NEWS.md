@@ -1,3 +1,14 @@
+# reactRouter 0.2.1
+
+Dependency maintenance release. No changes to the R API.
+
+* Updated the bundled `react-router-dom` from 7.15.0 to 7.18.2 and rebuilt
+  `inst/reactRouter/react-router-dom.js`.
+* Updated the JavaScript build toolchain: `webpack` 5.109.2 and
+  `webpack-cli` 7.2.2.
+* Updated GitHub Actions workflows: `actions/checkout` v7,
+  `actions/setup-node` v7, and Node 24 for the JS build check.
+
 # reactRouter 0.2.0
 
 CRAN submission. Major release upgrading the package to React Router v7

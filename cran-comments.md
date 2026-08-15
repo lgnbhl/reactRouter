@@ -1,8 +1,8 @@
 ## Submission
 
-This is a major release that updates the package to React Router v7 and
-adds the data router API (loaders, actions, fetchers), nested routes,
-deferred data via `Await`, and the full set of v7 navigation hooks.
+This is a patch release. It updates the bundled JavaScript dependencies
+(`react-router-dom` 7.15.0 -> 7.18.2) and the build toolchain, and rebuilds
+`inst/reactRouter/react-router-dom.js`. There are no changes to the R API.
 
 ## Test environments
 
