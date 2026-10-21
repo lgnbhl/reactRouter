@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# reactRouter <img src="man/figures/logo.png" align="right" height="138" />
+# reactRouter <img src="man/figures/logo.png" align="right" height="138" alt="reactRouter logo" />
 
 <!-- badges: start -->
 
@@ -10,7 +10,7 @@ status](https://www.r-pkg.org/badges/version/reactRouter)](https://CRAN.R-projec
 [![Grand
 total](https://cranlogs.r-pkg.org/badges/grand-total/reactRouter)](https://cran.r-project.org/package=reactRouter)
 [![R-CMD-check](https://github.com/lgnbhl/reactRouter/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/lgnbhl/reactRouter/actions/workflows/R-CMD-check.yaml)
-[![](https://img.shields.io/badge/react--router--dom-7.18.2-blue.svg)](https://reactrouter.com)
+[![react-router-dom 7.18.2](https://img.shields.io/badge/react--router--dom-7.18.2-blue.svg)](https://reactrouter.com)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Follow-E4405F?style=social&logo=linkedin)](https://www.linkedin.com/in/FelixLuginbuhl)
 <!-- badges: end -->
 
