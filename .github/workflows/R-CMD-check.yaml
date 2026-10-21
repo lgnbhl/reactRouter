@@ -40,6 +40,15 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
+      # pak would install chromium (for chromote) from the flaky xtradeb PPA;
+      # runners already ship google-chrome, so install the other sysreqs ourselves.
+      - name: Install system dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev cmake make libuv1-dev zlib1g-dev libicu-dev
+          echo "PKG_SYSREQS=false" >> "$GITHUB_ENV"
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck
