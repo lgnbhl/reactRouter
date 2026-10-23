@@ -23,6 +23,15 @@
   a `Form` in the current route would submit to (optionally for a given
   `action` path and `relative` mode), for building custom forms.
 
+* `render` and `into` can now be combined in every hook wrapper. `render`
+  then receives the `into` element (with any `...` props applied) as its last
+  argument, `(value, el)` (`(params, setParams, el)` for
+  `useSearchParams()`), so it can clone an R-built component with props
+  computed in JS. Since `render` runs during render, it can also call other
+  React Router hooks, e.g. `useNavigation()` for optimistic UI. See
+  "Combining hooks" in `vignette("advanced-hooks")`. Passing both previously
+  raised an error, so existing code is unaffected.
+
 ## Minor changes
 
 * `useViewTransitionState()` and `useLinkClickHandler()` now validate

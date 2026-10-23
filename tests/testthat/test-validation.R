@@ -66,3 +66,16 @@ test_that("missing() guards on required positional args fire", {
   expect_error(useMatch(), "`pattern` is required", fixed = TRUE)
   expect_error(useRouteLoaderData(), "`routeId` is required", fixed = TRUE)
 })
+
+test_that("`into` and `render` can be combined", {
+  span <- htmltools::tags$span()
+  expect_no_error(useLoaderData(span, render = JS("(d, el) => el")))
+  expect_no_error(useSearchParams(span, render = JS("(p, set, el) => el")))
+  # The function-target checks only apply to injection via `as`.
+  expect_no_error(
+    useNavigate(htmltools::tags$button("Go"), render = JS("(nav, el) => el"))
+  )
+  expect_no_error(
+    useLinkClickHandler(to = "/x", into = span, render = JS("(h, el) => el"))
+  )
+})

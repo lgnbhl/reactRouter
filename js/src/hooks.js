@@ -32,13 +32,38 @@ function applySelector(result, selector, mapArray) {
 // render receives the full hook value so it can navigate it freely
 // (matches React Router's native render-prop mental model).
 //
+// When both `render` and `into` are given, render also receives `into`
+// (with the extra `...rest` props applied) as its last argument, so it
+// can clone an R-built component with props computed in JS. render is
+// called from its own RenderProp component, so it may itself call React
+// Router hooks (e.g. useNavigation()) to combine several hook values —
+// the package never needs to know about the combination. The separate
+// component keeps those hooks out of the wrapper's hook list, so early
+// returns in a wrapper (UseHook's `nullIfFalsy`) can't change its count.
+// Do NOT inline `render(...)` back into the wrappers: calling hooks from
+// `render` is documented public API (vignette "advanced-hooks").
+//
 // When `as === "children"` and the value is a plain object, it is
 // JSON-stringified to avoid React error #31 ("Objects are not valid as
 // a React child"). Arrays of primitives (strings/numbers) are joined
 // with ", " so repeated query params or list-like loader data display
 // readably; arrays of objects still fall back to JSON.
+function renderTarget(into, rest) {
+  return into ? React.cloneElement(into, rest) : undefined;
+}
+
+function RenderProp({ render, args }) {
+  return render(...args);
+}
+
+function callRender(render, args) {
+  return React.createElement(RenderProp, { render, args });
+}
+
 function injectValue({ result, selector, mapArray, render, into, as, rest }) {
-  if (typeof render === 'function') return render(result);
+  if (typeof render === 'function') {
+    return callRender(render, [result, renderTarget(into, rest)]);
+  }
   let value = applySelector(result, selector, mapArray);
   if (as === 'children' && value != null && typeof value === 'object') {
     const isPrimitiveArray = Array.isArray(value) &&
@@ -131,7 +156,10 @@ export function useSearchParams({ param, single = false, defaultInit, as, into, 
   // When using the render prop, pass the setter as a second argument so JS
   // code can update query params programmatically:
   //   render = JS("(val, setParams) => <button onClick={() => setParams({tag:'b'})}>...")
-  if (typeof render === 'function') return render(result, setSearchParams);
+  // With `into` too, the target element comes third (see injectValue).
+  if (typeof render === 'function') {
+    return callRender(render, [result, setSearchParams, renderTarget(into, rest)]);
+  }
   return injectValue({ result, render, into, as, rest });
 }
 

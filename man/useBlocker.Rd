@@ -26,9 +26,14 @@ If \code{NULL} (the default), the entire data is passed. Dotted paths
 like \code{"summary.title"} navigate nested objects.}
 
 \item{render}{Optional \code{\link{JS}} function \code{(value) => ReactNode}
-used in place of \code{into}/\code{as}. Mirrors the native React Router
-pattern for cases where a single prop is not expressive enough (e.g.
-\code{JS("v => `${v.first} ${v.last}`")}).}
+used in place of \code{as}/\code{selector}. Mirrors the native React
+Router pattern for cases where a single prop is not expressive enough
+(e.g. \code{JS("v => `${v.first} ${v.last}`")}). If \code{into} is also
+given, it is passed as the last argument, \code{(value, el)}, with
+\code{...} props applied, so the function can clone it with computed
+props. The function runs during render and may call other React Router
+hooks from \code{window.jsmodule['react-router-dom']} (see the
+"Combining hooks" section of \code{vignette("advanced-hooks")}).}
 
 \item{shouldBlock}{Either \code{FALSE} (the default, disables blocking)
 or a \code{\link{JS}} function receiving

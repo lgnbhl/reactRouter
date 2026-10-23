@@ -21,7 +21,8 @@ that will receive the hook value as the specified prop.}
 value into. Defaults to \code{"children"}.}
 
 \item{render}{Optional \code{\link{JS}} function \code{(value) => ReactNode}
-used in place of \code{into}/\code{as}.}
+used in place of \code{as}. If \code{into} is also given, it is passed
+as the last argument, \code{(value, el)}, with \code{...} props applied.}
 
 \item{to}{Character. The destination path being transitioned to.}
 

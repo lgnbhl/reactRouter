@@ -16,7 +16,8 @@ value into. Defaults to \code{"children"}.}
 \item{to}{Character. The path to resolve.}
 
 \item{render}{Optional \code{\link{JS}} function \code{(value) => ReactNode}
-used in place of \code{into}/\code{as}.}
+used in place of \code{as}. If \code{into} is also given, it is passed
+as the last argument, \code{(value, el)}, with \code{...} props applied.}
 
 \item{relative}{Optional character, how \code{..} segments in \code{to}
 are resolved: \code{"route"} (React Router's default) goes up one level

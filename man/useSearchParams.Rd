@@ -35,9 +35,14 @@ a data grid, \code{"value"} for an input).}
   \code{render = JS("v => v.length ? v.join(', ') : <em>none</em>")}.}
 
 \item{render}{Optional \code{\link{JS}} function \code{(value) => ReactNode}
-used in place of \code{into}/\code{as}. Mirrors the native React Router
-pattern for cases where a single prop is not expressive enough (e.g.
-\code{JS("v => `${v.first} ${v.last}`")}).}
+used in place of \code{as}/\code{selector}. Mirrors the native React
+Router pattern for cases where a single prop is not expressive enough
+(e.g. \code{JS("v => `${v.first} ${v.last}`")}). If \code{into} is also
+given, it is passed as the last argument, \code{(value, el)}, with
+\code{...} props applied, so the function can clone it with computed
+props. The function runs during render and may call other React Router
+hooks from \code{window.jsmodule['react-router-dom']} (see the
+"Combining hooks" section of \code{vignette("advanced-hooks")}).}
 
 \item{single}{Logical. When \code{TRUE}, uses \code{URLSearchParams.get()}
 instead of \code{getAll()}: with \code{param}, returns the first value
@@ -76,7 +81,8 @@ formatting, use \code{render}.
 \itemize{
   \item \code{into} / \code{as} — \emph{read-only}. Receives the parsed
     params (or one \code{param}) and ignores the setter.
-  \item \code{render} — receives both as \code{(params, setSearchParams)},
+  \item \code{render} — receives both as \code{(params, setSearchParams)}
+    (plus the \code{into} element as a third argument when given),
     so use this form when you need to update the URL programmatically:
     \preformatted{
   useSearchParams(render = JS(

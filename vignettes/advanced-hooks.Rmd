@@ -51,7 +51,7 @@ read `session$clientData$url_hash` instead of trying to drive an
 
 ## Two ways to inject hook values
 
-Every hook wrapper in **reactRouter** offers two mutually exclusive ways to
+Every hook wrapper in **reactRouter** offers two ways to
 turn a hook value into UI. Pick whichever is more ergonomic for the case at
 hand — the API is identical across all hooks (`useLoaderData()`,
 `useParams()`, `useBlocker()`, `useOutletContext()`, …).
@@ -74,8 +74,96 @@ combining several fields, conditional rendering, or template strings:
 useOutletContext(render = JS("u => `${u.name} (${u.role})`"))
 ```
 
-When `render` is supplied, `into`, `as`, and `selector` are ignored —
-apply any selection inside the JS function directly.
+When `render` is supplied, `as` and `selector` are ignored — apply any
+selection inside the JS function directly. If you also pass `into`, the
+function receives it as its last argument (with any extra `...` props
+applied), so it can set props on an R-built component:
+
+```r
+useLoaderData(
+  tags$span(class = "user"),
+  render = JS("(d, el) => window.jsmodule['react'].cloneElement(el, {
+    title: d.email, children: d.name
+  })")
+)
+```
+
+For `useSearchParams()`, whose `render` already receives the setter as its
+second argument, the element comes third: `(params, setParams, el)`.
+
+## Combining hooks
+
+Each wrapper calls exactly one React Router hook. When a value depends on
+several hooks, do what you would do in React: call the other hooks yourself.
+`render` runs while the wrapper's component renders, so it may call any
+React Router hook from `window.jsmodule['react-router-dom']`, as long as the
+calls are unconditional (the
+[rules of hooks](https://react.dev/reference/rules/rules-of-hooks)).
+
+Data hooks such as `useNavigation()` only work under a data router
+(`RouterProvider()` with `createHashRouter()`, `createBrowserRouter()` or
+`createMemoryRouter()`), not under `HashRouter()` / `BrowserRouter()`.
+
+### Optimistic UI with `useNavigation()`
+
+A control that is controlled against loader data and writes its state to
+the URL (a toggle group, a multi-select) only shows a click once the loader
+has answered: until then, the prop it renders from is still the previous
+loader result. React Router's answer is
+optimistic UI ([`useNavigation()`](https://api.reactrouter.com/v7/functions/react-router.useNavigation.html)):
+while a navigation is pending, read the value from the URL being loaded,
+`useNavigation().location`, and fall back to the loader data otherwise.
+
+Here a multi-select MUI `ToggleButtonGroup` writes `?colors=red,blue` to the
+URL, and a (slow) loader returns the selection the page should show:
+
+```r
+library(muiMaterial)
+
+optimistic_colors <- JS("(data, el) => {
+  const { useNavigation, useLocation } = window.jsmodule['react-router-dom'];
+  const navigation = useNavigation();
+  const location = useLocation();
+  const next = navigation.location;
+  let colors = data.colors;
+  // Only for a pending navigation to this same page.
+  if (next && next.pathname === location.pathname) {
+    const params = new URLSearchParams(next.search);
+    if (params.has('colors')) {
+      colors = params.get('colors').split(',').filter(Boolean);
+    }
+  }
+  return window.jsmodule['react'].cloneElement(el, { value: colors });
+}")
+
+Route(
+  index = TRUE,
+  loader = JS("async ({ request }) => {
+    const colors = new URL(request.url).searchParams.get('colors') || '';
+    await new Promise(r => setTimeout(r, 1000));  // e.g. a slow API call
+    return { colors: colors.split(',').filter(Boolean) };
+  }"),
+  element = useLoaderData(
+    ToggleButtonGroup(
+      ToggleButton(value = "red", "Red"),
+      ToggleButton(value = "green", "Green"),
+      ToggleButton(value = "blue", "Blue"),
+      onChange = JS(
+        "(_e, colors) => { location.hash = '#/?colors=' + colors.join(','); }"
+      )
+    ),
+    render = optimistic_colors
+  )
+)
+```
+
+Without `render`, `useLoaderData(ToggleButtonGroup(...), as = "value",
+selector = "colors")` would work too, but each click would only show after
+the one-second loader.
+
+The loader stays the source of truth: as soon as it answers,
+`navigation.location` is `undefined` again and the prop shows the loader's
+value, including any normalisation or default it applies.
 
 ---
 
@@ -97,7 +185,7 @@ apply any selection inside the JS function directly.
 | `into` | yes\* | Component that receives the value |
 | `as` | no | Prop to inject into. Defaults to `"children"` |
 | `selector` | no | Field from the blocker object. Defaults to `"state"` |
-| `render` | no | `JS()` function `(value) => ReactNode`. When supplied, replaces `into`/`as`/`selector`. |
+| `render` | no | `JS()` function `(value) => ReactNode`. When supplied, replaces `as`/`selector`; `into`, if given, is passed as its last argument. |
 | `shouldBlock` | no | A `JS()` function receiving `{ currentLocation, nextLocation, historyAction }` and returning `true` to block or `false` to allow. Defaults to `FALSE` (never blocks). |
 
 \* `into` is required unless `render` is supplied.
@@ -256,7 +344,7 @@ through deeply nested layouts.
 | `into` | yes\* | Component that receives the value |
 | `as` | no | Prop to inject into. Defaults to `"children"` |
 | `selector` | no | Field to extract from the context object. Dotted paths like `"user.name"` navigate nested objects. `NULL` (default) injects the full context. |
-| `render` | no | `JS()` function `(context) => ReactNode`. When supplied, replaces `into`/`as`/`selector`. |
+| `render` | no | `JS()` function `(context) => ReactNode`. When supplied, replaces `as`/`selector`; `into`, if given, is passed as its last argument. |
 
 \* `into` is required unless `render` is supplied.
 
