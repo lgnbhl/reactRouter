@@ -26,6 +26,8 @@ basic data loading and navigation:
 
 Both hooks require a data router: `RouterProvider()` with
 `createHashRouter()`, `createBrowserRouter()`, or `createMemoryRouter()`.
+The `useBlocker()` section also covers its companion `useBeforeUnload()`,
+which warns when the user leaves the app entirely.
 
 ## Why "hooks" are components in this package
 
@@ -39,10 +41,11 @@ JavaScript `render` function.
 
 The practical consequence is that **every hook call must produce some UI**:
 either a target component that receives the value, or a `render = JS(...)`
-function that returns a React node. There is no "call the hook just to
-trigger a side effect" form, because the hook only runs when its element
-is mounted in the React tree. If you need to react to a hook value from
-the Shiny server, mount a `Link.shinyInput()` / `NavLink.shinyInput()` or
+function that returns a React node. The hook only runs while its element
+is mounted in the React tree. The one exception is `useBeforeUnload()`,
+which has no value to inject: it renders nothing and exists only for its
+side effect, so place it anywhere in the UI. If you need to react to a
+hook value from the Shiny server, mount a `Link.shinyInput()` / `NavLink.shinyInput()` or
 read `session$clientData$url_hash` instead of trying to drive an
 `observeEvent()` from `useLocation()` directly.
 
@@ -216,6 +219,27 @@ JS("() => true")
 # Never block
 FALSE  # the default
 ```
+
+### Leaving the app: `useBeforeUnload()`
+
+`useBlocker()` only sees navigation *inside* the router. Closing the tab,
+reloading, or typing another site's URL bypasses it. For those, use
+`useBeforeUnload()`, which runs a `JS()` callback on the browser's
+`beforeunload` event. Call `e.preventDefault()` in the callback to make the
+browser show its native "Leave site?" dialog. Browsers use their own text,
+so a custom message is ignored.
+
+```r
+# Warn before leaving while the note field has content
+useBeforeUnload(JS("e => {
+  if (document.querySelector('#note')?.value) e.preventDefault();
+}"))
+```
+
+Unlike `useBlocker()`, it works in any router, renders nothing, and takes
+no `into`/`render`. Pass `capture = TRUE` to register the listener in the
+capture phase. Pair the two hooks to protect unsaved changes against both
+kinds of exit.
 
 ---
 
