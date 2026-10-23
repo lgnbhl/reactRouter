@@ -36,6 +36,23 @@ ui <- reactRouter::RouterProvider(
               to = "../settings",
               selector = "pathname"
             )
+          ),
+          div(
+            id = "hrefPathRelative",
+            reactRouter::useHref(
+              tags$span(),
+              to = "../settings",
+              relative = "path"
+            )
+          ),
+          div(
+            id = "resolvedPathRelative",
+            reactRouter::useResolvedPath(
+              tags$span(),
+              to = "../settings",
+              selector = "pathname",
+              relative = "path"
+            )
           )
         )
       )

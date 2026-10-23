@@ -10,6 +10,7 @@ useSearchParams(
   param = NULL,
   render = NULL,
   single = FALSE,
+  defaultInit = NULL,
   ...
 )
 }
@@ -46,6 +47,13 @@ the target prop needs a scalar, e.g. the \code{value} of an MUI
 \code{Tabs} or \code{Select}, which compare with \code{===}.
 Defaults to \code{FALSE}.}
 
+\item{defaultInit}{Optional default search params, used for any key the
+URL does not contain. Either a named list or named character vector
+(e.g. \code{list(tab = "overview", tag = c("a", "b"))}), or a single
+query string (e.g. \code{"tab=overview"}). Defaults are only read, not
+written into the URL. React Router captures them on first render, so
+later changes to \code{defaultInit} are ignored.}
+
 \item{...}{Additional props to pass to the component.}
 }
 \description{
@@ -75,4 +83,17 @@ formatting, use \code{render}.
   ))
     }
 }
+}
+\examples{
+\dontrun{
+# Drive an MUI Tabs value from `?tab=`, falling back to "overview"
+useSearchParams(
+  muiMaterial::Tabs(...),
+  as = "value",
+  param = "tab",
+  single = TRUE,
+  defaultInit = list(tab = "overview")
+)
+}
+
 }

@@ -7,6 +7,16 @@
   as a scalar string (or `null` if absent) instead of an array. This lets
   `into`/`as` target props that need a scalar, such as MUI `Tabs` or
   `Select` `value`. The default (`FALSE`) keeps the previous behaviour.
+* `useSearchParams()` gains a `defaultInit` argument, forwarded to the
+  hook's native `defaultInit`: default values used for keys missing from
+  the URL (e.g. `defaultInit = list(tab = "overview")`). They are not
+  written into the URL.
+* `useHref()` and `useResolvedPath()` gain a `relative` argument
+  (`"route"` or `"path"`), forwarded as the hooks' `{ relative }` option.
+  It controls whether `..` goes up one route level or one URL segment.
+* New `useBeforeUnload()` wraps the hook of the same name: it runs a `JS()`
+  callback when the tab is closed or reloaded, complementing `useBlocker()`
+  for in-app navigation.
 
 ## Minor changes
 

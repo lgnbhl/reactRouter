@@ -226,6 +226,20 @@ useHookElement <- function(
   )
 }
 
+# Internal: validate a `relative` argument and wrap it as the `{ relative }`
+# options object passed to UseHook as `hookOpts`. NULL means "omit the
+# options", so React Router applies its own default ("route").
+relativeOpts <- function(label, relative) {
+  if (is.null(relative)) return(NULL)
+  if (!is.character(relative) || length(relative) != 1 || !relative %in% c("route", "path")) {
+    stop(
+      sprintf('%s(): `relative` must be NULL, "route" or "path".', label),
+      call. = FALSE
+    )
+  }
+  list(relative = relative)
+}
+
 #' useLoaderData
 #'
 #' \url{https://api.reactrouter.com/v7/functions/react-router.useLoaderData.html}
@@ -599,6 +613,24 @@ useMatches <- function(
 #'   the target prop needs a scalar, e.g. the \code{value} of an MUI
 #'   \code{Tabs} or \code{Select}, which compare with \code{===}.
 #'   Defaults to \code{FALSE}.
+#' @param defaultInit Optional default search params, used for any key the
+#'   URL does not contain. Either a named list or named character vector
+#'   (e.g. \code{list(tab = "overview", tag = c("a", "b"))}), or a single
+#'   query string (e.g. \code{"tab=overview"}). Defaults are only read, not
+#'   written into the URL. React Router captures them on first render, so
+#'   later changes to \code{defaultInit} are ignored.
+#'
+#' @examples
+#' \dontrun{
+#' # Drive an MUI Tabs value from `?tab=`, falling back to "overview"
+#' useSearchParams(
+#'   muiMaterial::Tabs(...),
+#'   as = "value",
+#'   param = "tab",
+#'   single = TRUE,
+#'   defaultInit = list(tab = "overview")
+#' )
+#' }
 #'
 #' @rdname useSearchParams
 #' @export
@@ -608,6 +640,7 @@ useSearchParams <- function(
   param = NULL,
   render = NULL,
   single = FALSE,
+  defaultInit = NULL,
   ...
 ) {
   validateTarget("useSearchParams", into, render)
@@ -621,8 +654,31 @@ useSearchParams <- function(
     param = param,
     render = render,
     single = single,
+    defaultInit = normalizeDefaultInit(defaultInit),
     ...
   )
+}
+
+# Internal: coerce `defaultInit` into a shape that serialises to what
+# React Router's createSearchParams() accepts — a query string, or an
+# object of string / string-array values. A named character vector would
+# lose its names in JSON, so it is converted to a list first.
+normalizeDefaultInit <- function(defaultInit) {
+  if (is.null(defaultInit)) return(NULL)
+  if (is.character(defaultInit) && length(defaultInit) == 1 && is.null(names(defaultInit))) {
+    return(defaultInit)
+  }
+  nms <- names(defaultInit)
+  if (!(is.list(defaultInit) || is.character(defaultInit)) ||
+      length(defaultInit) == 0 || is.null(nms) || any(is.na(nms) | nms == "")) {
+    stop(
+      "useSearchParams(): `defaultInit` must be a named list or named character ",
+      'vector (e.g. list(tab = "overview")), or a single query string ',
+      '(e.g. "tab=overview").',
+      call. = FALSE
+    )
+  }
+  lapply(as.list(defaultInit), as.character)
 }
 
 #' useHref
@@ -634,16 +690,24 @@ useSearchParams <- function(
 #'
 #' @inheritParams hook-wrapper-noselector
 #' @param to Character. The path to resolve.
+#' @param relative Optional character, how \code{..} segments in \code{to}
+#'   are resolved: \code{"route"} (React Router's default) goes up one level
+#'   in the route hierarchy, \code{"path"} goes up one URL segment. They
+#'   differ in nested routes, e.g. from \code{"/products/42"} matched by
+#'   \code{Route(path = "products/:id")}, \code{"../settings"} resolves to
+#'   \code{"/settings"} with \code{"route"} but \code{"/products/settings"}
+#'   with \code{"path"}.
 #'
 #' @rdname useHref
 #' @export
-useHref <- function(into = NULL, as = "children", to, render = NULL, ...) {
+useHref <- function(into = NULL, as = "children", to, render = NULL, relative = NULL, ...) {
   if (missing(to)) {
     stop('useHref(): `to` is required (the path to resolve).', call. = FALSE)
   }
   useHookElement(
     hook = "useHref",
     hookArg = to,
+    hookOpts = relativeOpts("useHref", relative),
     into = into,
     as = as,
     render = render,
@@ -660,7 +724,7 @@ useHref <- function(into = NULL, as = "children", to, render = NULL, ...) {
 #' Returns \code{pathname}, \code{search}, and \code{hash}.
 #'
 #' @inheritParams hook-wrapper
-#' @param to Character. The path to resolve.
+#' @inheritParams useHref
 #'
 #' @rdname useResolvedPath
 #' @export
@@ -670,6 +734,7 @@ useResolvedPath <- function(
   selector = NULL,
   render = NULL,
   to,
+  relative = NULL,
   ...
 ) {
   if (missing(to)) {
@@ -678,6 +743,7 @@ useResolvedPath <- function(
   useHookElement(
     hook = "useResolvedPath",
     hookArg = to,
+    hookOpts = relativeOpts("useResolvedPath", relative),
     into = into,
     as = as,
     selector = selector,
@@ -837,6 +903,55 @@ useBlocker <- function(
     selector = selector,
     render = render,
     ...
+  )
+}
+
+#' useBeforeUnload
+#'
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useBeforeUnload.html}
+#'
+#' Calls the \code{useBeforeUnload()} hook, which runs \code{callback} on the
+#' browser's \code{beforeunload} event -- when the tab is closed, reloaded, or
+#' navigated to another site. Renders nothing; place it anywhere in the UI.
+#'
+#' Complements \code{\link{useBlocker}}: \code{useBlocker} intercepts
+#' navigation \emph{inside} the app, \code{useBeforeUnload} catches the user
+#' \emph{leaving} it. To ask the browser to show its native "Leave site?"
+#' dialog, call \code{event.preventDefault()} in the callback. Browsers show
+#' their own message; custom text is ignored.
+#'
+#' @param callback A \code{\link{JS}} function receiving the
+#'   \code{BeforeUnloadEvent}. \strong{Must be a JS() expression}, not an R
+#'   function -- the browser calls it synchronously while the page unloads.
+#' @param capture Optional logical. When \code{TRUE}, the listener is
+#'   registered in the capture phase. Defaults to \code{NULL} (the browser
+#'   default, bubbling phase).
+#'
+#' @examples
+#' \dontrun{
+#' # Warn before leaving while a form field has content
+#' useBeforeUnload(JS("e => {
+#'   if (document.querySelector('#note')?.value) e.preventDefault();
+#' }"))
+#' }
+#'
+#' @rdname useBeforeUnload
+#' @export
+useBeforeUnload <- function(callback, capture = NULL) {
+  if (missing(callback) || !inherits(callback, "JS_EVAL")) {
+    stop(
+      "useBeforeUnload(): `callback` must be a JS() expression, e.g. ",
+      'callback = JS("e => e.preventDefault()").',
+      call. = FALSE
+    )
+  }
+  if (!is.null(capture) && !isTRUE(capture) && !isFALSE(capture)) {
+    stop("useBeforeUnload(): `capture` must be NULL, TRUE or FALSE.", call. = FALSE)
+  }
+  customHookElement(
+    "useBeforeUnload",
+    callback = callback,
+    capture = capture
   )
 }
 

@@ -65,15 +65,17 @@ const ALLOWED_HOOKS = new Set([
 ]);
 
 // Generic dispatcher for any React Router hook that fits the common shape:
-//   value = ReactRouter[hook](hookArg?); optional dotted-path `selector`;
+//   value = ReactRouter[hook](hookArg?, hookOpts?); optional dotted-path `selector`;
 //   render it via `render` JS function or by cloning `into` with `[as]=value`.
 //
 // The R wrapper for each hook passes a fixed `hook` string, so the same hook
 // is always invoked at the same position in the render tree — rules-of-hooks
-// compliant. Hooks with distinct argument or return shapes (useSearchParams,
+// compliant. `hookOpts` is an optional second positional argument, e.g. the
+// `{ relative }` options of useHref(to, opts) / useResolvedPath(to, opts).
+// Hooks with distinct argument or return shapes (useSearchParams,
 // useFetcher, Await) stay as dedicated components below.
 export function UseHook({
-  hook, hookArg, selector, as, into, render,
+  hook, hookArg, hookOpts, selector, as, into, render,
   mapArray = false, nullIfFalsy = false, ...rest
 }) {
   if (!ALLOWED_HOOKS.has(hook)) {
@@ -89,7 +91,10 @@ export function UseHook({
       `This is an internal reactRouter package error — please report it.`
     );
   }
-  const result = hookArg !== undefined ? fn(hookArg) : fn();
+  let result;
+  if (hookArg === undefined) result = fn();
+  else if (hookOpts == null) result = fn(hookArg);
+  else result = fn(hookArg, hookOpts);
   if (nullIfFalsy && !result) return null;
   return injectValue({ result, selector, mapArray, render, into, as, rest });
 }
@@ -101,8 +106,10 @@ export function UseHook({
 // `injectValue` renders arrays of primitives readably. `single` switches to
 // `.get()` (first value as a string, `null` if absent) for target props that
 // need a scalar, e.g. MUI `Tabs value`, which compares with `===`.
-export function useSearchParams({ param, single = false, as, into, render, ...rest }) {
-  const [searchParams, setSearchParams] = ReactRouter.useSearchParams();
+// `defaultInit` is forwarded as the hook's own argument: its keys apply
+// whenever the URL lacks them (they are not written into the URL).
+export function useSearchParams({ param, single = false, defaultInit, as, into, render, ...rest }) {
+  const [searchParams, setSearchParams] = ReactRouter.useSearchParams(defaultInit ?? undefined);
   let result;
   if (param) {
     result = single ? searchParams.get(param) : searchParams.getAll(param);
@@ -148,6 +155,17 @@ export function UseRoutes({ routes, children }) {
     ? routes
     : ReactRouter.createRoutesFromElements(children);
   return ReactRouter.useRoutes(resolved);
+}
+
+// Not routed through UseHook: the hook returns nothing and has no value to
+// inject — it only registers a `beforeunload` listener on window. Renders
+// nothing.
+export function useBeforeUnload({ callback, capture }) {
+  ReactRouter.useBeforeUnload(
+    callback,
+    capture != null ? { capture } : undefined
+  );
+  return null;
 }
 
 // Not routed through UseHook: takes (to, opts) — two positional args.

@@ -21,3 +21,26 @@ test_that("useHref() and useResolvedPath() resolve paths", {
   resolved_pathname <- app$get_text("#resolvedPathname")
   expect_equal(resolved_pathname, "/settings")
 })
+
+test_that("useHref() and useResolvedPath() honour `relative`", {
+  skip_on_cran()
+
+  app <- shinytest2::AppDriver$new(
+    app_dir = testthat::test_path("test-apps", "UseHrefResolvedPath")
+  )
+  app$wait_for_idle()
+
+  app$get_js("window.location.hash = '#/products/42'")
+  app$wait_for_idle()
+
+  # Default ("route"): ".." leaves the products/:id route -> /settings.
+  # "path": ".." drops one URL segment (42) -> /products/settings.
+  expect_equal(app$get_text("#hrefPathRelative"), "#/products/settings")
+  expect_equal(app$get_text("#resolvedPathRelative"), "/products/settings")
+})
+
+test_that("useHref() and useResolvedPath() validate `relative`", {
+  expect_no_error(useHref(shiny::span(), to = "/a", relative = "path"))
+  expect_error(useHref(shiny::span(), to = "/a", relative = "url"), '`relative` must be NULL, "route" or "path"', fixed = TRUE)
+  expect_error(useResolvedPath(shiny::span(), to = "/a", relative = TRUE), '`relative` must be NULL, "route" or "path"', fixed = TRUE)
+})

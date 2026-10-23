@@ -46,3 +46,35 @@ test_that("useSearchParams() validates `single`", {
     "`single` must be TRUE or FALSE"
   )
 })
+
+test_that("useSearchParams(defaultInit) applies defaults only for missing keys", {
+  skip_on_cran()
+
+  app <- shinytest2::AppDriver$new(
+    app_dir = testthat::test_path("test-apps", "UseSearchParams")
+  )
+  app$wait_for_idle()
+
+  expect_equal(app$get_text("#tabDefault"), "overview")
+  expect_equal(app$get_text("#tabDefaultString"), "summary")
+
+  app$get_js("window.location.hash = '#/?tab=details'")
+  app$wait_for_idle()
+
+  expect_equal(app$get_text("#tabDefault"), "details")
+  expect_equal(app$get_text("#tabDefaultString"), "details")
+  # Defaults are read-only: they never appear in the URL.
+  expect_false(grepl("overview", app$get_js("window.location.hash")))
+})
+
+test_that("useSearchParams() validates `defaultInit`", {
+  expect_no_error(
+    reactRouter::useSearchParams(htmltools::tags$span(), defaultInit = c(tab = "a"))
+  )
+  for (bad in list(c("a", "b"), list("a"), list(), 1, c(tab = "a", "b"))) {
+    expect_error(
+      reactRouter::useSearchParams(htmltools::tags$span(), defaultInit = bad),
+      "`defaultInit` must be a named list"
+    )
+  }
+})

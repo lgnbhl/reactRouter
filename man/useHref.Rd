@@ -4,7 +4,7 @@
 \alias{useHref}
 \title{useHref}
 \usage{
-useHref(into = NULL, as = "children", to, render = NULL, ...)
+useHref(into = NULL, as = "children", to, render = NULL, relative = NULL, ...)
 }
 \arguments{
 \item{into}{A component (HTML tag or \pkg{shiny.react}-based element)
@@ -17,6 +17,14 @@ value into. Defaults to \code{"children"}.}
 
 \item{render}{Optional \code{\link{JS}} function \code{(value) => ReactNode}
 used in place of \code{into}/\code{as}.}
+
+\item{relative}{Optional character, how \code{..} segments in \code{to}
+are resolved: \code{"route"} (React Router's default) goes up one level
+in the route hierarchy, \code{"path"} goes up one URL segment. They
+differ in nested routes, e.g. from \code{"/products/42"} matched by
+\code{Route(path = "products/:id")}, \code{"../settings"} resolves to
+\code{"/settings"} with \code{"route"} but \code{"/products/settings"}
+with \code{"path"}.}
 
 \item{...}{Additional props to pass to the component.}
 }

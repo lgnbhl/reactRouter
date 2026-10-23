@@ -36,6 +36,24 @@ ui <- reactRouter::HashRouter(
       single = TRUE
     )
   ),
+  div(
+    id = "tabDefault",
+    reactRouter::useSearchParams(
+      tags$span(),
+      param = "tab",
+      single = TRUE,
+      defaultInit = list(tab = "overview")
+    )
+  ),
+  div(
+    id = "tabDefaultString",
+    reactRouter::useSearchParams(
+      tags$span(),
+      param = "tab",
+      single = TRUE,
+      defaultInit = "tab=summary"
+    )
+  ),
   reactRouter::Routes(
     reactRouter::Route(
       path = "/",

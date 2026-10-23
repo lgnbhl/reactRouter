@@ -10,6 +10,7 @@ useResolvedPath(
   selector = NULL,
   render = NULL,
   to,
+  relative = NULL,
   ...
 )
 }
@@ -31,6 +32,14 @@ pattern for cases where a single prop is not expressive enough (e.g.
 \code{JS("v => `${v.first} ${v.last}`")}).}
 
 \item{to}{Character. The path to resolve.}
+
+\item{relative}{Optional character, how \code{..} segments in \code{to}
+are resolved: \code{"route"} (React Router's default) goes up one level
+in the route hierarchy, \code{"path"} goes up one URL segment. They
+differ in nested routes, e.g. from \code{"/products/42"} matched by
+\code{Route(path = "products/:id")}, \code{"../settings"} resolves to
+\code{"/settings"} with \code{"route"} but \code{"/products/settings"}
+with \code{"path"}.}
 
 \item{...}{Additional props to pass to the component.}
 }
