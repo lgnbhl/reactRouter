@@ -4,7 +4,14 @@
 \alias{useSearchParams}
 \title{useSearchParams}
 \usage{
-useSearchParams(into = NULL, as = "children", param = NULL, render = NULL, ...)
+useSearchParams(
+  into = NULL,
+  as = "children",
+  param = NULL,
+  render = NULL,
+  single = FALSE,
+  ...
+)
 }
 \arguments{
 \item{into}{A component (HTML tag or \pkg{shiny.react}-based element)
@@ -31,6 +38,14 @@ used in place of \code{into}/\code{as}. Mirrors the native React Router
 pattern for cases where a single prop is not expressive enough (e.g.
 \code{JS("v => `${v.first} ${v.last}`")}).}
 
+\item{single}{Logical. When \code{TRUE}, uses \code{URLSearchParams.get()}
+instead of \code{getAll()}: with \code{param}, returns the first value
+as a single string (\code{null} if absent); without \code{param},
+returns a named list mapping each key to its first value. Use this when
+the target prop needs a scalar, e.g. the \code{value} of an MUI
+\code{Tabs} or \code{Select}, which compare with \code{===}.
+Defaults to \code{FALSE}.}
+
 \item{...}{Additional props to pass to the component.}
 }
 \description{
@@ -41,8 +56,9 @@ Calls the \code{useSearchParams()} hook and injects the result
 \code{as} a prop of the \code{into} component. Use the \code{param}
 argument to extract a query parameter by name.
 
-Values are always returned as character vectors so that repeated keys
-(e.g. \code{"?tag=a&tag=b"}) are preserved. When injected as
+By default, values are returned as character vectors so that repeated keys
+(e.g. \code{"?tag=a&tag=b"}) are preserved; set \code{single = TRUE} to
+get only the first value as a scalar string. When injected as
 \code{"children"}, vectors are joined with \code{", "}; for custom
 formatting, use \code{render}.
 

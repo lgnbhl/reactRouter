@@ -14,6 +14,28 @@ ui <- reactRouter::HashRouter(
       param = "color"
     )
   ),
+  div(
+    id = "tagAll",
+    reactRouter::useSearchParams(
+      tags$span(),
+      param = "tag"
+    )
+  ),
+  div(
+    id = "tagSingle",
+    reactRouter::useSearchParams(
+      tags$span(),
+      param = "tag",
+      single = TRUE
+    )
+  ),
+  div(
+    id = "allSingle",
+    reactRouter::useSearchParams(
+      tags$span(),
+      single = TRUE
+    )
+  ),
   reactRouter::Routes(
     reactRouter::Route(
       path = "/",

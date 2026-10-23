@@ -1,3 +1,18 @@
+# reactRouter 0.3.0
+
+## New features
+
+* `useSearchParams()` gains a `single` argument. When `TRUE`, it uses
+  `URLSearchParams.get()` instead of `getAll()`, returning the first value
+  as a scalar string (or `null` if absent) instead of an array. This lets
+  `into`/`as` target props that need a scalar, such as MUI `Tabs` or
+  `Select` `value`. The default (`FALSE`) keeps the previous behaviour.
+
+## Minor changes
+
+* An argument named `single` passed to `useSearchParams()` is no longer
+  forwarded to the `into` component as a prop.
+
 # reactRouter 0.2.1
 
 Dependency maintenance release. No changes to the R API.

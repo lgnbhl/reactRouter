@@ -560,8 +560,9 @@ useMatches <- function(
 #' \code{as} a prop of the \code{into} component. Use the \code{param}
 #' argument to extract a query parameter by name.
 #'
-#' Values are always returned as character vectors so that repeated keys
-#' (e.g. \code{"?tag=a&tag=b"}) are preserved. When injected as
+#' By default, values are returned as character vectors so that repeated keys
+#' (e.g. \code{"?tag=a&tag=b"}) are preserved; set \code{single = TRUE} to
+#' get only the first value as a scalar string. When injected as
 #' \code{"children"}, vectors are joined with \code{", "}; for custom
 #' formatting, use \code{render}.
 #'
@@ -591,6 +592,13 @@ useMatches <- function(
 #'   "present-but-empty" (e.g. show a placeholder), use the \code{render}
 #'   form and branch on \code{Array.isArray(v) && v.length === 0}, e.g.
 #'   \code{render = JS("v => v.length ? v.join(', ') : <em>none</em>")}.
+#' @param single Logical. When \code{TRUE}, uses \code{URLSearchParams.get()}
+#'   instead of \code{getAll()}: with \code{param}, returns the first value
+#'   as a single string (\code{null} if absent); without \code{param},
+#'   returns a named list mapping each key to its first value. Use this when
+#'   the target prop needs a scalar, e.g. the \code{value} of an MUI
+#'   \code{Tabs} or \code{Select}, which compare with \code{===}.
+#'   Defaults to \code{FALSE}.
 #'
 #' @rdname useSearchParams
 #' @export
@@ -599,15 +607,20 @@ useSearchParams <- function(
   as = "children",
   param = NULL,
   render = NULL,
+  single = FALSE,
   ...
 ) {
   validateTarget("useSearchParams", into, render)
+  if (!isTRUE(single) && !isFALSE(single)) {
+    stop("useSearchParams(): `single` must be TRUE or FALSE.", call. = FALSE)
+  }
   customHookElement(
     "useSearchParams",
     as = as,
     into = into,
     param = param,
     render = render,
+    single = single,
     ...
   )
 }

@@ -96,15 +96,23 @@ export function UseHook({
 
 // Not routed through UseHook: the hook returns a tuple [searchParams, setter]
 // and `searchParams` is a URLSearchParams instance (not a plain object), so
-// the generic dotted-path `selector` can't walk it. We use `.getAll(param)`
-// so repeated keys like `?tag=a&tag=b` are preserved; single-value keys
-// come back as a length-1 array, which R's vector semantics treat the same
-// as a scalar, and `injectValue` renders arrays of primitives readably.
-export function useSearchParams({ param, as, into, render, ...rest }) {
+// the generic dotted-path `selector` can't walk it. By default we use
+// `.getAll(param)` so repeated keys like `?tag=a&tag=b` are preserved, and
+// `injectValue` renders arrays of primitives readably. `single` switches to
+// `.get()` (first value as a string, `null` if absent) for target props that
+// need a scalar, e.g. MUI `Tabs value`, which compares with `===`.
+export function useSearchParams({ param, single = false, as, into, render, ...rest }) {
   const [searchParams, setSearchParams] = ReactRouter.useSearchParams();
   let result;
   if (param) {
-    result = searchParams.getAll(param);
+    result = single ? searchParams.get(param) : searchParams.getAll(param);
+  } else if (single) {
+    // Not Object.fromEntries(searchParams): it keeps the *last* value of a
+    // repeated key, whereas `.get()` returns the first.
+    result = {};
+    for (const key of new Set(searchParams.keys())) {
+      result[key] = searchParams.get(key);
+    }
   } else {
     result = {};
     for (const key of new Set(searchParams.keys())) {
