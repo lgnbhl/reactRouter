@@ -17,6 +17,9 @@
 * New `useBeforeUnload()` wraps the hook of the same name: it runs a `JS()`
   callback when the tab is closed or reloaded, complementing `useBlocker()`
   for in-app navigation.
+* New `useFormAction()` wraps the hook of the same name: it injects the URL
+  a `Form` in the current route would submit to (optionally for a given
+  `action` path and `relative` mode), for building custom forms.
 
 ## Minor changes
 

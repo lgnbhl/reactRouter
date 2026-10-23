@@ -752,6 +752,58 @@ useResolvedPath <- function(
   )
 }
 
+#' useFormAction
+#'
+#' \url{https://api.reactrouter.com/v7/functions/react-router.useFormAction.html}
+#'
+#' Calls the \code{useFormAction()} hook and injects the resolved form action
+#' URL \code{as} a prop of the \code{into} component (e.g.
+#' \code{as = "action"} on a \code{<form>}). This is the URL a
+#' \code{\link{Form}} in the current route would submit to, so use it to
+#' build a custom form or submit button that targets a route's
+#' \code{action}. Must be used inside a \code{\link{Route}}.
+#'
+#' @inheritParams hook-wrapper-noselector
+#' @inheritParams useHref
+#' @param action Optional character. The action path to resolve, relative to
+#'   the current route. When \code{NULL} (default), resolves to the current
+#'   route and keeps the current URL's search params, as \code{\link{Form}}
+#'   does when it has no \code{action}.
+#'
+#' @examples
+#' \dontrun{
+#' # A plain <form> that posts to the "edit" child route's action
+#' useFormAction(
+#'   tags$form(method = "post", tags$button("Save")),
+#'   as = "action",
+#'   action = "edit"
+#' )
+#' }
+#'
+#' @rdname useFormAction
+#' @export
+useFormAction <- function(
+  into = NULL,
+  as = "children",
+  render = NULL,
+  action = NULL,
+  relative = NULL,
+  ...
+) {
+  if (!is.null(action) && (!is.character(action) || length(action) != 1)) {
+    stop("useFormAction(): `action` must be NULL or a single string.", call. = FALSE)
+  }
+  useHookElement(
+    hook = "useFormAction",
+    hookArg = action,
+    hookOpts = relativeOpts("useFormAction", relative),
+    into = into,
+    as = as,
+    render = render,
+    ...
+  )
+}
+
 #' useFetcher
 #'
 #' \url{https://api.reactrouter.com/v7/functions/react-router.useFetcher.html}

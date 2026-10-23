@@ -61,7 +61,7 @@ const ALLOWED_HOOKS = new Set([
   'useRouteLoaderData', 'useRouteError', 'useMatch', 'useMatches',
   'useHref', 'useResolvedPath', 'useFetchers', 'useRevalidator',
   'useBlocker', 'useInRouterContext', 'useOutlet', 'useOutletContext',
-  'useAsyncValue', 'useAsyncError',
+  'useAsyncValue', 'useAsyncError', 'useFormAction',
 ]);
 
 // Generic dispatcher for any React Router hook that fits the common shape:
@@ -72,6 +72,8 @@ const ALLOWED_HOOKS = new Set([
 // is always invoked at the same position in the render tree — rules-of-hooks
 // compliant. `hookOpts` is an optional second positional argument, e.g. the
 // `{ relative }` options of useHref(to, opts) / useResolvedPath(to, opts).
+// It is passed even without `hookArg` (as `fn(undefined, opts)`), since
+// useFormAction(action?, opts) treats a missing action as meaningful.
 // Hooks with distinct argument or return shapes (useSearchParams,
 // useFetcher, Await) stay as dedicated components below.
 export function UseHook({
@@ -92,9 +94,9 @@ export function UseHook({
     );
   }
   let result;
-  if (hookArg === undefined) result = fn();
-  else if (hookOpts == null) result = fn(hookArg);
-  else result = fn(hookArg, hookOpts);
+  if (hookOpts != null) result = fn(hookArg ?? undefined, hookOpts);
+  else if (hookArg !== undefined) result = fn(hookArg);
+  else result = fn();
   if (nullIfFalsy && !result) return null;
   return injectValue({ result, selector, mapArray, render, into, as, rest });
 }
