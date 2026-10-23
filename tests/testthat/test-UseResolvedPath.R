@@ -44,3 +44,13 @@ test_that("useHref() and useResolvedPath() validate `relative`", {
   expect_error(useHref(shiny::span(), to = "/a", relative = "url"), '`relative` must be NULL, "route" or "path"', fixed = TRUE)
   expect_error(useResolvedPath(shiny::span(), to = "/a", relative = TRUE), '`relative` must be NULL, "route" or "path"', fixed = TRUE)
 })
+
+test_that("useViewTransitionState() and useLinkClickHandler() validate `relative`", {
+  expect_no_error(useViewTransitionState(shiny::span(), to = "/a", relative = "path"))
+  expect_error(useViewTransitionState(shiny::span(), to = "/a", relative = "url"), '`relative` must be NULL, "route" or "path"', fixed = TRUE)
+  expect_error(
+    useLinkClickHandler(to = "/a", render = JS("h => null"), relative = c("route", "path")),
+    '`relative` must be NULL, "route" or "path"',
+    fixed = TRUE
+  )
+})

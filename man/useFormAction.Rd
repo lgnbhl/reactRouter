@@ -42,21 +42,26 @@ with \code{"path"}.}
 \url{https://api.reactrouter.com/v7/functions/react-router.useFormAction.html}
 }
 \details{
-Calls the \code{useFormAction()} hook and injects the resolved form action
-URL \code{as} a prop of the \code{into} component (e.g.
-\code{as = "action"} on a \code{<form>}). This is the URL a
-\code{\link{Form}} in the current route would submit to, so use it to
-build a custom form or submit button that targets a route's
-\code{action}. Must be used inside a \code{\link{Route}}.
+Calls the \code{useFormAction()} hook and passes the resolved form action
+URL to \code{render} (or injects it \code{as} a prop of \code{into}).
+This is the URL a \code{\link{Form}} in the current route would submit
+to. Must be used inside a \code{\link{Route}}.
+
+The URL is a router path, not a server URL: injecting it as the
+\code{action} of a plain HTML \code{<form>} makes the browser POST to the
+Shiny server and reload the page, bypassing the route's \code{action}
+(and, with a hash router, it lacks the \code{#}). To submit to a route
+action from custom UI, pass the URL to \code{submit()} from
+\code{\link{useSubmit}} or to \code{fetcher.submit()} from
+\code{\link{useFetcher}} as the \code{action} option.
 }
 \examples{
 \dontrun{
-# A plain <form> that posts to the "edit" child route's action
-useFormAction(
-  tags$form(method = "post", tags$button("Save")),
-  as = "action",
-  action = "edit"
-)
+# Show where a Form in this route would submit to
+useFormAction(tags$code(), action = "edit")
+
+# Store it on a custom element, e.g. for a JS handler that calls submit()
+useFormAction(tags$div(class = "editor"), as = "data-action", action = "edit")
 }
 
 }

@@ -49,7 +49,8 @@ Defaults to \code{FALSE}.}
 
 \item{defaultInit}{Optional default search params, used for any key the
 URL does not contain. Either a named list or named character vector
-(e.g. \code{list(tab = "overview", tag = c("a", "b"))}), or a single
+(e.g. \code{list(tab = "overview", tag = c("a", "b"))}; repeated names
+such as \code{c(tag = "a", tag = "b")} are combined), or a single
 query string (e.g. \code{"tab=overview"}). Defaults are only read, not
 written into the URL. React Router captures them on first render, so
 later changes to \code{defaultInit} are ignored.}

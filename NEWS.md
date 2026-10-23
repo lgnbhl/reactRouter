@@ -7,10 +7,12 @@
   as a scalar string (or `null` if absent) instead of an array. This lets
   `into`/`as` target props that need a scalar, such as MUI `Tabs` or
   `Select` `value`. The default (`FALSE`) keeps the previous behaviour.
+  (`single` is no longer forwarded to the `into` component as a prop.)
 * `useSearchParams()` gains a `defaultInit` argument, forwarded to the
   hook's native `defaultInit`: default values used for keys missing from
   the URL (e.g. `defaultInit = list(tab = "overview")`). They are not
-  written into the URL.
+  written into the URL. Repeated names (e.g. `c(tag = "a", tag = "b")`)
+  are combined into one multi-value key.
 * `useHref()` and `useResolvedPath()` gain a `relative` argument
   (`"route"` or `"path"`), forwarded as the hooks' `{ relative }` option.
   It controls whether `..` goes up one route level or one URL segment.
@@ -23,8 +25,9 @@
 
 ## Minor changes
 
-* An argument named `single` passed to `useSearchParams()` is no longer
-  forwarded to the `into` component as a prop.
+* `useViewTransitionState()` and `useLinkClickHandler()` now validate
+  `relative`, erroring on anything other than `NULL`, `"route"` or `"path"`
+  like `useHref()` and `useResolvedPath()`.
 
 # reactRouter 0.2.1
 

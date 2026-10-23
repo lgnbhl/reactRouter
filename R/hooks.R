@@ -226,17 +226,24 @@ useHookElement <- function(
   )
 }
 
-# Internal: validate a `relative` argument and wrap it as the `{ relative }`
-# options object passed to UseHook as `hookOpts`. NULL means "omit the
-# options", so React Router applies its own default ("route").
-relativeOpts <- function(label, relative) {
-  if (is.null(relative)) return(NULL)
+# Internal: validate a `relative` argument. NULL means "not set", so React
+# Router applies its own default ("route").
+validateRelative <- function(label, relative) {
+  if (is.null(relative)) return(invisible(NULL))
   if (!is.character(relative) || length(relative) != 1 || !relative %in% c("route", "path")) {
     stop(
       sprintf('%s(): `relative` must be NULL, "route" or "path".', label),
       call. = FALSE
     )
   }
+  invisible(relative)
+}
+
+# Internal: validate `relative` and wrap it as the `{ relative }` options
+# object passed to UseHook as `hookOpts` (NULL omits the options).
+relativeOpts <- function(label, relative) {
+  validateRelative(label, relative)
+  if (is.null(relative)) return(NULL)
   list(relative = relative)
 }
 
@@ -615,7 +622,8 @@ useMatches <- function(
 #'   Defaults to \code{FALSE}.
 #' @param defaultInit Optional default search params, used for any key the
 #'   URL does not contain. Either a named list or named character vector
-#'   (e.g. \code{list(tab = "overview", tag = c("a", "b"))}), or a single
+#'   (e.g. \code{list(tab = "overview", tag = c("a", "b"))}; repeated names
+#'   such as \code{c(tag = "a", tag = "b")} are combined), or a single
 #'   query string (e.g. \code{"tab=overview"}). Defaults are only read, not
 #'   written into the URL. React Router captures them on first render, so
 #'   later changes to \code{defaultInit} are ignored.
@@ -678,7 +686,15 @@ normalizeDefaultInit <- function(defaultInit) {
       call. = FALSE
     )
   }
-  lapply(as.list(defaultInit), as.character)
+  # Repeated names (e.g. c(tag = "a", tag = "b")) would become duplicate
+  # JSON keys, of which only the last survives, so merge them into one
+  # string-array value per key.
+  vals <- lapply(as.list(defaultInit), as.character)
+  keys <- unique(nms)
+  stats::setNames(
+    lapply(keys, function(k) unlist(vals[nms == k], use.names = FALSE)),
+    keys
+  )
 }
 
 #' useHref
@@ -756,12 +772,18 @@ useResolvedPath <- function(
 #'
 #' \url{https://api.reactrouter.com/v7/functions/react-router.useFormAction.html}
 #'
-#' Calls the \code{useFormAction()} hook and injects the resolved form action
-#' URL \code{as} a prop of the \code{into} component (e.g.
-#' \code{as = "action"} on a \code{<form>}). This is the URL a
-#' \code{\link{Form}} in the current route would submit to, so use it to
-#' build a custom form or submit button that targets a route's
-#' \code{action}. Must be used inside a \code{\link{Route}}.
+#' Calls the \code{useFormAction()} hook and passes the resolved form action
+#' URL to \code{render} (or injects it \code{as} a prop of \code{into}).
+#' This is the URL a \code{\link{Form}} in the current route would submit
+#' to. Must be used inside a \code{\link{Route}}.
+#'
+#' The URL is a router path, not a server URL: injecting it as the
+#' \code{action} of a plain HTML \code{<form>} makes the browser POST to the
+#' Shiny server and reload the page, bypassing the route's \code{action}
+#' (and, with a hash router, it lacks the \code{#}). To submit to a route
+#' action from custom UI, pass the URL to \code{submit()} from
+#' \code{\link{useSubmit}} or to \code{fetcher.submit()} from
+#' \code{\link{useFetcher}} as the \code{action} option.
 #'
 #' @inheritParams hook-wrapper-noselector
 #' @inheritParams useHref
@@ -772,12 +794,11 @@ useResolvedPath <- function(
 #'
 #' @examples
 #' \dontrun{
-#' # A plain <form> that posts to the "edit" child route's action
-#' useFormAction(
-#'   tags$form(method = "post", tags$button("Save")),
-#'   as = "action",
-#'   action = "edit"
-#' )
+#' # Show where a Form in this route would submit to
+#' useFormAction(tags$code(), action = "edit")
+#'
+#' # Store it on a custom element, e.g. for a JS handler that calls submit()
+#' useFormAction(tags$div(class = "editor"), as = "data-action", action = "edit")
 #' }
 #'
 #' @rdname useFormAction
@@ -1277,6 +1298,7 @@ useViewTransitionState <- function(
     stop('useViewTransitionState(): `to` is required (the destination path being transitioned to).', call. = FALSE)
   }
   validateTarget("useViewTransitionState", into, render)
+  validateRelative("useViewTransitionState", relative)
   customHookElement(
     "useViewTransitionState",
     as = as,
@@ -1336,6 +1358,7 @@ useLinkClickHandler <- function(
     stop('useLinkClickHandler(): `to` is required (the destination path).', call. = FALSE)
   }
   validateFunctionTarget("useLinkClickHandler", into, render, as, onClickSafe = TRUE)
+  validateRelative("useLinkClickHandler", relative)
   customHookElement(
     "useLinkClickHandler",
     as = as,

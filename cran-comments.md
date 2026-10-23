@@ -1,8 +1,10 @@
 ## Submission
 
-This is a patch release. It updates the bundled JavaScript dependencies
-(`react-router-dom` 7.15.0 -> 7.18.2) and the build toolchain, and rebuilds
-`inst/reactRouter/react-router-dom.js`. There are no changes to the R API.
+This is a minor release. It adds two exported functions, `useBeforeUnload()`
+and `useFormAction()`, and new optional arguments to `useSearchParams()`
+(`single`, `defaultInit`), `useHref()` and `useResolvedPath()` (`relative`).
+Existing behaviour is unchanged. `inst/reactRouter/react-router-dom.js` is
+rebuilt to include the new hooks.
 
 ## Test environments
 

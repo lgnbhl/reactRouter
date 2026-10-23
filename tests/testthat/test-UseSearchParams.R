@@ -71,6 +71,14 @@ test_that("useSearchParams() validates `defaultInit`", {
   expect_no_error(
     reactRouter::useSearchParams(htmltools::tags$span(), defaultInit = c(tab = "a"))
   )
+  expect_equal(
+    reactRouter:::normalizeDefaultInit(c(tag = "a", tab = "x", tag = "b")),
+    list(tag = c("a", "b"), tab = "x")
+  )
+  expect_equal(
+    reactRouter:::normalizeDefaultInit(list(tag = "a", tag = c("b", "c"))),
+    list(tag = c("a", "b", "c"))
+  )
   for (bad in list(c("a", "b"), list("a"), list(), 1, c(tab = "a", "b"))) {
     expect_error(
       reactRouter::useSearchParams(htmltools::tags$span(), defaultInit = bad),
